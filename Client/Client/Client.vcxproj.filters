@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Event">
+      <UniqueIdentifier>{8c903655-3a16-48e4-82c9-e84a12e46536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{7f22f07d-5c4e-4fc7-bd91-19d39fd1678a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{f2a6c875-35f6-42ed-8664-98b04b9ef669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stdafx">
+      <UniqueIdentifier>{3d6ec14a-7c0b-4674-b1ce-ff721d7cb55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{02c987dc-b9bd-4d7a-91c2-ffc1a08995ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependence">
+      <UniqueIdentifier>{4ec8b57e-f058-428d-a9fd-3f8c53db1e3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{531135bc-4f8c-41f6-bb7e-926eb23ea8af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{94e1d383-b5fe-46e8-9e33-a694305dacbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\glsl">
+      <UniqueIdentifier>{cbe0fbff-af68-45f9-a307-6006edd4d43a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Obj">
+      <UniqueIdentifier>{59f210bd-0f5a-4346-a529-8eaa7a04fc7f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="KeyboardEvent.cpp">
+      <Filter>Event</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <Filter>stdafx</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\glad\src\glad.c">
+      <Filter>Dependence</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KeyboardEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>stdafx</Filter>
+    </ClInclude>
+    <ClInclude Include="SUNKUE.h" />
+    <ClInclude Include="System.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.hpp">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Shader\background.vert">
+      <Filter>Shader\glsl</Filter>
+    </None>
+    <None Include="Resource\Shader\background.frag">
+      <Filter>Shader\glsl</Filter>
+    </None>
+    <None Include="Resource\Shader\obj.frag">
+      <Filter>Shader\glsl</Filter>
+    </None>
+    <None Include="Resource\Shader\obj.vert">
+      <Filter>Shader\glsl</Filter>
+    </None>
+  </ItemGroup>
+</Project>
