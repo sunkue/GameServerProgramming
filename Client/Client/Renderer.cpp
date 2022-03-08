@@ -88,14 +88,14 @@ void Renderer::init()
 
 void Renderer::load_shader()
 {
-	vector<string> VS; VS.emplace_back("./Resource/Shader/background.vert"sv);
-	vector<string> FS; FS.emplace_back("./Resource/Shader/background.frag"sv);
+	vector<string> VS; VS.emplace_back("./Resource/Shader/background.vert");
+	vector<string> FS; FS.emplace_back("./Resource/Shader/background.frag");
 	vector<string> GS;
 
 	bg_shader = Shader::create(VS, FS, GS);
 
-	VS.clear(); VS.emplace_back("./Resource/Shader/obj.vert"sv);
-	FS.clear(); FS.emplace_back("./Resource/Shader/obj.frag"sv);
+	VS.clear(); VS.emplace_back("./Resource/Shader/obj.vert");
+	FS.clear(); FS.emplace_back("./Resource/Shader/obj.frag");
 	GS.clear();
 	obj_shader = Shader::create(VS, FS, GS);
 }

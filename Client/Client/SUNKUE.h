@@ -1,25 +1,14 @@
 #pragma once
 /*
-* This is sunkue's utility hpp. almost JJamBBong. didn't subdivided.
-* sunkue@kakao.com //  korean // yoon_sunkue.
-*
-
 */
 
-#include <concepts>
-#include <type_traits>
 #include <string>
 #include <iostream>
 #include <string_view>
-#include <ranges>
-#include <thread>
-#include <any>
-#include <random>
-#include <thread>
 #include <chrono>
-#include <future>
-#include <condition_variable>
-#include <queue>
+#include <map>
+#include <functional>
+
 #define MY_NAME_SPACE SUNKUE
 
 #ifndef NONAMESPACE
@@ -73,37 +62,9 @@ namespace MY_NAME_SPACE
 }
 
 
-
-
 //	CHRONO
 namespace MY_NAME_SPACE
 {
 	using clk = std::chrono::high_resolution_clock;
 	using namespace std::chrono;
-	using namespace std::literals::string_view_literals;
-
-	namespace timer {
-		class TIMER {
-		public:
-			static TIMER& get() {
-				static TIMER instance_;
-				return instance_;
-			}
-
-			void start() noexcept {
-				_stop_watch = clk::now();
-			}
-
-			void end(std::string_view mess = ""sv, std::ostream& os = std::cout) {
-				auto t = clk::now();
-				_lap = duration_cast<milliseconds>(t - _stop_watch);
-				os << mess << " : " << _lap << std::endl;
-			}
-
-			const milliseconds get_last_lap() const noexcept { return _lap; }
-		private:
-			clk::time_point _stop_watch;
-			milliseconds _lap{};
-		};
-	}
 }

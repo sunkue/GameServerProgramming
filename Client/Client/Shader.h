@@ -18,8 +18,8 @@ public:
 		vector<string> VS;
 		vector<string> FS;
 		vector<string> GS;
-		VS.clear(); VS.emplace_back("./Shader/test_vertex.glsl"sv);
-		FS.clear(); FS.emplace_back("./Shader/default_fragment.glsl"sv);
+		VS.clear(); VS.emplace_back("./Shader/test_vertex.glsl");
+		FS.clear(); FS.emplace_back("./Shader/default_fragment.glsl");
 		GS.clear(); 
 		static ShaderPtr basic = Shader::create(VS, FS, GS);
 		return basic;

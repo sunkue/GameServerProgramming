@@ -9,10 +9,12 @@ public:
 
 	struct key_event
 	{
+		key_event(int key, int code, int action, int modifiers, clk::time_point time_of_event)
+			:key{ key }, code{ code }, action{ action }, modifiers{ modifiers }, time_of_event{ time_of_event }{};
 		int key, code, action, modifiers;
 		clk::time_point time_of_event;
 	};
-	
+
 	using key = int;
 	using action = int;
 	// main_func return true if wanna don't call other keyfunctions with the key.
@@ -29,7 +31,7 @@ private:
 
 public:
 	void KeyBoard(GLFWwindow* window, int key, int code, int action, int modifiers);
-	
+
 	void BindKeyFunc(key key, key_func func);
 	void BindMainKeyFunc(main_key_func func);
 

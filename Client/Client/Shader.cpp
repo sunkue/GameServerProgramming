@@ -6,7 +6,7 @@ Shader::Shader(vector<string>& filenameVS, vector<string>& filenameFS, vector<st
 
 /// //////////////////////////////////////////////
 
-bool read_file(string_view filename, std::string& target)
+bool read_file(string& filename, string& target)
 {
 	std::ifstream file(filename.data());
 	if (file.fail())

@@ -46,5 +46,5 @@ void main()
 	vec4 color = texture(u_texture, tex);
 	if( color.a < 0.1) discard;
 
-	FragColor = texture(u_texture, tex) + vec4(0.1f);
+	FragColor = color + vec4(0.1f);
 }
