@@ -35,6 +35,18 @@
     <Filter Include="Obj">
       <UniqueIdentifier>{59f210bd-0f5a-4346-a529-8eaa7a04fc7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Obj\Player">
+      <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Obj\Obj">
+      <UniqueIdentifier>{453c32b5-d86c-4c1d-bd47-4a300d801421}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Share">
+      <UniqueIdentifier>{21587028-6169-420c-966d-ed8eb5456c34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{056e85f1-68fc-46e7-8ff9-716c3bc72b06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
@@ -62,8 +74,17 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Texture</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Obj\Player</Filter>
+    </ClCompile>
     <ClCompile Include="Obj.cpp">
-      <Filter>Obj</Filter>
+      <Filter>Obj\Obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Networker.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Share\SocketUtil.cpp">
+      <Filter>Share</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,7 +94,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>stdafx</Filter>
     </ClInclude>
-    <ClInclude Include="SUNKUE.h" />
     <ClInclude Include="System.h">
       <Filter>System</Filter>
     </ClInclude>
@@ -95,8 +115,35 @@
     <ClInclude Include="stb_image.h">
       <Filter>Texture</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Obj\Player</Filter>
+    </ClInclude>
     <ClInclude Include="Obj.h">
-      <Filter>Obj</Filter>
+      <Filter>Obj\Obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Networker.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Protocol.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\PacketZip.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Share.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Defines.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Includes.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SUNKUE.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SocketUtil.h">
+      <Filter>Share</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

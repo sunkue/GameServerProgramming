@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Obj.h"
+#include "Player.h"
 
 class Game
 {
-	SINGLE_TON(Game) :n_{ 8 } 
+	SINGLE_TON(Game)
 	{
 		player_ = make_shared<Player>();
 		objs_.emplace_back(player_);
@@ -22,6 +23,7 @@ public:
 
 public:
 	GET(n);
+	SET(n);
 	GET(objs);
 	GET(player);
 

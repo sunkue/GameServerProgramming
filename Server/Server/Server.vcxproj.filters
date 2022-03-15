@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="stdafx">
+      <UniqueIdentifier>{5e3c7237-5c67-4b19-a18f-aaa02f132b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Share">
+      <UniqueIdentifier>{5c46630b-2a79-47f9-9974-4a1da3bc0921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{ad18a53c-692a-40f6-a13b-10a6eee5f6e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server\ClientSession">
+      <UniqueIdentifier>{aba14d36-326b-4103-b5fb-0e6fb80cf5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{df4043e3-5060-420c-812d-2593148c1023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameLogic">
+      <UniqueIdentifier>{c3871234-ca3f-4f60-8a34-a1177af14947}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj">
+      <UniqueIdentifier>{11af24d2-537f-4990-8b5a-3c85b3009f2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Player">
+      <UniqueIdentifier>{ee324b9a-a523-4b9f-b1f1-2461f8f250b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameBoard">
+      <UniqueIdentifier>{3c9e4144-c38e-4a94-b421-192ea9b701ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>stdafx</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Server.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLogic.cpp">
+      <Filter>Game\GameLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientSession.cpp">
+      <Filter>Server\ClientSession</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Share\SocketUtil.cpp">
+      <Filter>Share</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj.cpp">
+      <Filter>Game\Obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="GameBoard.cpp">
+      <Filter>Game\GameBoard</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>stdafx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Defines.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Includes.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\PacketZip.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Protocol.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\Share.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SUNKUE.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLogic.h">
+      <Filter>Game\GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSession.h">
+      <Filter>Server\ClientSession</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SocketUtil.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\enum.h">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj.h">
+      <Filter>Game\Obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GameBoard.h">
+      <Filter>Game\GameBoard</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

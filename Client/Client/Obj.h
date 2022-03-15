@@ -23,9 +23,7 @@ public:
 	Obj(OBJ_TYPE type, glm::vec2 pos = glm::vec2(0)) :type_{ type }, pos_{ pos } {};
 
 public:
-	bool move(glm::vec2 diff) noexcept;
-
-public:
+	SET(pos);
 	GET(pos);
 	GET(type);
 
@@ -34,40 +32,3 @@ private:
 	OBJ_TYPE type_;
 };
 
-#include "KeyboardEvent.h"
-
-class Player : public Obj
-{
-public:
-	Player(glm::vec2 pos = glm::vec2(0)) :Obj{ OBJ_TYPE::Wknight,pos } {};
-
-	bool process_input(const KEY_BOARD_EVENT_MANAGER::key_event& key)
-	{
-		bool pressed = (key.action != GLFW_RELEASE);
-		if (pressed)
-		{
-			switch (key.key)
-			{
-			case GLFW_KEY_UP: case GLFW_KEY_W:
-			{
-				move({ 0,-1 });
-			}
-			CASE GLFW_KEY_DOWN : case GLFW_KEY_S:
-			{
-				move({ 0, 1 });
-			}
-			CASE GLFW_KEY_LEFT : case GLFW_KEY_A:
-			{
-				move({ -1, 0 });
-			}
-			CASE GLFW_KEY_RIGHT : case GLFW_KEY_D:
-			{
-				move({ 1, 0 });
-			}
-			break; default: return false;
-			}
-		}
-
-		return true;
-	}
-};

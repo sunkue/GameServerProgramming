@@ -3,6 +3,7 @@
 #include "System.h"
 #include "Game.h"
 #include "Renderer.h"
+#include "Networker.h"
 
 void DoNextFrame()
 {
@@ -58,12 +59,17 @@ int main()
 	System::get().window = window;
 
 	BindDefaultInputFuncs();
+	
+	thread NetwokerThread{ &Networker::start_recv, &Networker::get() };
 
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
 		DoNextFrame();
 	}
+
+	Networker::get().stop();
+	NetwokerThread.join();
 
 	glfwTerminate();
 }
