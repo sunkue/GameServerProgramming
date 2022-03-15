@@ -10,7 +10,8 @@ class Networker
 		SOCKADDR_IN server_addr; ZeroMemory(&server_addr, sizeof(server_addr));
 		server_addr.sin_family = AF_INET;
 		server_addr.sin_port = htons(SERVER_PORT);
-		inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
+		string sever_ip; cout << "서버 IP를 입력하세요 :: "; cin >> sever_ip;
+		inet_pton(AF_INET, sever_ip.c_str(), &server_addr.sin_addr);
 		ret = WSAConnect(socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr), nullptr, nullptr, nullptr, nullptr);
 		SocketUtil::CheckError(ret);
 	}
