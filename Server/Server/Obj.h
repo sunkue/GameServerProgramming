@@ -10,6 +10,7 @@ public:
 
 public:
 	GET(pos);
+	SET(pos);
 
 private:
 	glm::vec2 pos_;

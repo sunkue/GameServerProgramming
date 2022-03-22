@@ -28,6 +28,7 @@ BETTER_ENUM
 
 	, SC_NONE = 100
 	, SC_HI
+	, SC_READY
 	, SC_SET_POSITION
 
 );
@@ -53,17 +54,28 @@ PACKET(none)
 
 PACKET(cs_hi)
 {
-	
 };
 
 PACKET(sc_hi)
 {
+	NetID id;
 	uint8 n;
+};
+
+PACKET(sc_ready)
+{
+
+};
+
+PACKET(sc_copy_maps)
+{
+
 };
 
 PACKET(sc_set_position)
 {
-	Net::nt<uint8, 2> pos; 
+	NetID id;
+	Net::nt<uint8, 2> pos;
 };
 
 enum class move_oper : uint8

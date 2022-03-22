@@ -5,6 +5,8 @@
 
 void SocketUtil::DisplayError(int err, std::wostream& wos)
 {
+	if (ERROR_IO_PENDING == err)return;
+
 	TCHAR* w_msg = nullptr;
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
@@ -12,7 +14,6 @@ void SocketUtil::DisplayError(int err, std::wostream& wos)
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		reinterpret_cast<LPTSTR>(&w_msg), 0, nullptr);
 	MessageBox(nullptr, reinterpret_cast<LPTSTR>(w_msg), nullptr, MB_ICONERROR);
-	//wos.imbue(std::locale("korean"));
 	wos << w_msg << std::endl;
 	LocalFree(w_msg);
 }
@@ -20,7 +21,6 @@ void SocketUtil::DisplayError(int err, std::wostream& wos)
 void SocketUtil::terminate()
 {
 	DisplayError(WSAGetLastError());
-	exit(-1);
 }
 
 void SocketUtil::CheckError(int ret_val)

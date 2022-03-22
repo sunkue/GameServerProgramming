@@ -3,13 +3,13 @@
 #include "GameBoard.h"
 #include "Server.h"
 
-bool GameLogic::move(NetID id, move_oper oper)
+bool GameLogic::move(ID id, move_oper oper)
 {
 	glm::vec2 diff{};
 
 	switch (oper)
 	{
-	case move_oper::up :
+	case move_oper::up:
 	{
 		diff = { 0,-1 };
 	}
@@ -23,9 +23,9 @@ bool GameLogic::move(NetID id, move_oper oper)
 	}
 	CASE move_oper::left :
 	{
-		diff = {-1, 0 };
+		diff = { -1, 0 };
 	}
 	}
-	
-	return players.at(id).move(diff);
+
+	return players[id].move(diff);
 }

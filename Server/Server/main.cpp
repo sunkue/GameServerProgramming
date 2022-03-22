@@ -3,6 +3,5 @@
 
 int main()
 {
-	Server::get().accept();
-	Server::get().do_recv();
+	Server::get().loop_accept();
 }

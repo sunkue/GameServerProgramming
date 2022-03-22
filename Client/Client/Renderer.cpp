@@ -70,11 +70,16 @@ void Renderer::draw()
 	obj_shader->set("u_focus_center", focus_center);
 	obj_shader->set("u_raw_col", Game::get().get_n());
 
-	for (const auto& obj : Game::get().get_objs())
+	auto draw_obj = [&](const Obj& obj)
 	{
-		obj_shader->set("u_type", int(obj->get_type()));
-		obj_shader->set("u_position", obj->get_pos());
+		obj_shader->set("u_type", int(obj.get_type()));
+		obj_shader->set("u_position", obj.get_pos());
 		ScreenQuad::get().draw_quad();
+	};
+
+	for (const auto& other : Game::get().get_players())
+	{
+		draw_obj(other.second);
 	}
 }
 

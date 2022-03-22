@@ -2,23 +2,33 @@
 #include "ClientSession.h"
 #include "Server.h"
 
+EXPOVERLAPPED::EXPOVERLAPPED(const void* const packet)
+{
+	send_wsabuf.buf = send_buf.data();
+	send_wsabuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
+	memcpy(send_wsabuf.buf, packet, send_wsabuf.len);
+}
+
+///////////////////////////////////////////////////////////
+
 void ClientSession::do_recv()
 {
-	WSABUF mybuf; mybuf.buf = recv_buf.data(); mybuf.len = static_cast<ULONG>(recv_buf.size());
-	DWORD recv_byte, recv_flag = 0;
-	cout << "RC" << endl;
-	int ret = WSARecv(socket, &mybuf, 1, &recv_byte, &recv_flag, 0, 0);
-	cout << "[ " << (int)id << " ] Sent [" << recv_byte << " bytes]" << endl;
+	recv_buf.fill(NULL);
+	ZeroMemory(&recv_over, sizeof(WSAOVERLAPPED));
+	recv_over.hEvent = reinterpret_cast<HANDLE>(id_);
+	DWORD recv_flag = 0;
+	int ret = WSARecv(socket, &recv_wsabuf, 1, nullptr, &recv_flag, &recv_over, Server::cb_recv);
 	SocketUtil::CheckError(ret);
-	Server::get().process_packet(id, recv_buf.data());
-	// recv_buf.fill(0);
 }
 
 void ClientSession::do_send(const void* const packet)
 {
-	WSABUF mybuf; mybuf.buf = reinterpret_cast<char*>(const_cast<void*>(packet));
-	mybuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
-	DWORD sent_byte;
-	int ret = WSASend(socket, &mybuf, 1, &sent_byte, 0, 0, 0);
+	EXPOVERLAPPED* over = new EXPOVERLAPPED(packet);
+	
+	over->send_over.hEvent = reinterpret_cast<HANDLE>(id_);
+	
+	int ret = WSASend(socket, &over->send_wsabuf, 1, nullptr, 0, &over->send_over, Server::cb_send);
 	SocketUtil::CheckError(ret);
 }
+
+

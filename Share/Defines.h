@@ -16,8 +16,9 @@ using uint64 = uint64_t;
 
 //====================================
 
-using NetID = uint8;
+using NetID = SOCKET;
 using packet_size_t = uint8;
+using ID = SOCKET;
 
 //====================================
 
@@ -25,7 +26,7 @@ const auto SERVER_IP = "127.0.0.1";
 const uint16_t SERVER_PORT = 8282;
 
 //====================================
-const int MAX_PLAYER = 1;
+const int MAX_PLAYER = 10;
 const int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max() + 1;
 const int MAX_BUFFER_SIZE = MAX_PACKET_SIZE;
 static_assert(MAX_PACKET_SIZE <= MAX_BUFFER_SIZE, "Net Buffer could overflow");

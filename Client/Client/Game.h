@@ -5,30 +5,21 @@
 
 class Game
 {
-	SINGLE_TON(Game)
-	{
-		player_ = make_shared<Player>();
-		objs_.emplace_back(player_);
-
-		KEY_BOARD_EVENT_MANAGER::get().BindMainKeyFunc(
-			[this](const KEY_BOARD_EVENT_MANAGER::key_event& key)->bool
-			{ return player_->process_input(key); });
-	};
+	SINGLE_TON(Game) = default;
 
 public:
-	void update()
-	{
-		
-	}
-
+	void update();
+	void init();
 public:
 	GET(n);
 	SET(n);
-	GET(objs);
-	GET(player);
+	GET(id);
+	SET(id);
+	GET_REF_UNSAFE(players);
 
 private:
-	int n_;
-	shared_ptr<Player> player_;
-	vector<shared_ptr<Obj>> objs_;
+	int n_{};
+private:
+	ID id_{};
+	unordered_map<ID, Player> players_;
 };

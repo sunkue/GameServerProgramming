@@ -13,18 +13,28 @@ void DoNextFrame()
 	Game::get().update();
 	Renderer::get().draw();
 
+	SleepEx(0, true);
+
 	glfwPollEvents();
 	glfwSwapBuffers(System::get().window);
 }
 
 void BindDefaultInputFuncs()
 {
+	glfwSetFramebufferSizeCallback(System::get().window,
+		[](GLFWwindow* window, int w, int h)
+		{});
+
+	glfwSetKeyCallback(System::get().window,
+		[](GLFWwindow* window, int key, int code, int action, int modifiers)
+		{ KEY_BOARD_EVENT_MANAGER::get().KeyBoard(window, key, code, action, modifiers);  });
+
 
 }
 
 int main()
 {
-	thread NetwokerThread{ &Networker::start_recv, &Networker::get() };
+	Networker::get().start();
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -49,28 +59,20 @@ int main()
 		return -1;
 	}
 
-
-	glfwSetFramebufferSizeCallback(window,
-		[](GLFWwindow* window, int w, int h)
-		{  });
-	
-	glfwSetKeyCallback(window,
-		[](GLFWwindow* window, int key, int code, int action, int modifiers)
-		{ KEY_BOARD_EVENT_MANAGER::get().KeyBoard(window, key, code, action, modifiers);  });
-
 	System::get().window = window;
 
 	BindDefaultInputFuncs();
-	
+
+	while (false == Networker::get().get_ready())
+	{
+		SleepEx(0, true);
+	}
 
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
 		DoNextFrame();
 	}
-
-	Networker::get().stop();
-	NetwokerThread.join();
 
 	glfwTerminate();
 }
