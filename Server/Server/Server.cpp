@@ -43,7 +43,6 @@ void Server::process_packet(SOCKET id, const void* const packet)
 
 			for (auto& c : clients)
 			{
-				cout << clients.size() << endl;
 				auto other_id = c.first;
 				auto pos = game.get_position(other_id);
 				sc_set_position other_pos;
@@ -63,7 +62,6 @@ void Server::process_packet(SOCKET id, const void* const packet)
 			{
 				sc_ready ready;
 				SND2ME(&ready);
-				cout << "ready" << endl;
 			}
 
 		}
@@ -109,15 +107,25 @@ void Server::loop_accept()
 {
 	INT addr_size = sizeof(server_addr);
 
-	for (SOCKET new_socket;;)
+	for (SOCKET new_socket; ;)
 	{
 		new_socket = WSAAccept(socket, reinterpret_cast<sockaddr*>(&server_addr), &addr_size, 0, 0);
 		SocketUtil::CheckError(new_socket);
+
+		if (MAX_PLAYER <= clients.size())
+		{
+			cout << "Clients Full [" << clients.size() << "]" << endl;
+			int res = ::closesocket(new_socket);
+			SocketUtil::CheckError(res);
+			continue;
+		}
+
 		char tcp_opt = 1;
 		int res = ::setsockopt(new_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&tcp_opt, sizeof(tcp_opt));
 		SocketUtil::CheckError(res);
 
 		clients.try_emplace(new_socket, new_socket);
+		cout << "[ " << clients.size() << " ] on_line" << endl;
 		clients[new_socket].do_recv();
 	}
 }
@@ -129,6 +137,7 @@ void Server::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD 
 	auto socket = reinterpret_cast<SOCKET>(over->hEvent);
 	auto& clients = Server::get().clients;
 	auto& client = clients[socket];
+
 	if (0 == transfered)
 	{
 		cout << " Client Disconnected" << endl;
@@ -136,7 +145,30 @@ void Server::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD 
 		return;
 	}
 
-	Server::get().process_packet(socket, client.recv_buf.data());
+	auto pck_start = client.recv_buf.data();
+	auto remain_bytes = transfered + client.prerecv_size;
+
+	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+		need_bytes <= remain_bytes;)
+	{
+		Server::get().process_packet(socket, pck_start);
+
+		pck_start += need_bytes;
+		remain_bytes -= need_bytes;
+		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+
+		if (0 == remain_bytes)
+		{
+			break;
+		}
+	}
+
+	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);
+
+	if (0 != remain_bytes)
+	{
+		memmove(client.recv_buf.data(), pck_start, remain_bytes);
+	}
 
 	client.do_recv();
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 class Networker
 {
 	SINGLE_TON(Networker);
@@ -21,7 +22,8 @@ private:
 
 private:
 	SOCKET socket;
-	bool ready_ = false;
+	bool ready_{ false };
+	packet_size_t prerecv_size{};
 	array<char, MAX_BUFFER_SIZE> recv_buf{};
 };
 

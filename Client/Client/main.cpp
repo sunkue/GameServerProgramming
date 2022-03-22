@@ -65,6 +65,11 @@ int main()
 
 	while (false == Networker::get().get_ready())
 	{
+		if (glfwWindowShouldClose(window))
+		{
+			break;
+		}
+
 		SleepEx(0, true);
 	}
 

@@ -14,6 +14,7 @@ class ClientSession
 public:
 	ClientSession(SOCKET s) :socket{ s } { recv_wsabuf.buf = recv_buf.data(); recv_wsabuf.len = static_cast<ULONG>(recv_buf.size()); };
 	ClientSession() = default;
+	~ClientSession();
 
 public:
 	void do_recv();
@@ -26,6 +27,7 @@ private:
 		SOCKET socket;
 		ID id_;
 	};
+	packet_size_t prerecv_size{};
 	WSABUF recv_wsabuf{};
 	WSAOVERLAPPED recv_over{};
 	array<char, MAX_BUFFER_SIZE> recv_buf{};

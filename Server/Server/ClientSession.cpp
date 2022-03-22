@@ -11,6 +11,20 @@ EXPOVERLAPPED::EXPOVERLAPPED(const void* const packet)
 
 ///////////////////////////////////////////////////////////
 
+ClientSession::~ClientSession()
+{
+	// 필요없을지도
+	int res = ::closesocket(socket);
+	SocketUtil::CheckError(res);
+
+	sc_remove_obj remove;
+	remove.id = socket;
+	for (auto& c : Server::get().clients)
+	{
+		c.second.do_send(&remove);
+	}
+};
+
 void ClientSession::do_recv()
 {
 	recv_buf.fill(NULL);
@@ -24,9 +38,9 @@ void ClientSession::do_recv()
 void ClientSession::do_send(const void* const packet)
 {
 	EXPOVERLAPPED* over = new EXPOVERLAPPED(packet);
-	
+
 	over->send_over.hEvent = reinterpret_cast<HANDLE>(id_);
-	
+
 	int ret = WSASend(socket, &over->send_wsabuf, 1, nullptr, 0, &over->send_over, Server::cb_send);
 	SocketUtil::CheckError(ret);
 }

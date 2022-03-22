@@ -30,7 +30,7 @@ BETTER_ENUM
 	, SC_HI
 	, SC_READY
 	, SC_SET_POSITION
-
+	, SC_REMOVE_OBJ
 );
 
 
@@ -67,15 +67,15 @@ PACKET(sc_ready)
 
 };
 
-PACKET(sc_copy_maps)
-{
-
-};
-
 PACKET(sc_set_position)
 {
 	NetID id;
 	Net::nt<uint8, 2> pos;
+};
+
+PACKET(sc_remove_obj)
+{
+	NetID id;
 };
 
 enum class move_oper : uint8
