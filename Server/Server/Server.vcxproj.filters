@@ -11,12 +11,6 @@
     <Filter Include="Share">
       <UniqueIdentifier>{5c46630b-2a79-47f9-9974-4a1da3bc0921}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Server">
-      <UniqueIdentifier>{ad18a53c-692a-40f6-a13b-10a6eee5f6e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Server\ClientSession">
-      <UniqueIdentifier>{aba14d36-326b-4103-b5fb-0e6fb80cf5ac}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game">
       <UniqueIdentifier>{df4043e3-5060-420c-812d-2593148c1023}</UniqueIdentifier>
     </Filter>
@@ -32,20 +26,32 @@
     <Filter Include="Game\GameBoard">
       <UniqueIdentifier>{3c9e4144-c38e-4a94-b421-192ea9b701ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{ad18a53c-692a-40f6-a13b-10a6eee5f6e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\ClientSession">
+      <UniqueIdentifier>{aba14d36-326b-4103-b5fb-0e6fb80cf5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\ListenSocket">
+      <UniqueIdentifier>{b9db6618-7e6d-4d79-9346-8c2ff26f2693}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Server">
+      <UniqueIdentifier>{f5f060f3-a918-477f-9bca-d9dd3ec5ad62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\ExpOverlapped">
+      <UniqueIdentifier>{1dffceda-928a-4a03-b294-c1414ff38dfa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>stdafx</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Server.cpp">
-      <Filter>Server</Filter>
-    </ClCompile>
     <ClCompile Include="GameLogic.cpp">
       <Filter>Game\GameLogic</Filter>
     </ClCompile>
     <ClCompile Include="ClientSession.cpp">
-      <Filter>Server\ClientSession</Filter>
+      <Filter>Network\ClientSession</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Share\SocketUtil.cpp">
       <Filter>Share</Filter>
@@ -58,6 +64,18 @@
     </ClCompile>
     <ClCompile Include="GameBoard.cpp">
       <Filter>Game\GameBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="ListenSocket.cpp">
+      <Filter>Network\ListenSocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>Network\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ExpOverlapped.cpp">
+      <Filter>Network\ExpOverlapped</Filter>
+    </ClCompile>
+    <ClCompile Include="Server-processpacket.cpp">
+      <Filter>Network\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,14 +100,11 @@
     <ClInclude Include="..\..\Share\SUNKUE.h">
       <Filter>Share</Filter>
     </ClInclude>
-    <ClInclude Include="Server.h">
-      <Filter>Server</Filter>
-    </ClInclude>
     <ClInclude Include="GameLogic.h">
       <Filter>Game\GameLogic</Filter>
     </ClInclude>
     <ClInclude Include="ClientSession.h">
-      <Filter>Server\ClientSession</Filter>
+      <Filter>Network\ClientSession</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Share\SocketUtil.h">
       <Filter>Share</Filter>
@@ -105,6 +120,15 @@
     </ClInclude>
     <ClInclude Include="GameBoard.h">
       <Filter>Game\GameBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>Network\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="ListenSocket.h">
+      <Filter>Network\ListenSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="ExpOverlapped.h">
+      <Filter>Network\ExpOverlapped</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -63,13 +63,8 @@ int main()
 
 	BindDefaultInputFuncs();
 
-	while (false == Networker::get().get_ready())
+	while (false == Networker::get().get_ready() && !glfwWindowShouldClose(window))
 	{
-		if (glfwWindowShouldClose(window))
-		{
-			break;
-		}
-
 		SleepEx(0, true);
 	}
 

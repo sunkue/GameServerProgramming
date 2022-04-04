@@ -1,161 +1,79 @@
 #include "stdafx.h"
 #include "Server.h"
-#include "ClientSession.h"
-#include "GameLogic.h"
-#include "GameBoard.h"
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
-void Server::process_packet(SOCKET id, const void* const packet)
-{
-	auto SND2ME = [this, id](const void* const packet)
-	{
-		clients[id].do_send(packet);
-	};
-
-	auto SND2OTHERS = [this, id](const void* const packet)
-	{
-		for (auto& c : clients)
-		{
-			if (c.second.get_id() != id) { c.second.do_send(packet); }
-		}
-	};
-
-	auto SND2EVERY = [this](const void* const packet)
-	{
-		for (auto& c : clients)
-		{
-			c.second.do_send(packet);
-		}
-	};
-
-	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
-	switch (packet_type)
-	{
-		CASE PACKET_TYPE::CS_HI :
-		{
-			{
-				sc_hi hi;
-				hi.n = GameBoard::get().get_n();
-				hi.id = NetID(id);
-				SND2ME(&hi);
-			}
-
-			for (auto& c : clients)
-			{
-				auto other_id = c.first;
-				auto pos = game.get_position(other_id);
-				sc_set_position other_pos;
-				other_pos.id = NetID(other_id); /////
-				other_pos.pos = decltype(other_pos.pos)::encode(pos);
-				SND2ME(&other_pos);
-			}
-
-			{
-				sc_set_position set_pos;
-				set_pos.id = NetID(id); /////
-				auto pos = game.get_position(id);
-				set_pos.pos = decltype(set_pos.pos)::encode(pos);
-				SND2EVERY(&set_pos);
-			}
-
-			{
-				sc_ready ready;
-				SND2ME(&ready);
-			}
-
-		}
-		CASE PACKET_TYPE::CS_INPUT :
-		{
-			auto pck = reinterpret_cast<const cs_input*>(packet);
-			if (game.move(id, pck->input))
-			{
-				sc_set_position set_pos;
-				auto pos = game.get_position(id);
-				set_pos.id = NetID(id); /////
-				set_pos.pos = decltype(set_pos.pos)::encode(pos);
-				SND2EVERY(&set_pos);
-			}
-		}
-	break; default: break;
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
 
 Server::Server()
 {
-	WSADATA WSAData; int ret = WSAStartup(MAKEWORD(2, 2), &WSAData); SocketUtil::CheckError(ret);
-	socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	ZeroMemory(&server_addr, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	ret = ::bind(socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	SocketUtil::CheckError(ret);
-
-	ret = listen(socket, SOMAXCONN);
-	SocketUtil::CheckError(ret);
+	WSADATA WSAData; int ret = ::WSAStartup(MAKEWORD(2, 2), &WSAData); SocketUtil::CheckError(ret);
+	iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+	ListenSocket::get().init(iocp);
+	ListenSocket::get().do_accept();
+	clients.reserve(MAX_PLAYER);
 }
 
 Server::~Server()
 {
-	WSACleanup();
+	::WSACleanup();
 }
 
-void Server::loop_accept()
+/////////////////////////////////////////////////////////////
+
+void Server::ProcessQueuedCompleteOperationLoop()
 {
-	INT addr_size = sizeof(server_addr);
-
-	for (SOCKET new_socket; ;)
+	while (true)
 	{
-		new_socket = WSAAccept(socket, reinterpret_cast<sockaddr*>(&server_addr), &addr_size, 0, 0);
-		SocketUtil::CheckError(new_socket);
+		DWORD returned_bytes; ID id; EXPOVERLAPPED* exover{};
+	//	cerr << "GQCSTART::";
+		auto res = GetQueuedCompletionStatus(iocp, &returned_bytes, reinterpret_cast<PULONG_PTR>(&id), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
+	//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
-		if (MAX_PLAYER <= clients.size())
+		if (FALSE == res) [[unlikely]]
 		{
-			cout << "Clients Full [" << clients.size() << "]" << endl;
-			int res = ::closesocket(new_socket);
-			SocketUtil::CheckError(res);
+			cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
+			if (0 == returned_bytes)
+			{
+				clients[id].do_disconnect();
+			}
 			continue;
+		};
+
+		switch (exover->op)
+		{
+		case COMP_OP::OP_RECV: OnRecvComplete(id, returned_bytes); break;
+		case COMP_OP::OP_SEND: OnSendComplete(id, exover); break;
+		case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
+		case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(id, exover); break;
+		default: cerr << "[[[??]]]" << endl; break;
 		}
-
-		char tcp_opt = 1;
-		int res = ::setsockopt(new_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&tcp_opt, sizeof(tcp_opt));
-		SocketUtil::CheckError(res);
-
-		clients.try_emplace(new_socket, new_socket);
-		cout << "[ " << clients.size() << " ] on_line" << endl;
-		clients[new_socket].do_recv();
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void Server::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD flag)
+void Server::OnRecvComplete(ID id, DWORD transfered)
 {
-	auto socket = reinterpret_cast<SOCKET>(over->hEvent);
-	auto& clients = Server::get().clients;
-	auto& client = clients[socket];
+//	cerr << "recv" << endl;
+	auto& client = clients[id];
 
+	/*
 	if (0 == transfered)
 	{
 		cout << " Client Disconnected" << endl;
 		clients.erase(client.socket);
 		return;
 	}
+	*/
 
-	auto pck_start = client.recv_buf.data();
+	auto pck_start = client.recv_over.buf.data();
 	auto remain_bytes = transfered + client.prerecv_size;
 
 	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 		need_bytes <= remain_bytes;)
 	{
-		Server::get().process_packet(socket, pck_start);
+		process_packet(id, pck_start);
 
 		pck_start += need_bytes;
 		remain_bytes -= need_bytes;
-		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start); // 허위 정보가 들어갈 수 있으나, 그땐 remain_bytes 가 0 이기에 괜찮다.
 
 		if (0 == remain_bytes)
 		{
@@ -167,17 +85,50 @@ void Server::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD 
 
 	if (0 != remain_bytes)
 	{
-		memmove(client.recv_buf.data(), pck_start, remain_bytes);
+		memmove(client.recv_over.buf.data(), pck_start, remain_bytes);
 	}
 
 	client.do_recv();
 }
 
-void Server::cb_send(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD flag)
+void Server::OnSendComplete(ID id, EXPOVERLAPPED* exover)
 {
-	auto& clients = Server::get().clients;
-	auto& client = clients[reinterpret_cast<SOCKET>(over->hEvent)];
-	auto exover = reinterpret_cast<EXPOVERLAPPED*>(over);
-	auto pck = reinterpret_cast<const packet_base<void>*>(&exover->send_buf);
+	//cerr << "send" << endl;
+	/*
+	auto& client = clients[id];
+
+	if (transfered != exover->wsabuf.len)
+	{
+		client.do_disconnect();
+	}
+	*/
 	delete exover;
 }
+
+void Server::OnAcceptComplete(EXPOVERLAPPED* exover)
+{
+	SOCKET new_socket = *reinterpret_cast<SOCKET*>(exover->buf.data());
+	//cerr << "aceept::"<< new_socket << endl;
+
+	if (MAX_PLAYER <= clients.size()) [[unlikely]]
+	{
+		cerr << "Clients Full [" << clients.size() << "]" << endl;
+		int res = ::closesocket(new_socket);
+		SocketUtil::CheckError(res);
+	}
+	else
+	{
+		::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, new_socket, 0);
+		clients.try_emplace(new_socket, new_socket);
+		cerr << "[ " << clients.size() << " ] on_line" << endl;
+		clients[new_socket].do_recv();
+	}
+
+	ListenSocket::get().do_accept();
+}
+
+void Server::OnDisconnectComplete(ID id, EXPOVERLAPPED* exover)
+{
+	clients.erase(id);
+}
+

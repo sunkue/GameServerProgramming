@@ -23,6 +23,11 @@ void SocketUtil::terminate()
 	DisplayError(WSAGetLastError());
 }
 
+void SocketUtil::CheckErrorEx(BOOL ret_val)
+{
+	if (FALSE == ret_val) { terminate(); }
+}
+
 void SocketUtil::CheckError(int ret_val)
 {
 	if (SOCKET_SUCCESS != ret_val) { terminate(); }

@@ -33,7 +33,8 @@ BETTER_ENUM
 	, SC_REMOVE_OBJ
 );
 
-
+// 가용길이 패킷 
+// FIXED_PACKET // DYNAMIC_PACKET => chat, 맵 로딩 등,,,
 
 #pragma pack (push, 1)
 //================ BASE ================

@@ -3,5 +3,5 @@
 
 int main()
 {
-	Server::get().loop_accept();
+	Server::get().ProcessQueuedCompleteOperationLoop();
 }
