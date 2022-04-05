@@ -12,14 +12,14 @@ namespace SUNKUE_NET
 	constexpr auto float_precision1 = 1;
 	constexpr auto float_precision2 = 2;
 
-	template<class Ty_, size_t N>
+	template<class compressedT, size_t N>
 	struct nt
 	{
-		std::array<Ty_, N> data;
+		std::array<compressedT, N> data;
 
-		using this_type = nt<Ty_, N>;
-		template<class T> inline static nt<Ty_, N> encode(const T& var);
-		template<class T> inline static T decode(const nt<Ty_, N>& var);
+		using this_type = nt<compressedT, N>;
+		template<class originT> inline static nt<compressedT, N> encode(const originT& var);
+		template<class originT> inline static originT decode(const nt<compressedT, N>& var);
 	};
 };
 

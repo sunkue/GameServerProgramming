@@ -28,14 +28,14 @@ ClientSession::~ClientSession()
 		c.second.do_send(&remove);
 	}
 
-	cerr << "diconnect::" << (int)id << "::" << endl;
+	cerr << "diconnect::" << id << "::" << endl;
 	int res = ::closesocket(socket);
 	SocketUtil::CheckError(res);
 };
 
 void ClientSession::do_recv()
 {
-	ZeroMemory(&recv_over, sizeof(WSAOVERLAPPED));
+	ZeroMemory(&recv_over.over, sizeof(WSAOVERLAPPED));
 	recv_over.wsabuf.buf = recv_over.buf.data() + prerecv_size;
 	recv_over.wsabuf.len = sizeof(recv_over.buf) - prerecv_size;
 	DWORD recv_flag = 0;

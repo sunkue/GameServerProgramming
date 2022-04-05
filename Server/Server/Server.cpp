@@ -80,7 +80,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 			break;
 		}
 	}
-
+	
 	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);
 
 	if (0 != remain_bytes)
@@ -108,7 +108,9 @@ void Server::OnSendComplete(ID id, EXPOVERLAPPED* exover)
 void Server::OnAcceptComplete(EXPOVERLAPPED* exover)
 {
 	SOCKET new_socket = *reinterpret_cast<SOCKET*>(exover->buf.data());
-	//cerr << "aceept::"<< new_socket << endl;
+	ID id = new_socket;
+
+	cerr << "accept ::" << id << endl;
 
 	if (MAX_PLAYER <= clients.size()) [[unlikely]]
 	{
@@ -118,10 +120,10 @@ void Server::OnAcceptComplete(EXPOVERLAPPED* exover)
 	}
 	else
 	{
-		::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, new_socket, 0);
-		clients.try_emplace(new_socket, new_socket);
+		::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
+		clients.try_emplace(id, new_socket);
 		cerr << "[ " << clients.size() << " ] on_line" << endl;
-		clients[new_socket].do_recv();
+		clients[id].do_recv();
 	}
 
 	ListenSocket::get().do_accept();

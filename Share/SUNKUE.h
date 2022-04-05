@@ -25,7 +25,7 @@ namespace MY_NAME_SPACE
         public:											\
             CLASS(const CLASS&) = delete;				\
             CLASS& operator=(const CLASS&) = delete;
-	
+
 #define SINGLE_TON(CLASS)								\
 		DISABLE_COPY(CLASS)								\
 		public:											\
@@ -59,8 +59,9 @@ namespace MY_NAME_SPACE
 			{ enabler(Arg&&...arg) :CLASS(std::forward<Arg>(arg)...) {} };	\
 			return std::make_unique<enabler>(std::forward<Arg>(arg)...);	\
 		}
-}
 
+	template<class> constexpr bool always_false = false;
+}
 
 //	CHRONO
 namespace MY_NAME_SPACE

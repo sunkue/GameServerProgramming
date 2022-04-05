@@ -15,7 +15,7 @@
 template<class T>
 inline void Shader::set(const string& uniform_var, const T& value)const
 {
-	static_assert(sizeof(T) == 0, "Shader::set T&, come to Shader.hpp and specialize template for type.");
+	static_assert(always_false<T>, "Shader::set T&, come to Shader.hpp and specialize template for type.");
 }
 
 /////////////////////////////////////////
@@ -80,4 +80,5 @@ set(uniform_var_name + ".power.specular", value->specular);
 
 #undef TEMPLATE_SHADER_SET
 #undef UNIFORM_LOCATION
+#undef UNIFORM_LOCATION_STRUCT
 #undef SET_LIGHT_POWER

@@ -31,5 +31,4 @@ void ListenSocket::do_accept()
 	DWORD received{};
 	auto res = ::AcceptEx(listen_socket, newface_socket, accept_buf.data(), 0, len, len, &received, &accept_over.over);
 	SocketUtil::CheckErrorEx(res);
-	cerr << "accept started, waiting for... ::" << newface_socket << endl;
 }
