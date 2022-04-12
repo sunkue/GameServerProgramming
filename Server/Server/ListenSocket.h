@@ -9,7 +9,7 @@ class ListenSocket
 private:
 	SOCKET listen_socket{};
 	SOCKET newface_socket{};
-	EXPOVERLAPPED accept_over{ COMP_OP::OP_ACCEPT };
+	ExpOverlapped accept_over{ COMP_OP::OP_ACCEPT };
 	array<char, 64> accept_buf{};
 public:
 	void init(HANDLE iocp);

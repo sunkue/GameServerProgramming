@@ -3,11 +3,13 @@
 
 Server::Server()
 {
+	for (int i = 0; i < clients.size(); i++)
+	{
+		clients[i].id = i;
+	}
+
 	WSADATA WSAData; int ret = ::WSAStartup(MAKEWORD(2, 2), &WSAData); SocketUtil::CheckError(ret);
 	iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
-	ListenSocket::get().init(iocp);
-	ListenSocket::get().do_accept();
-	clients.reserve(MAX_PLAYER);
 }
 
 Server::~Server()
@@ -21,10 +23,11 @@ void Server::ProcessQueuedCompleteOperationLoop()
 {
 	while (true)
 	{
-		DWORD returned_bytes; ID id; EXPOVERLAPPED* exover{};
-	//	cerr << "GQCSTART::";
+		DWORD returned_bytes{}; ID id{}; ExpOverlapped* exover{};
+		//	cerr << "GQCSTART::";
 		auto res = GetQueuedCompletionStatus(iocp, &returned_bytes, reinterpret_cast<PULONG_PTR>(&id), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
-	//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
+		//	cout << this_thread::get_id() << endl;
+		//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
 		if (FALSE == res) [[unlikely]]
 		{
@@ -47,13 +50,18 @@ void Server::ProcessQueuedCompleteOperationLoop()
 	}
 }
 
+void Server::StartAccept()
+{
+	ListenSocket::get().init(iocp);
+	ListenSocket::get().do_accept();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void Server::OnRecvComplete(ID id, DWORD transfered)
 {
-//	cerr << "recv" << endl;
+	//	cerr << "recv" << endl;
 	auto& client = clients[id];
-
 	/*
 	if (0 == transfered)
 	{
@@ -80,7 +88,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 			break;
 		}
 	}
-	
+
 	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);
 
 	if (0 != remain_bytes)
@@ -91,7 +99,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 	client.do_recv();
 }
 
-void Server::OnSendComplete(ID id, EXPOVERLAPPED* exover)
+void Server::OnSendComplete(ID id, ExpOverlapped* exover)
 {
 	//cerr << "send" << endl;
 	/*
@@ -105,32 +113,57 @@ void Server::OnSendComplete(ID id, EXPOVERLAPPED* exover)
 	delete exover;
 }
 
-void Server::OnAcceptComplete(EXPOVERLAPPED* exover)
+ID Server::get_free_id()
+{
+	for (ID i = 0; i < clients.size(); i++)
+	{
+		auto expect = SESSION_STATE::FREE;
+		if (clients[i].state.compare_exchange_strong(expect, SESSION_STATE::ACCEPTED))
+		{
+			return i;
+		}
+	}
+
+	cerr << "NO FREE ID" << endl;
+	return -1;
+}
+
+void Server::OnAcceptComplete(ExpOverlapped* exover)
 {
 	SOCKET new_socket = *reinterpret_cast<SOCKET*>(exover->buf.data());
-	ID id = new_socket;
+	ID id = get_free_id();
+	__analysis_assume(id == 0);
 
-	cerr << "accept ::" << id << endl;
-
-	if (MAX_PLAYER <= clients.size()) [[unlikely]]
+	if (-1 == id) [[unlikely]]
 	{
 		cerr << "Clients Full [" << clients.size() << "]" << endl;
 		int res = ::closesocket(new_socket);
 		SocketUtil::CheckError(res);
 	}
-	else
-	{
-		::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
-		clients.try_emplace(id, new_socket);
-		cerr << "[ " << clients.size() << " ] on_line" << endl;
-		clients[id].do_recv();
-	}
+
+	cerr << "accept ::" << id << endl;
+
+	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
+	clients[id].init(new_socket);
+//	cerr << "[ " << clients.size() << " ] on_line" << endl;
+	clients[id].do_recv();
 
 	ListenSocket::get().do_accept();
 }
 
-void Server::OnDisconnectComplete(ID id, EXPOVERLAPPED* exover)
+void Server::OnDisconnectComplete(ID id, ExpOverlapped* exover)
 {
-	clients.erase(id);
+	sc_remove_obj remove;
+	remove.id = id;
+	for (auto& c : clients)
+	{
+		c.do_send(&remove);
+	}
+
+	cerr << "diconnect::" << id << "::" << endl;
+	int res = ::closesocket(clients[id].socket);
+	SocketUtil::CheckError(res);
 }
+
+
 

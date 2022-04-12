@@ -73,7 +73,6 @@ void Networker::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWO
 	{
 		memmove(nw.recv_buf.data(), pck_start, remain_bytes);
 	}
-
 	nw.do_recv();
 }
 

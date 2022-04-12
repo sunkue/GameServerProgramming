@@ -2,7 +2,7 @@
 #include "ClientSession.h"
 #include "Server.h"
 
-EXPOVERLAPPED::EXPOVERLAPPED(COMP_OP op, const void* const packet)
+ExpOverlapped::ExpOverlapped(COMP_OP op, const void* const packet)
 	: op{ op }
 {
 	wsabuf.buf = buf.data();
@@ -10,7 +10,7 @@ EXPOVERLAPPED::EXPOVERLAPPED(COMP_OP op, const void* const packet)
 	memcpy(wsabuf.buf, packet, wsabuf.len);
 }
 
-EXPOVERLAPPED::EXPOVERLAPPED(COMP_OP op)
+ExpOverlapped::ExpOverlapped(COMP_OP op)
 	: op{ op }
 {
 	wsabuf.buf = buf.data();
@@ -21,20 +21,18 @@ EXPOVERLAPPED::EXPOVERLAPPED(COMP_OP op)
 
 ClientSession::~ClientSession()
 {
-	sc_remove_obj remove;
-	remove.id = id;
-	for (auto& c : Server::get().get_clients())
-	{
-		c.second.do_send(&remove);
-	}
 
-	cerr << "diconnect::" << id << "::" << endl;
-	int res = ::closesocket(socket);
-	SocketUtil::CheckError(res);
 };
+
+void ClientSession::init(SOCKET s)
+{
+	socket = s;
+}
 
 void ClientSession::do_recv()
 {
+	if (IsFree())
+		return;
 	ZeroMemory(&recv_over.over, sizeof(WSAOVERLAPPED));
 	recv_over.wsabuf.buf = recv_over.buf.data() + prerecv_size;
 	recv_over.wsabuf.len = sizeof(recv_over.buf) - prerecv_size;
@@ -45,7 +43,9 @@ void ClientSession::do_recv()
 
 void ClientSession::do_send(const void* const packet)
 {
-	EXPOVERLAPPED* over = new EXPOVERLAPPED{ COMP_OP::OP_SEND, packet };
+	if (IsFree())
+		return;
+	ExpOverlapped* over = new ExpOverlapped{ COMP_OP::OP_SEND, packet };
 	int ret = ::WSASend(socket, &over->wsabuf, 1, nullptr, 0, &over->over, nullptr);
 	SocketUtil::CheckError(ret);
 }
@@ -53,6 +53,9 @@ void ClientSession::do_send(const void* const packet)
 
 void ClientSession::do_disconnect()
 {
-	auto exover = new EXPOVERLAPPED{ COMP_OP::OP_DISCONNECT };
+	if (IsFree())
+		return;
+	state = SESSION_STATE::FREE;
+	auto exover = new ExpOverlapped{ COMP_OP::OP_DISCONNECT };
 	PostQueuedCompletionStatus(Server::get().get_iocp(), 0, id, &exover->over);
 }

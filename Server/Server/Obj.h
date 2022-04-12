@@ -11,7 +11,13 @@ public:
 public:
 	GET(pos);
 	SET(pos);
-
+	GET(name);
+	SET(name);
+	
 private:
 	glm::vec2 pos_;
+	string name_;
+
+public:
+	shared_mutex m{}; // MyLock 가져와서 쓰자.
 };

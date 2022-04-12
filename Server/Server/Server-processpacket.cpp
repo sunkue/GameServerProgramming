@@ -14,9 +14,9 @@ void Server::process_packet(ID id, const void* const packet)
 
 	auto SND2OTHERS = [this, id](const void* const packet)
 	{
-		for (auto& c : clients)
+		for (int i = 0; i < clients.size(); i++)
 		{
-			if (c.second.id != id) { c.second.do_send(packet); }
+			if (i != id) { clients[i].do_send(packet); }
 		}
 	};
 
@@ -24,7 +24,7 @@ void Server::process_packet(ID id, const void* const packet)
 	{
 		for (auto& c : clients)
 		{
-			c.second.do_send(packet);
+			c.do_send(packet);
 		}
 	};
 
@@ -40,12 +40,13 @@ void Server::process_packet(ID id, const void* const packet)
 				SND2ME(&hi);
 			}
 
-			for (auto& c : clients)
+			for (int i = 0; i < clients.size(); i++)
 			{
-				auto other_id = c.first;
-				auto pos = GameLogic::get().get_position(other_id);
+				if (clients[i].IsFree())
+					continue;
+				auto pos = GameLogic::get().get_position(i);
 				sc_set_position other_pos;
-				other_pos.id = NetID(other_id); /////
+				other_pos.id = NetID(i); /////
 				other_pos.pos = decltype(other_pos.pos)::encode(pos);
 				SND2ME(&other_pos);
 			}

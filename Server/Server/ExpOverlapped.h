@@ -9,10 +9,10 @@ enum class COMP_OP : int8
 	OP_DISCONNECT
 };
 
-struct EXPOVERLAPPED
+struct ExpOverlapped
 {
-	EXPOVERLAPPED(COMP_OP op, const void* const packet);
-	explicit EXPOVERLAPPED(COMP_OP op);
+	ExpOverlapped(COMP_OP op, const void* const packet);
+	explicit ExpOverlapped(COMP_OP op);
 	WSAOVERLAPPED over{};
 	WSABUF wsabuf{};
 	array<char, MAX_BUFFER_SIZE> buf{};
