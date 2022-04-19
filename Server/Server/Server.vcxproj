@@ -157,6 +157,7 @@
     <ClInclude Include="ListenSocket.h" />
     <ClInclude Include="Obj.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="RingBuffer.hpp" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

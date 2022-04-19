@@ -130,5 +130,6 @@
     <ClInclude Include="ExpOverlapped.h">
       <Filter>Network\ExpOverlapped</Filter>
     </ClInclude>
+    <ClInclude Include="RingBuffer.hpp" />
   </ItemGroup>
 </Project>

@@ -60,7 +60,6 @@ void Server::StartAccept()
 
 void Server::OnRecvComplete(ID id, DWORD transfered)
 {
-	//	cerr << "recv" << endl;
 	auto& client = clients[id];
 	/*
 	if (0 == transfered)
@@ -70,6 +69,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		return;
 	}
 	*/
+
 
 	auto pck_start = client.recv_over.buf.data();
 	auto remain_bytes = transfered + client.prerecv_size;
@@ -81,7 +81,8 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 
 		pck_start += need_bytes;
 		remain_bytes -= need_bytes;
-		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start); // 허위 정보가 들어갈 수 있으나, 그땐 remain_bytes 가 0 이기에 괜찮다.
+		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+		// 허위 정보가 들어갈 수 있으나, 그땐 remain_bytes 가 0 이기에 괜찮다.
 
 		if (0 == remain_bytes)
 		{
@@ -145,7 +146,7 @@ void Server::OnAcceptComplete(ExpOverlapped* exover)
 
 	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
 	clients[id].init(new_socket);
-//	cerr << "[ " << clients.size() << " ] on_line" << endl;
+	//	cerr << "[ " << clients.size() << " ] on_line" << endl;
 	clients[id].do_recv();
 
 	ListenSocket::get().do_accept();

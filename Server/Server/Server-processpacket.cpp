@@ -7,6 +7,7 @@
 
 void Server::process_packet(ID id, const void* const packet)
 {
+	// conditional funtion => 함수객체 전달해서 처리.
 	auto SND2ME = [this, id](const void* const packet)
 	{
 		clients[id].do_send(packet);

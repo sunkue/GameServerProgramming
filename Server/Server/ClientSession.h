@@ -1,6 +1,7 @@
 #pragma once
 
 #include"ExpOverlapped.h"
+#include "RingBuffer.hpp"
 
 enum class SESSION_STATE : int8
 {
