@@ -18,7 +18,7 @@ using uint64 = uint64_t;
 
 using ID = int;
 using NetID = ID; // nt<type,1> :: ID
-using packet_size_t = uint8;
+using packet_size_t = uint8; //  need to be unsigned
 
 //====================================
 
@@ -28,6 +28,6 @@ const uint16_t SERVER_PORT = 8282;
 //====================================
 const int MAX_PLAYER = 10;
 static_assert(MAX_PLAYER < std::numeric_limits<ID>::max(), "Player ID could overflow");
-const int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max();
-const int MAX_BUFFER_SIZE = MAX_PACKET_SIZE + 1;
+const int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max() + 1;
+const int MAX_BUFFER_SIZE = MAX_PACKET_SIZE;
 static_assert(MAX_PACKET_SIZE <= MAX_BUFFER_SIZE, "Net Buffer could overflow");

@@ -9,12 +9,26 @@ enum class COMP_OP : int8
 	OP_DISCONNECT
 };
 
-struct ExpOverlapped
+struct ExpOverlappedBasic
+{
+	ExpOverlappedBasic(COMP_OP op) :op{ op } {};
+	WSAOVERLAPPED over{};
+	WSABUF wsabuf{};
+	COMP_OP op;
+};
+
+struct ExpOverlapped : ExpOverlappedBasic
 {
 	ExpOverlapped(COMP_OP op, const void* const packet);
 	explicit ExpOverlapped(COMP_OP op);
-	WSAOVERLAPPED over{};
-	WSABUF wsabuf{};
-	array<char, MAX_BUFFER_SIZE> buf{};
-	COMP_OP op;
+	array<std::byte, MAX_PACKET_SIZE> buf{};
+};
+
+#include "RingBuffer.hpp"
+
+struct RecvExpOverlapped : ExpOverlappedBasic
+{
+	RecvExpOverlapped();
+	RecvRingBuffer<25> ring_buf{};
+	//RecvRingBuffer<MAX_BUFFER_SIZE> ring_buf{};
 };

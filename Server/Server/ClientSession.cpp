@@ -2,20 +2,7 @@
 #include "ClientSession.h"
 #include "Server.h"
 
-ExpOverlapped::ExpOverlapped(COMP_OP op, const void* const packet)
-	: op{ op }
-{
-	wsabuf.buf = buf.data();
-	wsabuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
-	memcpy(wsabuf.buf, packet, wsabuf.len);
-}
 
-ExpOverlapped::ExpOverlapped(COMP_OP op)
-	: op{ op }
-{
-	wsabuf.buf = buf.data();
-	wsabuf.len = static_cast<ULONG>(MAX_BUFFER_SIZE);
-}
 
 ///////////////////////////////////////////////////////////
 
@@ -34,8 +21,8 @@ void ClientSession::do_recv()
 	if (IsFree())
 		return;
 	ZeroMemory(&recv_over.over, sizeof(WSAOVERLAPPED));
-	recv_over.wsabuf.buf = recv_over.buf.data() + prerecv_size;
-	recv_over.wsabuf.len = sizeof(recv_over.buf) - prerecv_size;
+	recv_over.wsabuf.buf = reinterpret_cast<CHAR*>(recv_over.ring_buf.end());
+	recv_over.wsabuf.len = recv_over.ring_buf.bytes_to_recv();
 	DWORD recv_flag = 0;
 	int res = ::WSARecv(socket, &recv_over.wsabuf, 1, 0, &recv_flag, &recv_over.over, nullptr);
 	SocketUtil::CheckError(res);

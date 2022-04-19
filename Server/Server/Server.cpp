@@ -27,7 +27,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 		//	cerr << "GQCSTART::";
 		auto res = GetQueuedCompletionStatus(iocp, &returned_bytes, reinterpret_cast<PULONG_PTR>(&id), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
 		//	cout << this_thread::get_id() << endl;
-		//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
+	//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
 		if (FALSE == res) [[unlikely]]
 		{
@@ -69,13 +69,58 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		return;
 	}
 	*/
+	cerr << "[recv]" << endl;
+	auto& recvbuf = client.recv_over.ring_buf;
+	recvbuf.move_rear(transfered);
 
+	auto pck_start = recvbuf.begin();
+	auto remain_bytes = recvbuf.size();
 
+	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+		need_bytes <= remain_bytes && 0 < remain_bytes;)
+	{
+		// 링버퍼경계에 걸친 패킷
+		if (recvbuf.check_overflow_when_read(need_bytes))
+		{
+			cerr << "[RingBuffer]::CollideOnEdge" << endl;
+			// 미완성 패킷임
+			if (recvbuf.size() < need_bytes)
+			{
+				continue;
+			}
+
+			std::byte temp_packet[MAX_PACKET_SIZE];
+			auto packetsize1 = recvbuf.filled_edgespace();
+			memcpy(temp_packet, pck_start, packetsize1);
+			auto packetsize2 = need_bytes - packetsize1;
+			memcpy(temp_packet + packetsize1, &recvbuf, packetsize2);
+			pck_start = temp_packet;
+		}
+
+		process_packet(id, pck_start);
+		recvbuf.move_front(need_bytes);
+
+		pck_start = recvbuf.begin();
+		remain_bytes = recvbuf.size();
+		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
+	}
+
+	/*
+		일반배열	{recv-> memmove}
+		링버퍼	{recv-> move_rear, bytes_to_recv}
+				{processpacket -> move_front}
+				{move_front collide edge ? -> memcpy * 2}
+
+		성능비교를 해봐야 뭐가 더 좋을지 확신할 수 있겠음,,
+		패킷 대비 버퍼가 클 수록 링버퍼가 유리.
+	*/
+
+	/*
 	auto pck_start = client.recv_over.buf.data();
 	auto remain_bytes = transfered + client.prerecv_size;
 
 	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
-		need_bytes <= remain_bytes;)
+		need_bytes <= remain_bytes && 0 < remain_bytes;)
 	{
 		process_packet(id, pck_start);
 
@@ -83,11 +128,6 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		remain_bytes -= need_bytes;
 		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 		// 허위 정보가 들어갈 수 있으나, 그땐 remain_bytes 가 0 이기에 괜찮다.
-
-		if (0 == remain_bytes)
-		{
-			break;
-		}
 	}
 
 	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);
@@ -96,6 +136,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 	{
 		memmove(client.recv_over.buf.data(), pck_start, remain_bytes);
 	}
+	*/
 
 	client.do_recv();
 }

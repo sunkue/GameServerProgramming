@@ -4,9 +4,11 @@
 #include <array>
 
 template<size_t N, class Contanier = std::array<std::byte, N>>
-class RingBuffer : Contanier
+class RingBuffer : protected Contanier
 {
+	using value_type = Contanier::value_type;
 public:
+	value_type* data() { return &Contanier::operator[](begin_idx_); }
 	size_t size() const { return size_; }
 	size_t capacity() const { return Contanier::size(); }
 	size_t write(const void* _src, size_t bytes)
@@ -65,8 +67,49 @@ private:
 
 
 
+// 멤버함수로는 데이터복사등의 조작이 불가함. 데이터는 내비두고 캐럿만 변화시킴.
 template<size_t N, class Contanier = std::array<std::byte, N>>
-class RecvBuffer : RingBuffer<N, Contanier>
+class RecvRingBuffer : protected Contanier
 {
+	using value_type = Contanier::value_type;
+public:
+	value_type* begin() { return &Contanier::operator[](begin_idx_); }
+	value_type* end() { return &Contanier::operator[](end_idx_); }
+	size_t size() const { return size_; }
+	size_t capacity() const { return Contanier::size(); }
+	bool full() const { return capacity() == size(); }
+	size_t filled_edgespace() const { return capacity() - begin_idx_; }
+	size_t empty_edgespace() const { return capacity() - end_idx_; }
+	size_t bytes_to_recv() const
+	{
+		if (full()) [[unlikely]]
+			return 0;
 
+		if (end_idx_ < begin_idx_) [[unlikely]]
+			return begin_idx_ - end_idx_;
+
+		return empty_edgespace();
+	}
+	// write
+	void move_rear(size_t bytes)
+	{
+		auto capacity = this->capacity();
+		end_idx_ = (end_idx_ + bytes) % capacity;
+		size_ += bytes;
+	}
+	// read :: return true when overflowed
+	void move_front(size_t bytes)
+	{
+		auto capacity = this->capacity();
+		begin_idx_ = (begin_idx_ + bytes) % capacity;
+		size_ -= bytes;
+	}
+
+	bool check_overflow_when_read(size_t bytes) const
+	{
+		bool overflowed = filled_edgespace() < bytes;
+		return overflowed;
+	}
+private:
+	size_t begin_idx_{}, end_idx_{}, size_{};
 };

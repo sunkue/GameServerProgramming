@@ -80,6 +80,7 @@ void Server::process_packet(ID id, const void* const packet)
 		}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}
+	cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
