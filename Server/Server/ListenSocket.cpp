@@ -11,15 +11,16 @@ void ListenSocket::init(HANDLE iocp)
 	server_addr.sin_port = ::htons(SERVER_PORT);
 	server_addr.sin_addr.s_addr = ::htonl(INADDR_ANY);
 	auto res = ::bind(listen_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	SocketUtil::CheckError(res);
-	res = ::listen(listen_socket, SOMAXCONN); SocketUtil::CheckError(res);
+	SocketUtil::CheckError(res, "bind");
+	res = ::listen(listen_socket, SOMAXCONN);
+	SocketUtil::CheckError(res, "listen");
 	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(listen_socket), iocp, 0, 0);
 };
 
 ListenSocket::~ListenSocket()
 {
 	auto res = ::closesocket(listen_socket);
-	SocketUtil::CheckError(res);
+	SocketUtil::CheckError(res, "listen closesocket");
 }
 
 void ListenSocket::do_accept()
@@ -30,5 +31,5 @@ void ListenSocket::do_accept()
 	*reinterpret_cast<SOCKET*>(accept_over.buf.data()) = newface_socket;
 	DWORD received{};
 	auto res = ::AcceptEx(listen_socket, newface_socket, accept_buf.data(), 0, len, len, &received, &accept_over.over);
-	SocketUtil::CheckErrorEx(res);
+	SocketUtil::CheckErrorEx(res, "listen AcceptEx");
 }

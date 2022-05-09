@@ -19,6 +19,13 @@
 #include "Dependencies/GLFW/GLFW/glfw3.h"
 #include "Dependencies/GLFW/GLFW/glfw3native.h"
 
+#include "Dependencies/imgui/imgui.h"
+#include "Dependencies/imgui/imconfig.h"
+#include "Dependencies/imgui/imgui_impl_glfw.h"
+#include "Dependencies/imgui/imgui_impl_opengl3.h"
+
+#define gui ImGui
+
 #pragma warning(pop)
 
 #include <string>

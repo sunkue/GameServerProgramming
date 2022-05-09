@@ -20,22 +20,34 @@ void SocketUtil::DisplayError(int err, std::wostream& wos)
 
 void SocketUtil::terminate()
 {
-	DisplayError(WSAGetLastError());
+	//DisplayError(WSAGetLastError());
 }
 
-void SocketUtil::CheckErrorEx(BOOL ret_val)
+void SocketUtil::CheckErrorEx(BOOL ret_val, const char* msg)
 {
-	if (FALSE == ret_val) { terminate(); }
+	if (FALSE == ret_val)
+	{
+		if (ERROR_IO_PENDING == WSAGetLastError())return;
+		ReportError(msg); terminate();
+	}
 }
 
-void SocketUtil::CheckError(int ret_val)
+void SocketUtil::CheckError(int ret_val, const char* msg)
 {
-	if (SOCKET_SUCCESS != ret_val) { terminate(); }
+	if (SOCKET_SUCCESS != ret_val)
+	{
+		if (ERROR_IO_PENDING == WSAGetLastError())return;
+		ReportError(msg); terminate();
+	}
 }
 
-void SocketUtil::CheckError(const SOCKET& socket)
+void SocketUtil::CheckError(const SOCKET& socket, const char* msg)
 {
-	if (SOCKET_SUCCESS == socket) { terminate(); }
+	if (SOCKET_SUCCESS == socket)
+	{
+		if (ERROR_IO_PENDING == WSAGetLastError())return;
+		ReportError(msg); terminate();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////

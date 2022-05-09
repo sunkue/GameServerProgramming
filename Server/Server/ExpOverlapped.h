@@ -11,7 +11,7 @@ enum class COMP_OP : int8
 
 struct ExpOverlappedBasic
 {
-	ExpOverlappedBasic(COMP_OP op) :op{ op } {};
+	ExpOverlappedBasic(COMP_OP op) :op{ op } { ZeroMemory(&over, sizeof(over)); };
 	WSAOVERLAPPED over{};
 	WSABUF wsabuf{};
 	COMP_OP op;
@@ -29,6 +29,5 @@ struct ExpOverlapped : ExpOverlappedBasic
 struct RecvExpOverlapped : ExpOverlappedBasic
 {
 	RecvExpOverlapped();
-	RecvRingBuffer<25> ring_buf{};
-	//RecvRingBuffer<MAX_BUFFER_SIZE> ring_buf{};
+	RecvRingBuffer<MAX_BUFFER_SIZE> ring_buf{};
 };

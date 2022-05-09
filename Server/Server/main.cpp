@@ -15,8 +15,7 @@ int main()
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
 	for (int i = 0; i < workers.capacity(); i++)
 	{
-		workers.emplace_back([&]() { Server::get().ProcessQueuedCompleteOperationLoop(); });
+		workers.emplace_back([&]() { Server::get().ProcessQueuedCompleteOperationLoopEx(); });
 	}
-
 	Server::get().StartAccept();
 }

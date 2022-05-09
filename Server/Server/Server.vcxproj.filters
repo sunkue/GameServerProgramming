@@ -14,17 +14,11 @@
     <Filter Include="Game">
       <UniqueIdentifier>{df4043e3-5060-420c-812d-2593148c1023}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameLogic">
-      <UniqueIdentifier>{c3871234-ca3f-4f60-8a34-a1177af14947}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Obj">
       <UniqueIdentifier>{11af24d2-537f-4990-8b5a-3c85b3009f2e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Player">
       <UniqueIdentifier>{ee324b9a-a523-4b9f-b1f1-2461f8f250b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameBoard">
-      <UniqueIdentifier>{3c9e4144-c38e-4a94-b421-192ea9b701ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="Network">
       <UniqueIdentifier>{ad18a53c-692a-40f6-a13b-10a6eee5f6e0}</UniqueIdentifier>
@@ -41,15 +35,18 @@
     <Filter Include="Network\ExpOverlapped">
       <UniqueIdentifier>{1dffceda-928a-4a03-b294-c1414ff38dfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\RingBuffer">
+      <UniqueIdentifier>{d33a9614-a979-4f99-a9b6-7e3f6f8c6d10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\World">
+      <UniqueIdentifier>{95f8aa58-58f8-4e47-a8b1-64077dcfffae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>stdafx</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="GameLogic.cpp">
-      <Filter>Game\GameLogic</Filter>
-    </ClCompile>
     <ClCompile Include="ClientSession.cpp">
       <Filter>Network\ClientSession</Filter>
     </ClCompile>
@@ -62,9 +59,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game\Player</Filter>
     </ClCompile>
-    <ClCompile Include="GameBoard.cpp">
-      <Filter>Game\GameBoard</Filter>
-    </ClCompile>
     <ClCompile Include="ListenSocket.cpp">
       <Filter>Network\ListenSocket</Filter>
     </ClCompile>
@@ -76,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="Server-processpacket.cpp">
       <Filter>Network\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Game\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,12 +94,6 @@
     <ClInclude Include="..\..\Share\Share.h">
       <Filter>Share</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Share\SUNKUE.h">
-      <Filter>Share</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLogic.h">
-      <Filter>Game\GameLogic</Filter>
-    </ClInclude>
     <ClInclude Include="ClientSession.h">
       <Filter>Network\ClientSession</Filter>
     </ClInclude>
@@ -118,9 +109,6 @@
     <ClInclude Include="Player.h">
       <Filter>Game\Player</Filter>
     </ClInclude>
-    <ClInclude Include="GameBoard.h">
-      <Filter>Game\GameBoard</Filter>
-    </ClInclude>
     <ClInclude Include="Server.h">
       <Filter>Network\Server</Filter>
     </ClInclude>
@@ -130,6 +118,14 @@
     <ClInclude Include="ExpOverlapped.h">
       <Filter>Network\ExpOverlapped</Filter>
     </ClInclude>
-    <ClInclude Include="RingBuffer.hpp" />
+    <ClInclude Include="RingBuffer.hpp">
+      <Filter>Network\RingBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SUNKUE.hpp">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Game\World</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

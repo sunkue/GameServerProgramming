@@ -5,7 +5,7 @@ GLuint load_texture_file(const char* path, const string& directory);
 using TexturePtr = shared_ptr<struct Texture>;
 struct Texture
 {
-	CREATE_SHARED(TexturePtr, Texture);
+	CREATE_SHARED(Texture);
 
 	GLuint id;
 private:

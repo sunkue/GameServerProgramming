@@ -1,23 +1,27 @@
 #pragma once
 
-class Obj
+class StaticObj
 {
-public:
-	Obj(glm::vec2 pos = glm::vec2(0)) : pos_{ pos } {};
-
-public:
-	bool move(glm::vec2 diff);
-
 public:
 	GET(pos);
 	SET(pos);
-	GET(name);
-	SET(name);
-	
+	SET(enable);
+	GET_REF(enable);
+protected:
+	Position pos_{};
+	atomic_bool enable_{};
+	Position sector_{};
+};
+
+class DynamicObj : public StaticObj
+{
+public:
+	bool Move(Position diff);
 private:
-	glm::vec2 pos_;
-	string name_;
 
 public:
-	shared_mutex m{}; // MyLock 가져와서 쓰자.
+
+protected:
+	shared_mutex positionLock;
+private:
 };

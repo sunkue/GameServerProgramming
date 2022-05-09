@@ -27,8 +27,7 @@ private:
 	void load_texture();
 
 private:
-	bool start_with_dark{ false };
-	bool focus_center{ false };
+	bool focus_center{ true };
 	TexturePtr bg_tiles;
 	ShaderPtr bg_shader;
 

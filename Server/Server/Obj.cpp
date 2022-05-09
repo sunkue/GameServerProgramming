@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #include "Obj.h"
-#include "GameBoard.h"
+#include "World.h"
 
-bool Obj::move(glm::vec2 diff)
+bool DynamicObj::Move(const Position diff)
 {
+	unique_lock lck(positionLock);
+
 	pos_ += diff;
 
-	auto n = GameBoard::get().get_n();
-	if (n <= pos_.x || pos_.x < 0 || n <= pos_.y || pos_.y < 0)
+	if (pos_.x < 0 || MAP_SIZE <= pos_.x || pos_.y < 0 || MAP_SIZE <= pos_.y)
 	{
 		pos_ -= diff;
 		return false;
 	}
 
-	return true;;
+	return true;
 }

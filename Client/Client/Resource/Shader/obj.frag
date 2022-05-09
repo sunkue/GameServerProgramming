@@ -7,7 +7,7 @@ uniform bool u_focus_center;
 uniform int u_raw_col;
 
 uniform int u_type = 18; //[0,19]
-uniform vec2 u_position = vec2(2, 1);
+uniform vec2 u_position;
 
 in vec2 texcoord;
 

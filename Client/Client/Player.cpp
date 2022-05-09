@@ -2,9 +2,10 @@
 #include "Player.h"
 #include "NetWorker.h"
 
-bool Player::process_input(const KEY_BOARD_EVENT_MANAGER::key_event& key)
+bool Player::ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key)
 {
 	bool pressed = (key.action != GLFW_RELEASE);
+
 	if (pressed)
 	{
 		switch (key.key)
@@ -39,3 +40,5 @@ bool Player::process_input(const KEY_BOARD_EVENT_MANAGER::key_event& key)
 
 	return true;
 }
+
+

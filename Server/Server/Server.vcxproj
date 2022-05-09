@@ -149,11 +149,10 @@
     <ClInclude Include="..\..\Share\Protocol.h" />
     <ClInclude Include="..\..\Share\Share.h" />
     <ClInclude Include="..\..\Share\SocketUtil.h" />
-    <ClInclude Include="..\..\Share\SUNKUE.h" />
+    <ClInclude Include="..\..\Share\SUNKUE.hpp" />
     <ClInclude Include="ClientSession.h" />
     <ClInclude Include="ExpOverlapped.h" />
-    <ClInclude Include="GameBoard.h" />
-    <ClInclude Include="GameLogic.h" />
+    <ClInclude Include="World.h" />
     <ClInclude Include="ListenSocket.h" />
     <ClInclude Include="Obj.h" />
     <ClInclude Include="Player.h" />
@@ -167,8 +166,7 @@
     </ClCompile>
     <ClCompile Include="ClientSession.cpp" />
     <ClCompile Include="ExpOverlapped.cpp" />
-    <ClCompile Include="GameBoard.cpp" />
-    <ClCompile Include="GameLogic.cpp" />
+    <ClCompile Include="World.cpp" />
     <ClCompile Include="ListenSocket.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Obj.cpp" />

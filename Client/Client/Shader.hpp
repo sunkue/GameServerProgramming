@@ -46,6 +46,12 @@ TEMPLATE_SHADER_SET(v6mat4)
 	glUniformMatrix4fv(UNIFORM_LOCATION, 6, GL_FALSE, glm::value_ptr(value.front()));
 }
 
+TEMPLATE_SHADER_SET(Position)
+{
+	glm::vec2 tmp(value.x, value.y);
+	glUniform2fv(UNIFORM_LOCATION, 1, glm::value_ptr(tmp));
+}
+
 TEMPLATE_SHADER_SET(glm::vec2)
 {
 	glUniform2fv(UNIFORM_LOCATION, 1, glm::value_ptr(value));

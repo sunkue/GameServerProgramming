@@ -5,6 +5,8 @@
 #include "Renderer.h"
 #include "Networker.h"
 
+void DrawGui();
+
 void DoNextFrame()
 {
 	KEY_BOARD_EVENT_MANAGER::get().ProcessInput();
@@ -15,8 +17,27 @@ void DoNextFrame()
 
 	SleepEx(0, true);
 
+	DrawGui();
+
 	glfwPollEvents();
 	glfwSwapBuffers(System::get().window);
+}
+
+void DrawGui()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	gui::NewFrame();
+	gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	auto pos = Game::get().GetPlayer().get_pos();
+	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
+	// HP x/x
+	// LEVEL 
+	// EXP x/x
+	gui::End();
+
+	gui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
 }
 
 void BindDefaultInputFuncs()
@@ -63,6 +84,18 @@ int main()
 
 	BindDefaultInputFuncs();
 
+	{
+		IMGUI_CHECKVERSION();
+		gui::CreateContext();
+
+		ImGuiIO& io = gui::GetIO();
+
+		gui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init("#version 450");
+	}
+
+
 	while (false == Networker::get().get_ready() && !glfwWindowShouldClose(window))
 	{
 		SleepEx(0, true);
@@ -72,6 +105,13 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		DoNextFrame();
+	}
+
+
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		gui::DestroyContext();
 	}
 
 	glfwTerminate();

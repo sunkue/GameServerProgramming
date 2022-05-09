@@ -47,6 +47,12 @@
     <Filter Include="Network">
       <UniqueIdentifier>{056e85f1-68fc-46e7-8ff9-716c3bc72b06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gui">
+      <UniqueIdentifier>{bb6008c1-7161-49a4-9fc4-560bc4c33d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gui\imgui">
+      <UniqueIdentifier>{d6014188-722f-42ec-a351-5b7b5ba952be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
@@ -85,6 +91,30 @@
     </ClCompile>
     <ClCompile Include="..\..\Share\SocketUtil.cpp">
       <Filter>Share</Filter>
+    </ClCompile>
+    <ClCompile Include="Networker_processpacket.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_demo.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_draw.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_impl_glfw.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_tables.cpp">
+      <Filter>Gui\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\imgui\imgui_widgets.cpp">
+      <Filter>Gui\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,11 +169,38 @@
     <ClInclude Include="..\..\Share\Includes.h">
       <Filter>Share</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Share\SUNKUE.h">
-      <Filter>Share</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Share\SocketUtil.h">
       <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Share\SUNKUE.hpp">
+      <Filter>Share</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imconfig.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imgui.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imgui_impl_glfw.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imgui_impl_opengl3.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imgui_internal.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imstb_rectpack.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imstb_textedit.h">
+      <Filter>Gui\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\imgui\imstb_truetype.h">
+      <Filter>Gui\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -59,8 +59,7 @@ PACKET(cs_hi)
 
 PACKET(sc_hi)
 {
-	NetID id;
-	uint8 n;
+	NetID id = -1;
 };
 
 PACKET(sc_ready)
@@ -71,26 +70,27 @@ PACKET(sc_ready)
 PACKET(sc_set_position)
 {
 	NetID id;
-	Net::nt<uint8, 2> pos;
+	Position pos;
+	milliseconds timestamp;
 };
 
 PACKET(sc_remove_obj)
 {
-	NetID id;
+	NetID id = -1;
 };
 
 enum class move_oper : uint8
 {
-	none	= 0,
-	up		= 1,
-	down	= 2,
-	right	= 3,
-	left	= 4,
+	up,
+	down,
+	right,
+	left
 };
 
 PACKET(cs_input)
 {
 	move_oper input;
+	milliseconds timestamp;
 };
 
 #pragma pack(pop)

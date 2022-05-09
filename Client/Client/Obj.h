@@ -17,18 +17,27 @@ enum class OBJ_TYPE : int
 	Bpawn = 10,
 };
 
-class Obj
+class StaticObj
 {
 public:
-	Obj(OBJ_TYPE type, glm::vec2 pos = glm::vec2(0)) :type_{ type }, pos_{ pos } {};
-
+	StaticObj(OBJ_TYPE type, Position pos) : type_{ type }, pos_{ pos } {}
 public:
-	SET(pos);
 	GET(pos);
+	SET(pos);
 	GET(type);
+protected:
+	OBJ_TYPE type_{};
+	Position pos_{};
+};
 
+class DynamicObj : public StaticObj
+{
+public:
+	DynamicObj(OBJ_TYPE type, Position pos) : StaticObj{ type ,pos } {}
 private:
-	glm::vec2 pos_;
-	OBJ_TYPE type_;
+public:
+protected:
+	shared_mutex lock;
+private:
 };
 

@@ -49,31 +49,32 @@ void Renderer::ScreenQuad::draw_quad()
 ////////////////////////////////////////////////////////////////
 void Renderer::ready_draw()
 {
-	glClearColor(0, 1, 0, 1);
+	glClearColor(0.2, 0, 0.3, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Renderer::draw()
 {
 	ready_draw();
+	auto pos = Game::get().GetPlayer().get_pos();
+	bool start_with_dark = (pos.x + pos.y) % 2;
 
 	bg_shader->use();
 	bg_shader->set("u_texture", bg_tiles);
 	bg_shader->set("u_start_with_dark", start_with_dark);
 	bg_shader->set("u_focus_center", focus_center);
-	bg_shader->set("u_raw_col", Game::get().get_n());
+	bg_shader->set("u_raw_col", WINDOW_SIZE);
 	ScreenQuad::get().draw_quad();
 
 	obj_shader->use();
 	obj_shader->set("u_texture", obj_tiles);
 	obj_shader->set("u_start_with_dark", start_with_dark);
 	obj_shader->set("u_focus_center", focus_center);
-	obj_shader->set("u_raw_col", Game::get().get_n());
-
-	auto draw_obj = [&](const Obj& obj)
+	obj_shader->set("u_raw_col", WINDOW_SIZE);
+	auto draw_obj = [&](const StaticObj& obj)
 	{
 		obj_shader->set("u_type", int(obj.get_type()));
-		obj_shader->set("u_position", obj.get_pos());
+		obj_shader->set("u_position", obj.get_pos() - pos + Position{ WINDOW_SIZE / 2 });
 		ScreenQuad::get().draw_quad();
 	};
 

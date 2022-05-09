@@ -11,7 +11,7 @@ public:
 
 	GET(shader_id);
 
-	CREATE_SHARED(ShaderPtr, Shader);
+	CREATE_SHARED(Shader);
 
 	static ShaderPtr basic()
 	{

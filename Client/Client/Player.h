@@ -2,10 +2,9 @@
 #include "Obj.h"
 #include "KeyboardEvent.h"
 
-class Player : public Obj
+class Player : public DynamicObj
 {
 public:
-	Player(glm::vec2 pos = glm::vec2(0)) :Obj{ OBJ_TYPE::Wknight,pos } {};
-
-	bool process_input(const KEY_BOARD_EVENT_MANAGER::key_event& key);
+	Player(Position pos = {}) :DynamicObj{ OBJ_TYPE::Wknight, pos } {};
+	bool ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key);
 };

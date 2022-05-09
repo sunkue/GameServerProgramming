@@ -6,9 +6,10 @@
 enum class SESSION_STATE : int8
 {
 	FREE,
-	ACCEPTED,
+	ON_DISCONNECT,
 	__BAD__,
 	__GOOD__,
+	ACCEPTED,
 	INGAME,
 };
 
