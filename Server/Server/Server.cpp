@@ -48,21 +48,26 @@ void Server::ProcessQueuedCompleteOperationLoop()
 
 void Server::ProcessQueuedCompleteOperationLoopEx()
 {
-	constexpr size_t MAX_GQCS_IO_ENTRY{ 10 };
+	constexpr size_t MAX_GQCS_IO_ENTRY{ 50 };
 
+	ULONG returned_ios{};
+	array<OVERLAPPED_ENTRY, MAX_GQCS_IO_ENTRY> exovers{};
+	sizeof(exovers);
 	while (true)
 	{
+		exovers.fill({});
 		//	cerr << "GQCSTART::";
-		ULONG returned_ios{};
-		array<OVERLAPPED_ENTRY, MAX_GQCS_IO_ENTRY> exovers;
-
 		auto res = GetQueuedCompletionStatusEx(iocp, exovers.data(), exovers.size(), &returned_ios, INFINITE, FALSE);
 		//	cout << this_thread::get_id() << endl;
 //	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
 		if (1 < returned_ios)
 		{
-			//cerr << "[!!io num] [ " << returned_ios << " ]" << endl;
+			if (MAX_GQCS_IO_ENTRY == returned_ios)
+			{
+				// cerr << "[!!io num]" << endl;
+			}
+			// cerr << "[!!io num] [ " << returned_ios << " ]" << endl;
 		}
 
 		for (int i = 0; i < returned_ios; i++)
@@ -129,12 +134,14 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 	// cerr << "[recv]" << endl;
 
 	auto& client = clients[id];
-	auto& recvbuf = client.recv_over.ring_buf;
-	recvbuf.move_rear(transfered);
+	auto& recvbuf = client.recv_over.buf;
+
+
+#ifdef RINGBUFFER
 
 	if (0 == transfered)
 	{
-		cerr << " zero recv " << endl;
+		// cerr << " zero recv " << endl;
 		if (recvbuf.bytes_to_recv())
 		{
 			client.do_disconnect();
@@ -146,6 +153,8 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		return;
 	}
 
+	recvbuf.move_rear(transfered);
+
 	auto pck_start = recvbuf.begin();
 	auto remain_bytes = recvbuf.size();
 
@@ -155,7 +164,7 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		// 링버퍼경계에 걸친 패킷
 		if (recvbuf.check_overflow_when_read(need_bytes))
 		{
-			cerr << "[RingBuffer]::CollideOnEdge" << endl;
+			// cerr << "[RingBuffer]::CollideOnEdge" << endl;
 			// 미완성 패킷임
 			if (recvbuf.size() < need_bytes)
 				continue;
@@ -175,25 +184,20 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		remain_bytes = recvbuf.size();
 		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 	}
+#else
+	if (0 == transfered)
+	{
+		client.do_disconnect();
+		return;
+	}
 
-	/*
-		일반배열	{recv-> memmove(*)}
-		링버퍼	{recv-> move_rear(-), bytes_to_recv(branch)}
-				{processpacket -> move_front(-)}
-				{move_front collide edge ? -> memcpy(*) * 2}
-
-		성능비교를 해봐야 뭐가 더 좋을지 확신할 수 있겠음,,
-		패킷 대비 버퍼가 클 수록 링버퍼가 유리.
-	*/
-
-	/*
 	auto pck_start = client.recv_over.buf.data();
 	auto remain_bytes = transfered + client.prerecv_size;
 
 	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 		need_bytes <= remain_bytes && 0 != remain_bytes;)
 	{
-		process_packet(id, pck_start);
+		ProcessPacket(id, pck_start);
 
 		pck_start += need_bytes;
 		remain_bytes -= need_bytes;
@@ -203,7 +207,8 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 
 	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);
 	memmove(client.recv_over.buf.data(), pck_start, remain_bytes);
-	*/
+#endif // RINGBUFFER
+
 
 	client.do_recv();
 }
@@ -250,7 +255,7 @@ void Server::OnAcceptComplete(ExpOverlapped* exover)
 		SocketUtil::CheckError(res, "full->close_socket");
 	}
 
-	// cerr << "accept ::" << id << endl;
+		// cerr << "accept ::" << id << endl;
 
 	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
 	clients[id].init(new_socket);

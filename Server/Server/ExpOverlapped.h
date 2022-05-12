@@ -29,5 +29,9 @@ struct ExpOverlapped : ExpOverlappedBasic
 struct RecvExpOverlapped : ExpOverlappedBasic
 {
 	RecvExpOverlapped();
-	RecvRingBuffer<MAX_BUFFER_SIZE> ring_buf{};
+#ifdef RINGBUFFER
+	RecvRingBuffer<MAX_BUFFER_SIZE> buf{};
+#else
+	array<std::byte, MAX_BUFFER_SIZE> buf{};
+#endif // RINGBUFFER
 };

@@ -39,6 +39,9 @@ private:
 	ID id{ -1 };
 	RecvExpOverlapped recv_over{};
 	atomic<SESSION_STATE> state{ SESSION_STATE::FREE };
+#ifndef RINGBUFFER
+	packet_size_t prerecv_size{};
+#endif // RINGBUFFER
 };
 
 

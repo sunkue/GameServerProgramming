@@ -1,5 +1,8 @@
 #pragma once
 
+#define RINGBUFFER
+#define GQCPEX
+
 //====================================
 
 using BYTE = uint8_t;
@@ -19,18 +22,24 @@ using uint64 = uint64_t;
 using ID = int;
 using NetID = ID; // nt<type,1> :: ID
 using packet_size_t = uint8; //  need to be unsigned
-
+using Position = glm::ivec2;
 //====================================
 
 const uint16_t SERVER_PORT = 8282;
 
 //====================================
-constexpr int MAX_PLAYER = 5000 * 2;
-constexpr size_t MAP_SIZE = 2000;
-constexpr int SIGHT_SIZE = 15;
-constexpr int WINDOW_SIZE = 20;
-static constexpr size_t SECTOR_SIZE = 100;
-static constexpr size_t SECTOR_NUM = MAP_SIZE / SECTOR_SIZE;
+constexpr int MAX_PLAYER = 50000;
+constexpr int MAP_SIZE = 100;
+constexpr int SIGHT_SIZE = 11;
+constexpr int WINDOW_SIZE = 16;
+constexpr int SECTOR_SIZE = 20;
+constexpr int SECTOR_NUM = MAP_SIZE / SECTOR_SIZE;
+
+static_assert(SIGHT_SIZE % 2);
+static_assert(0 == MAP_SIZE % 2);
+static_assert(0 == SECTOR_SIZE % 2);
+static_assert(0 == WINDOW_SIZE % 2);
+static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 
 #undef max
 #undef min

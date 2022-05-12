@@ -22,7 +22,7 @@ using namespace chrono;
 extern HWND		hWnd;
 
 const static int MAX_CLIENTS = MAX_PLAYER;
-const static int MAX_TEST = MAX_CLIENTS / 5 * 3;
+const static int MAX_TEST = MAX_CLIENTS / 2;
 const static int INVALID_ID = -1;
 
 #pragma comment (lib, "ws2_32.lib")
@@ -153,7 +153,10 @@ void ProcessPacket(int ci, unsigned char packet[])
 		int my_id = ci;
 		client_map[login_packet->id] = my_id;
 		g_clients[my_id].id = login_packet->id;
-
+		//g_clients[my_id].x = login_packet->pos.x;
+		//g_clients[my_id].y = login_packet->pos.y;
+		g_clients[my_id].x = 0;
+		g_clients[my_id].y = 0;
 		//cs_packet_teleport t_packet;
 		//t_packet.size = sizeof(t_packet);
 		//t_packet.type = CS_TELEPORT;

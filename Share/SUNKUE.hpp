@@ -103,41 +103,7 @@ namespace MY_NAME_SPACE
 // CustomStruct
 namespace MY_NAME_SPACE
 {
-	struct Position
-	{
-		constexpr Position(int x, int y) :x{ x }, y{ y } {}
-		constexpr Position(int n) :x{ n }, y{ n } {}
-		constexpr Position() = default;
-		int x{}, y{};
-	};
 
-	inline Position operator+(const Position& a, const Position& b)
-	{
-		Position ret;
-		ret.x = a.x + b.x;
-		ret.y = a.y + b.y;
-		return ret;
-	}
-
-	inline Position operator-(const Position& a, const Position& b)
-	{
-		Position ret;
-		ret.x = a.x - b.x;
-		ret.y = a.y - b.y;
-		return ret;
-	}
-
-	inline Position& operator+=(Position& a, const Position& b)
-	{
-		a = a + b;
-		return a;
-	}
-
-	inline Position& operator-=(Position& a, const Position& b)
-	{
-		a = a - b;
-		return a;
-	}
 }
 
 //	CHRONO

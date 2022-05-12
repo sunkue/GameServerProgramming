@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ClientSession.h"
 #include "Server.h"
+#include "Player.h"
 
 
 
@@ -21,8 +22,13 @@ void ClientSession::do_recv()
 	if (IsBad())
 		return;
 	ZeroMemory(&recv_over.over, sizeof(WSAOVERLAPPED));
-	recv_over.wsabuf.buf = reinterpret_cast<CHAR*>(recv_over.ring_buf.end());
-	recv_over.wsabuf.len = recv_over.ring_buf.bytes_to_recv();
+#ifdef RINGBUFFER
+	recv_over.wsabuf.buf = reinterpret_cast<CHAR*>(recv_over.buf.end());
+	recv_over.wsabuf.len = recv_over.buf.bytes_to_recv();
+#else
+	recv_over.wsabuf.buf = reinterpret_cast<CHAR*>(recv_over.buf.data()) + prerecv_size;
+	recv_over.wsabuf.len = sizeof(recv_over.buf) - prerecv_size;
+#endif // RINGBUFFER
 	DWORD recv_flag = 0;
 	int res = ::WSARecv(socket, &recv_over.wsabuf, 1, 0, &recv_flag, &recv_over.over, nullptr);
 	//SocketUtil::CheckError(res, "do_recv");
@@ -50,12 +56,8 @@ void ClientSession::do_disconnect()
 	if (IsBad())
 		return;
 	state = SESSION_STATE::ON_DISCONNECT;
-	sc_remove_obj remove;
-	remove.id = id;
-	for (auto& c : Server::get().get_clients())
-	{
-		c.do_send(&remove);
-	}
+	PlayerManager::get().Disable(id);
+
 	auto exover = new ExpOverlapped{ COMP_OP::OP_DISCONNECT };
 	PostQueuedCompletionStatus(Server::get().get_iocp(), 0, id, &exover->over);
 }

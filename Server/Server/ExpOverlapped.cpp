@@ -20,6 +20,10 @@ ExpOverlapped::ExpOverlapped(COMP_OP op)
 RecvExpOverlapped::RecvExpOverlapped()
 	: ExpOverlappedBasic{ COMP_OP::OP_RECV }
 {
-	wsabuf.buf = reinterpret_cast<CHAR*>(ring_buf.begin());
+#ifdef RINGBUFFER
+	wsabuf.buf = reinterpret_cast<CHAR*>(buf.begin());
+#else
+	wsabuf.buf = reinterpret_cast<CHAR*>(buf.data());
+#endif // RINGBUFFER
 	wsabuf.len = static_cast<ULONG>(MAX_BUFFER_SIZE);
 }

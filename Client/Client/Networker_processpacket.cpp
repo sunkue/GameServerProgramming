@@ -7,7 +7,7 @@ void Networker::process_packet(const void* const packet)
 {
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	auto& game = Game::get();
-//	cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
+	//	cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
 	switch (packet_type)
 	{
 	case PACKET_TYPE::SC_HI:
