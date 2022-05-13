@@ -7,68 +7,68 @@ Networker::Networker()
 	WSADATA WSAData;
 	int res = WSAStartup(MAKEWORD(2, 2), &WSAData);
 	SocketUtil::CheckError(res, "WSAStartup");
-	socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	Socket_ = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	SOCKADDR_IN server_addr; ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(SERVER_PORT);
 	string sever_ip; cout << "서버 IP를 입력하세요 :: "; cin >> sever_ip;
 	inet_pton(AF_INET, sever_ip.c_str(), &server_addr.sin_addr);
-	res = WSAConnect(socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr), nullptr, nullptr, nullptr, nullptr);
+	res = WSAConnect(Socket_, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr), nullptr, nullptr, nullptr, nullptr);
 	SocketUtil::CheckError(res, "WSAConnect");
 }
 
-void Networker::do_recv()
+void Networker::DoRecv()
 {
-	mybuf.buf = reinterpret_cast<CHAR*>(recv_buf.data() + prerecv_size);
-	mybuf.len = static_cast<ULONG>(recv_buf.size());
-	ZeroMemory(&recv_over, sizeof(WSAOVERLAPPED));
+	MyBuf_.buf = reinterpret_cast<CHAR*>(RecvBuf_.data() + PrerecvSize_);
+	MyBuf_.len = static_cast<ULONG>(RecvBuf_.size());
+	ZeroMemory(&RecvOver_, sizeof(WSAOVERLAPPED));
 	DWORD recv_flag = 0;
-	int ret = WSARecv(socket, &mybuf, 1, nullptr, &recv_flag, &recv_over, Networker::cb_recv);
+	int ret = WSARecv(Socket_, &MyBuf_, 1, nullptr, &recv_flag, &RecvOver_, Networker::CbRecv);
 	SocketUtil::CheckError(ret, "recv");
 }
 
-void Networker::do_send(const void* const packet)
+void Networker::DoSend(const void* const packet)
 {
 	static WSABUF mybuf{}; mybuf.buf = reinterpret_cast<char*>(const_cast<void*>(packet));
 	mybuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
 	DWORD send_bytes;
-	int ret = WSASend(socket, &mybuf, 1, &send_bytes, 0, 0, 0);
+	int ret = WSASend(Socket_, &mybuf, 1, &send_bytes, 0, 0, 0);
 	SocketUtil::CheckError(ret, "send");
 }
 
-void Networker::cb_recv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD flag)
+void Networker::CbRecv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD flag)
 {
 	if (0 == transfered)
 	{
 		cout << " Server Disconnected" << endl;
-		glfwSetWindowShouldClose(System::get().window, true);
+		glfwSetWindowShouldClose(System::Get().Window, true);
 		return;
 	}
 
-	auto& nw = Networker::get();
+	auto& nw = Networker::Get();
 
-	auto pck_start = nw.recv_buf.data();
-	auto remain_bytes = transfered + nw.prerecv_size;
+	auto pck_start = nw.RecvBuf_.data();
+	auto remain_bytes = transfered + nw.PrerecvSize_;
 
 	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 		need_bytes <= remain_bytes && 0 != remain_bytes;)
 	{
-		nw.process_packet(pck_start);
+		nw.ProcessPacket(pck_start);
 
 		pck_start += need_bytes;
 		remain_bytes -= need_bytes;
 		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 	}
 
-	nw.prerecv_size = static_cast<packet_size_t>(remain_bytes);
-	memmove(nw.recv_buf.data(), pck_start, remain_bytes);
+	nw.PrerecvSize_ = static_cast<packet_size_t>(remain_bytes);
+	memmove(nw.RecvBuf_.data(), pck_start, remain_bytes);
 
-	nw.do_recv();
+	nw.DoRecv();
 }
 
-void Networker::start()
+void Networker::Start()
 {
-	cs_hi hi; do_send(&hi);
-	do_recv();
+	cs_hi hi; DoSend(&hi);
+	DoRecv();
 }
 

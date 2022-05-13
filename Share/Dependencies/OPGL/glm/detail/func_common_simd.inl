@@ -16,7 +16,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_abs(v.data);
+			result.Data = glm_vec4_abs(v.Data);
 			return result;
 		}
 	};
@@ -27,7 +27,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<int, P> call(tvec4<int, P> const & v)
 		{
 			tvec4<int, P> result(uninitialize);
-			result.data = glm_ivec4_abs(v.data);
+			result.Data = glm_ivec4_abs(v.Data);
 			return result;
 		}
 	};
@@ -38,7 +38,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_floor(v.data);
+			result.Data = glm_vec4_floor(v.Data);
 			return result;
 		}
 	};
@@ -49,7 +49,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_ceil(v.data);
+			result.Data = glm_vec4_ceil(v.Data);
 			return result;
 		}
 	};
@@ -60,7 +60,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_fract(v.data);
+			result.Data = glm_vec4_fract(v.Data);
 			return result;
 		}
 	};
@@ -71,7 +71,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_round(v.data);
+			result.Data = glm_vec4_round(v.Data);
 			return result;
 		}
 	};
@@ -82,7 +82,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & x, tvec4<float, P> const & y)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_mod(x.data, y.data);
+			result.Data = glm_vec4_mod(x.Data, y.Data);
 			return result;
 		}
 	};
@@ -93,7 +93,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v1, tvec4<float, P> const & v2)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = _mm_min_ps(v1.data, v2.data);
+			result.Data = _mm_min_ps(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -104,7 +104,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<int32, P> call(tvec4<int32, P> const & v1, tvec4<int32, P> const & v2)
 		{
 			tvec4<int32, P> result(uninitialize);
-			result.data = _mm_min_epi32(v1.data, v2.data);
+			result.Data = _mm_min_epi32(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -115,7 +115,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<int32, P> call(tvec4<uint32, P> const & v1, tvec4<uint32, P> const & v2)
 		{
 			tvec4<uint32, P> result(uninitialize);
-			result.data = _mm_min_epu32(v1.data, v2.data);
+			result.Data = _mm_min_epu32(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -126,7 +126,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v1, tvec4<float, P> const & v2)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = _mm_max_ps(v1.data, v2.data);
+			result.Data = _mm_max_ps(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -137,7 +137,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<int32, P> call(tvec4<int32, P> const & v1, tvec4<int32, P> const & v2)
 		{
 			tvec4<int32, P> result(uninitialize);
-			result.data = _mm_max_epi32(v1.data, v2.data);
+			result.Data = _mm_max_epi32(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -148,7 +148,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<uint32, P> call(tvec4<uint32, P> const & v1, tvec4<uint32, P> const & v2)
 		{
 			tvec4<uint32, P> result(uninitialize);
-			result.data = _mm_max_epu32(v1.data, v2.data);
+			result.Data = _mm_max_epu32(v1.Data, v2.Data);
 			return result;
 		}
 	};
@@ -159,7 +159,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & x, tvec4<float, P> const & minVal, tvec4<float, P> const & maxVal)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = _mm_min_ps(_mm_max_ps(x.data, minVal.data), maxVal.data);
+			result.Data = _mm_min_ps(_mm_max_ps(x.Data, minVal.Data), maxVal.Data);
 			return result;
 		}
 	};
@@ -170,7 +170,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<int32, P> call(tvec4<int32, P> const & x, tvec4<int32, P> const & minVal, tvec4<int32, P> const & maxVal)
 		{
 			tvec4<int32, P> result(uninitialize);
-			result.data = _mm_min_epi32(_mm_max_epi32(x.data, minVal.data), maxVal.data);
+			result.Data = _mm_min_epi32(_mm_max_epi32(x.Data, minVal.Data), maxVal.Data);
 			return result;
 		}
 	};
@@ -181,7 +181,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<uint32, P> call(tvec4<uint32, P> const & x, tvec4<uint32, P> const & minVal, tvec4<uint32, P> const & maxVal)
 		{
 			tvec4<uint32, P> result(uninitialize);
-			result.data = _mm_min_epu32(_mm_max_epu32(x.data, minVal.data), maxVal.data);
+			result.Data = _mm_min_epu32(_mm_max_epu32(x.Data, minVal.Data), maxVal.Data);
 			return result;
 		}
 	};
@@ -198,7 +198,7 @@ namespace detail
 #			if 0 && GLM_ARCH & GLM_ARCH_AVX
 				Result.data = _mm_blendv_ps(x.data, y.data, Mask);
 #			else
-				Result.data = _mm_or_ps(_mm_and_ps(Mask, y.data), _mm_andnot_ps(Mask, x.data));
+				Result.Data = _mm_or_ps(_mm_and_ps(Mask, y.Data), _mm_andnot_ps(Mask, x.Data));
 #			endif
 			return Result;
 		}
@@ -221,7 +221,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const& edge0, tvec4<float, P> const& edge1, tvec4<float, P> const& x)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_smoothstep(edge0.data, edge1.data, x.data);
+			result.Data = glm_vec4_smoothstep(edge0.Data, edge1.Data, x.Data);
 			return result;
 		}
 	};

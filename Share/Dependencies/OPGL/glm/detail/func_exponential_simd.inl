@@ -14,7 +14,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = _mm_sqrt_ps(v.data);
+			result.Data = _mm_sqrt_ps(v.Data);
 			return result;
 		}
 	};
@@ -25,7 +25,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, aligned_lowp> call(tvec4<float, aligned_lowp> const & v)
 		{
 			tvec4<float, aligned_lowp> result(uninitialize);
-			result.data = glm_vec4_sqrt_lowp(v.data);
+			result.Data = glm_vec4_sqrt_lowp(v.Data);
 			return result;
 		}
 	};

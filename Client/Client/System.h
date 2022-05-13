@@ -42,9 +42,9 @@ class System
 	SINGLE_TON(System) = default;
 
 public:
-	void update()
+	void Update()
 	{
-		timer.tick();
+		Timer.tick();
 	}
 
 	struct Screen
@@ -53,7 +53,7 @@ public:
 		const int height{ 520 };
 	};
 public:
-	Timer& timer = Timer::get();
-	GLFWwindow* window = nullptr;
-	Screen screen;
+	Timer& Timer = Timer::Get();
+	GLFWwindow* Window = nullptr;
+	Screen Screen;
 };

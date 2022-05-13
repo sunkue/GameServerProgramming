@@ -57,7 +57,7 @@ namespace detail
 		static tvec4<float, P> call(tvec4<float, P> const & a, tvec4<float, P> const & b)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_add_ps(a.data, b.data);
+			Result.Data = _mm_add_ps(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -81,7 +81,7 @@ namespace detail
 		static tvec4<float, P> call(tvec4<float, P> const & a, tvec4<float, P> const & b)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_sub_ps(a.data, b.data);
+			Result.Data = _mm_sub_ps(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -105,7 +105,7 @@ namespace detail
 		static tvec4<float, P> call(tvec4<float, P> const & a, tvec4<float, P> const & b)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_mul_ps(a.data, b.data);
+			Result.Data = _mm_mul_ps(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -129,7 +129,7 @@ namespace detail
 		static tvec4<float, P> call(tvec4<float, P> const & a, tvec4<float, P> const & b)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_div_ps(a.data, b.data);
+			Result.Data = _mm_div_ps(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -153,7 +153,7 @@ namespace detail
 		static tvec4<float, aligned_lowp> call(tvec4<float, aligned_lowp> const & a, tvec4<float, aligned_lowp> const & b)
 		{
 			tvec4<float, aligned_lowp> Result(uninitialize);
-			Result.data = _mm_mul_ps(a.data, _mm_rcp_ps(b.data));
+			Result.Data = _mm_mul_ps(a.Data, _mm_rcp_ps(b.Data));
 			return Result;
 		}
 	};
@@ -164,7 +164,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const& a, tvec4<T, P> const& b)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_and_si128(a.data, b.data);
+			Result.Data = _mm_and_si128(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -188,7 +188,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const& a, tvec4<T, P> const& b)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_or_si128(a.data, b.data);
+			Result.Data = _mm_or_si128(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -212,7 +212,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const& a, tvec4<T, P> const& b)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_xor_si128(a.data, b.data);
+			Result.Data = _mm_xor_si128(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -236,7 +236,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const& a, tvec4<T, P> const& b)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_sll_epi32(a.data, b.data);
+			Result.Data = _mm_sll_epi32(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -260,7 +260,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const& a, tvec4<T, P> const& b)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_srl_epi32(a.data, b.data);
+			Result.Data = _mm_srl_epi32(a.Data, b.Data);
 			return Result;
 		}
 	};
@@ -284,7 +284,7 @@ namespace detail
 		static tvec4<T, P> call(tvec4<T, P> const & v)
 		{
 			tvec4<T, P> Result(uninitialize);
-			Result.data = _mm_xor_si128(v.data, _mm_set1_epi32(-1));
+			Result.Data = _mm_xor_si128(v.Data, _mm_set1_epi32(-1));
 			return Result;
 		}
 	};
@@ -307,7 +307,7 @@ namespace detail
 	{
 		static bool call(tvec4<float, P> const & v1, tvec4<float, P> const & v2)
 		{
-			return _mm_movemask_ps(_mm_cmpeq_ps(v1.data, v2.data)) != 0;
+			return _mm_movemask_ps(_mm_cmpeq_ps(v1.Data, v2.Data)) != 0;
 		}
 	};
 
@@ -316,7 +316,7 @@ namespace detail
 	{
 		static bool call(tvec4<int32, P> const & v1, tvec4<int32, P> const & v2)
 		{
-			return _mm_movemask_epi8(_mm_cmpeq_epi32(v1.data, v2.data)) != 0;
+			return _mm_movemask_epi8(_mm_cmpeq_epi32(v1.Data, v2.Data)) != 0;
 		}
 	};
 
@@ -325,7 +325,7 @@ namespace detail
 	{
 		static bool call(tvec4<float, P> const & v1, tvec4<float, P> const & v2)
 		{
-			return _mm_movemask_ps(_mm_cmpneq_ps(v1.data, v2.data)) != 0;
+			return _mm_movemask_ps(_mm_cmpneq_ps(v1.Data, v2.Data)) != 0;
 		}
 	};
 
@@ -334,7 +334,7 @@ namespace detail
 	{
 		static bool call(tvec4<int32, P> const & v1, tvec4<int32, P> const & v2)
 		{
-			return _mm_movemask_epi8(_mm_cmpneq_epi32(v1.data, v2.data)) != 0;
+			return _mm_movemask_epi8(_mm_cmpneq_epi32(v1.Data, v2.Data)) != 0;
 		}
 	};
 }//namespace detail
@@ -364,17 +364,17 @@ namespace detail
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_lowp>::tvec4(float s) :
-		data(_mm_set1_ps(s))
+		Data(_mm_set1_ps(s))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_mediump>::tvec4(float s) :
-		data(_mm_set1_ps(s))
+		Data(_mm_set1_ps(s))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_highp>::tvec4(float s) :
-		data(_mm_set1_ps(s))
+		Data(_mm_set1_ps(s))
 	{}
 
 #	if GLM_ARCH & GLM_ARCH_AVX_BIT
@@ -396,17 +396,17 @@ namespace detail
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_lowp>::tvec4(int32 s) :
-		data(_mm_set1_epi32(s))
+		Data(_mm_set1_epi32(s))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_mediump>::tvec4(int32 s) :
-		data(_mm_set1_epi32(s))
+		Data(_mm_set1_epi32(s))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_highp>::tvec4(int32 s) :
-		data(_mm_set1_epi32(s))
+		Data(_mm_set1_epi32(s))
 	{}
 
 #	if GLM_ARCH & GLM_ARCH_AVX2_BIT
@@ -428,53 +428,53 @@ namespace detail
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_lowp>::tvec4(float a, float b, float c, float d) :
-		data(_mm_set_ps(d, c, b, a))
+		Data(_mm_set_ps(d, c, b, a))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_mediump>::tvec4(float a, float b, float c, float d) :
-		data(_mm_set_ps(d, c, b, a))
+		Data(_mm_set_ps(d, c, b, a))
 	{}
 
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_highp>::tvec4(float a, float b, float c, float d) :
-		data(_mm_set_ps(d, c, b, a))
+		Data(_mm_set_ps(d, c, b, a))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_lowp>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_set_epi32(d, c, b, a))
+		Data(_mm_set_epi32(d, c, b, a))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_mediump>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_set_epi32(d, c, b, a))
+		Data(_mm_set_epi32(d, c, b, a))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<int32, aligned_highp>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_set_epi32(d, c, b, a))
+		Data(_mm_set_epi32(d, c, b, a))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_lowp>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
+		Data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_mediump>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
+		Data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
 	{}
 
 	template <>
 	template <>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, aligned_highp>::tvec4(int32 a, int32 b, int32 c, int32 d) :
-		data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
+		Data(_mm_castsi128_ps(_mm_set_epi32(d, c, b, a)))
 	{}
 }//namespace glm
 

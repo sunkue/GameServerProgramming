@@ -13,7 +13,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static float call(tvec4<float, P> const & v)
 		{
-			return _mm_cvtss_f32(glm_vec4_length(v.data));
+			return _mm_cvtss_f32(glm_vec4_length(v.Data));
 		}
 	};
 
@@ -22,7 +22,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static float call(tvec4<float, P> const & p0, tvec4<float, P> const & p1)
 		{
-			return _mm_cvtss_f32(glm_vec4_distance(p0.data, p1.data));
+			return _mm_cvtss_f32(glm_vec4_distance(p0.Data, p1.Data));
 		}
 	};
 
@@ -31,7 +31,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static float call(tvec4<float, P> const& x, tvec4<float, P> const& y)
 		{
-			return _mm_cvtss_f32(glm_vec1_dot(x.data, y.data));
+			return _mm_cvtss_f32(glm_vec1_dot(x.Data, y.Data));
 		}
 	};
 
@@ -45,7 +45,7 @@ namespace detail
 			__m128 const xpd0 = glm_vec4_cross(set0, set1);
 
 			tvec4<float, P> result(uninitialize);
-			result.data = xpd0;
+			result.Data = xpd0;
 			return tvec3<float, P>(result);
 		}
 	};
@@ -56,7 +56,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const & v)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_normalize(v.data);
+			result.Data = glm_vec4_normalize(v.Data);
 			return result;
 		}
 	};
@@ -67,7 +67,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const& N, tvec4<float, P> const& I, tvec4<float, P> const& Nref)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_faceforward(N.data, I.data, Nref.data);
+			result.Data = glm_vec4_faceforward(N.Data, I.Data, Nref.Data);
 			return result;
 		}
 	};
@@ -78,7 +78,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const& I, tvec4<float, P> const& N)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_reflect(I.data, N.data);
+			result.Data = glm_vec4_reflect(I.Data, N.Data);
 			return result;
 		}
 	};
@@ -89,7 +89,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static tvec4<float, P> call(tvec4<float, P> const& I, tvec4<float, P> const& N, float eta)
 		{
 			tvec4<float, P> result(uninitialize);
-			result.data = glm_vec4_refract(I.data, N.data, _mm_set1_ps(eta));
+			result.Data = glm_vec4_refract(I.Data, N.Data, _mm_set1_ps(eta));
 			return result;
 		}
 	};

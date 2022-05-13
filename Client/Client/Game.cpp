@@ -9,7 +9,7 @@ void Game::update()
 
 void Game::init()
 {
-	KEY_BOARD_EVENT_MANAGER::get().BindMainKeyFunc(
+	KEY_BOARD_EVENT_MANAGER::Get().BindMainKeyFunc(
 		[this](const KEY_BOARD_EVENT_MANAGER::key_event& key)->bool
-		{ return players_[id_].ProcessInput(key); });
+		{ return Players_[Id_].ProcessInput(key); });
 }

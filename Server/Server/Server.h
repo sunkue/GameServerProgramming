@@ -12,21 +12,20 @@ public:
 	void StartAccept();
 	void RepeatSendLoop(milliseconds repeat_time = 50ms);
 private:
-	void OnRecvComplete(ID id, DWORD transfered);
-	void OnSendComplete(ID id, ExpOverlapped* exover);
+	void OnRecvComplete(ID Id_, DWORD transfered);
+	void OnSendComplete(ID Id_, ExpOverlapped* exover);
 	void OnAcceptComplete(ExpOverlapped* exover);
-	void OnDisconnectComplete(ID id, ExpOverlapped* exover);
+	void OnDisconnectComplete(ID Id_, ExpOverlapped* exover);
 public:
-	void ProcessPacket(ID id, const void* const packet);
+	void ProcessPacket(ID Id_, const void* const packet);
 private:
-	ID get_free_id();
+	ID GetFreeId();
 public:
-	auto get_iocp() { return iocp; };
-	auto& get_clients() { return clients; }
+	GET(Iocp);
+	GET_REF_UNSAFE(Clients);
 private:
-	HANDLE iocp;
-	array<ClientSession, MAX_PLAYER> clients;
-//	unordered_map<ID, class ClientSession> clients;
+	HANDLE Iocp_;
+	array<ClientSession, MAX_PLAYER> Clients_;
 };
 
 

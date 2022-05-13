@@ -8,7 +8,7 @@
 
 Renderer::ScreenQuad::ScreenQuad()
 {
-	glGenVertexArrays(1, &quad_vao);
+	glGenVertexArrays(1, &QuadVao_);
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 
@@ -28,7 +28,7 @@ Renderer::ScreenQuad::ScreenQuad()
 		,{{ 1, 1},{1,1} }
 	};
 
-	glBindVertexArray(quad_vao);
+	glBindVertexArray(QuadVao_);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadv), quadv, GL_STATIC_DRAW);
 
@@ -40,74 +40,74 @@ Renderer::ScreenQuad::ScreenQuad()
 	glBindVertexArray(0);
 }
 
-void Renderer::ScreenQuad::draw_quad()
+void Renderer::ScreenQuad::DrawQuad()
 {
-	glBindVertexArray(quad_vao);
+	glBindVertexArray(QuadVao_);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 ////////////////////////////////////////////////////////////////
-void Renderer::ready_draw()
+void Renderer::ReadyDraw()
 {
 	glClearColor(0.2, 0, 0.3, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Renderer::draw()
+void Renderer::Draw()
 {
-	ready_draw();
-	auto pos = Game::get().GetPlayer().get_pos();
+	ReadyDraw();
+	auto pos = Game::Get().GetPlayer().GetPos();
 	bool start_with_dark = (pos.x + pos.y) % 2;
 
-	bg_shader->use();
-	bg_shader->set("u_texture", bg_tiles);
-	bg_shader->set("u_start_with_dark", start_with_dark);
-	bg_shader->set("u_focus_center", focus_center);
-	bg_shader->set("u_raw_col", WINDOW_SIZE);
-	ScreenQuad::get().draw_quad();
+	BgShader_->Use();
+	BgShader_->Set("u_texture", BgTiles_);
+	BgShader_->Set("u_start_with_dark", start_with_dark);
+	BgShader_->Set("u_focus_center", FocusCenter_);
+	BgShader_->Set("u_raw_col", WINDOW_SIZE);
+	ScreenQuad::Get().DrawQuad();
 
-	obj_shader->use();
-	obj_shader->set("u_texture", obj_tiles);
-	obj_shader->set("u_start_with_dark", start_with_dark);
-	obj_shader->set("u_focus_center", focus_center);
-	obj_shader->set("u_raw_col", WINDOW_SIZE);
+	ObjShader_->Use();
+	ObjShader_->Set("u_texture", ObjTiles_);
+	ObjShader_->Set("u_start_with_dark", start_with_dark);
+	ObjShader_->Set("u_focus_center", FocusCenter_);
+	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
 	auto draw_obj = [&](const StaticObj& obj)
 	{
-		obj_shader->set("u_type", int(obj.get_type()));
-		obj_shader->set("u_position", obj.get_pos() - pos + Position{ WINDOW_SIZE / 2 });
-		ScreenQuad::get().draw_quad();
+		ObjShader_->Set("u_type", int(obj.GetType()));
+		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 });
+		ScreenQuad::Get().DrawQuad();
 	};
 
-	for (const auto& other : Game::get().get_players())
+	for (const auto& other : Game::Get().GetPlayers())
 	{
 		draw_obj(other.second);
 	}
 }
 
-void Renderer::init()
+void Renderer::Init()
 {
 	glEnable(GL_BLEND);
-	glViewport(10, 10, System::get().screen.width - 20, System::get().screen.height - 20);
-	load_texture();
-	load_shader();
+	glViewport(10, 10, System::Get().Screen.width - 20, System::Get().Screen.height - 20);
+	LoadTexture();
+	LoadShader();
 }
 
-void Renderer::load_shader()
+void Renderer::LoadShader()
 {
 	vector<string> VS; VS.emplace_back("./Resource/Shader/background.vert");
 	vector<string> FS; FS.emplace_back("./Resource/Shader/background.frag");
 	vector<string> GS;
 
-	bg_shader = Shader::create(VS, FS, GS);
+	BgShader_ = Shader::Create(VS, FS, GS);
 
 	VS.clear(); VS.emplace_back("./Resource/Shader/obj.vert");
 	FS.clear(); FS.emplace_back("./Resource/Shader/obj.frag");
 	GS.clear();
-	obj_shader = Shader::create(VS, FS, GS);
+	ObjShader_ = Shader::Create(VS, FS, GS);
 }
 
-void Renderer::load_texture()
+void Renderer::LoadTexture()
 {
-	bg_tiles = Texture::create("background.png");
-	obj_tiles = Texture::create("chess.png");
+	BgTiles_ = Texture::Create("background.png");
+	ObjTiles_ = Texture::Create("chess.png");
 }

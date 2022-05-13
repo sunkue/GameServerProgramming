@@ -15,7 +15,7 @@ namespace SUNKUE_NET
 	template<class compressedT, size_t N>
 	struct nt
 	{
-		std::array<compressedT, N> data;
+		std::array<compressedT, N> Data;
 
 		using this_type = nt<compressedT, N>;
 		template<class originT> inline static nt<compressedT, N> encode(const originT& var);
@@ -34,9 +34,9 @@ namespace SUNKUE_NET
 	{
 		constexpr auto mul = float_precision1 * 10;
 		this_type ret{};
-		ret.data.at(0) = (char)round(var.x * mul);
-		ret.data.at(1) = (char)round(var.y * mul);
-		ret.data.at(2) = (char)round(var.z * mul);
+		ret.Data.at(0) = (char)round(var.x * mul);
+		ret.Data.at(1) = (char)round(var.y * mul);
+		ret.Data.at(2) = (char)round(var.z * mul);
 		return ret;
 	};
 
@@ -45,9 +45,9 @@ namespace SUNKUE_NET
 		constexpr auto div = float_precision1 * 10;
 		glm::vec3 ret
 		{
-			(float)var.data.at(0),
-			(float)var.data.at(1),
-			(float)var.data.at(2)
+			(float)var.Data.at(0),
+			(float)var.Data.at(1),
+			(float)var.Data.at(2)
 		};
 		ret /= div;
 		return ret;
@@ -58,8 +58,8 @@ namespace SUNKUE_NET
 	NT_ENCODE(uint8, 2, glm::vec2)
 	{
 		this_type ret{};
-		ret.data.at(0) = static_cast<unsigned int>(round(var.x));
-		ret.data.at(1) = static_cast<unsigned int>(round(var.y));
+		ret.Data.at(0) = static_cast<unsigned int>(round(var.x));
+		ret.Data.at(1) = static_cast<unsigned int>(round(var.y));
 		return ret;
 	};
 
@@ -67,8 +67,8 @@ namespace SUNKUE_NET
 	{
 		glm::vec2 ret
 		{
-			static_cast<float>(var.data.at(0)),
-			static_cast<float>(var.data.at(1))
+			static_cast<float>(var.Data.at(0)),
+			static_cast<float>(var.Data.at(1))
 		};
 		return ret;
 	};

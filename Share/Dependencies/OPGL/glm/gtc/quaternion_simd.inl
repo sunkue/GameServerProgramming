@@ -66,7 +66,7 @@ namespace detail
 	{
 		static GLM_FUNC_QUALIFIER float call(tquat<float, P> const& x, tquat<float, P> const& y)
 		{
-			return _mm_cvtss_f32(glm_vec1_dot(x.data, y.data));
+			return _mm_cvtss_f32(glm_vec1_dot(x.Data, y.Data));
 		}
 	};
 
@@ -76,7 +76,7 @@ namespace detail
 		static tquat<float, P> call(tquat<float, P> const& q, tquat<float, P> const& p)
 		{
 			tquat<float, P> Result(uninitialize);
-			Result.data = _mm_add_ps(q.data, p.data);
+			Result.Data = _mm_add_ps(q.Data, p.Data);
 			return Result;
 		}
 	};
@@ -100,7 +100,7 @@ namespace detail
 		static tquat<float, P> call(tquat<float, P> const& q, tquat<float, P> const& p)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_sub_ps(q.data, p.data);
+			Result.Data = _mm_sub_ps(q.Data, p.Data);
 			return Result;
 		}
 	};
@@ -124,7 +124,7 @@ namespace detail
 		static tquat<float, P> call(tquat<float, P> const& q, float s)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_mul_ps(q.data, _mm_set_ps1(s));
+			Result.Data = _mm_mul_ps(q.Data, _mm_set_ps1(s));
 			return Result;
 		}
 	};
@@ -148,7 +148,7 @@ namespace detail
 		static tquat<float, P> call(tquat<float, P> const& q, float s)
 		{
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_div_ps(q.data, _mm_set_ps1(s));
+			Result.Data = _mm_div_ps(q.Data, _mm_set_ps1(s));
 			return Result;
 		}
 	};
@@ -171,11 +171,11 @@ namespace detail
 	{
 		static tvec4<float, P> call(tquat<float, P> const& q, tvec4<float, P> const& v)
 		{
-			__m128 const q_wwww = _mm_shuffle_ps(q.data, q.data, _MM_SHUFFLE(3, 3, 3, 3));
-			__m128 const q_swp0 = _mm_shuffle_ps(q.data, q.data, _MM_SHUFFLE(3, 0, 2, 1));
-			__m128 const q_swp1 = _mm_shuffle_ps(q.data, q.data, _MM_SHUFFLE(3, 1, 0, 2));
-			__m128 const v_swp0 = _mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(3, 0, 2, 1));
-			__m128 const v_swp1 = _mm_shuffle_ps(v.data, v.data, _MM_SHUFFLE(3, 1, 0, 2));
+			__m128 const q_wwww = _mm_shuffle_ps(q.Data, q.Data, _MM_SHUFFLE(3, 3, 3, 3));
+			__m128 const q_swp0 = _mm_shuffle_ps(q.Data, q.Data, _MM_SHUFFLE(3, 0, 2, 1));
+			__m128 const q_swp1 = _mm_shuffle_ps(q.Data, q.Data, _MM_SHUFFLE(3, 1, 0, 2));
+			__m128 const v_swp0 = _mm_shuffle_ps(v.Data, v.Data, _MM_SHUFFLE(3, 0, 2, 1));
+			__m128 const v_swp1 = _mm_shuffle_ps(v.Data, v.Data, _MM_SHUFFLE(3, 1, 0, 2));
 	
 			__m128 uv      = _mm_sub_ps(_mm_mul_ps(q_swp0, v_swp1), _mm_mul_ps(q_swp1, v_swp0));
 			__m128 uv_swp0 = _mm_shuffle_ps(uv, uv, _MM_SHUFFLE(3, 0, 2, 1));
@@ -187,7 +187,7 @@ namespace detail
 			uuv = _mm_mul_ps(uuv, two);
 
 			tvec4<float, P> Result(uninitialize);
-			Result.data = _mm_add_ps(v.Data, _mm_add_ps(uv, uuv));
+			Result.Data = _mm_add_ps(v.Data, _mm_add_ps(uv, uuv));
 			return Result;
 		}
 	};

@@ -9,18 +9,18 @@ void DrawGui();
 
 void DoNextFrame()
 {
-	KEY_BOARD_EVENT_MANAGER::get().ProcessInput();
+	KEY_BOARD_EVENT_MANAGER::Get().ProcessInput();
 
-	System::get().update();
-	Game::get().update();
-	Renderer::get().draw();
+	System::Get().Update();
+	Game::Get().update();
+	Renderer::Get().Draw();
 
 	SleepEx(0, true);
 
 	DrawGui();
 
 	glfwPollEvents();
-	glfwSwapBuffers(System::get().window);
+	glfwSwapBuffers(System::Get().Window);
 }
 
 void DrawGui()
@@ -29,7 +29,7 @@ void DrawGui()
 	ImGui_ImplGlfw_NewFrame();
 	gui::NewFrame();
 	gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	auto pos = Game::get().GetPlayer().get_pos();
+	auto pos = Game::Get().GetPlayer().GetPos();
 	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
 	// HP x/x
 	// LEVEL 
@@ -42,20 +42,20 @@ void DrawGui()
 
 void BindDefaultInputFuncs()
 {
-	glfwSetFramebufferSizeCallback(System::get().window,
+	glfwSetFramebufferSizeCallback(System::Get().Window,
 		[](GLFWwindow* window, int w, int h)
 		{});
 
-	glfwSetKeyCallback(System::get().window,
+	glfwSetKeyCallback(System::Get().Window,
 		[](GLFWwindow* window, int key, int code, int action, int modifiers)
-		{ KEY_BOARD_EVENT_MANAGER::get().KeyBoard(window, key, code, action, modifiers);  });
+		{ KEY_BOARD_EVENT_MANAGER::Get().KeyBoard(window, key, code, action, modifiers);  });
 
 
 }
 
 int main()
 {
-	Networker::get().start();
+	Networker::Get().Start();
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -64,7 +64,7 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(System::get().screen.width, System::get().screen.height, "SUNKUE", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(System::Get().Screen.width, System::Get().Screen.height, "SUNKUE", NULL, NULL);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -80,7 +80,7 @@ int main()
 		return -1;
 	}
 
-	System::get().window = window;
+	System::Get().Window = window;
 
 	BindDefaultInputFuncs();
 
@@ -96,7 +96,7 @@ int main()
 	}
 
 
-	while (false == Networker::get().get_ready() && !glfwWindowShouldClose(window))
+	while (false == Networker::Get().GetReady() && !glfwWindowShouldClose(window))
 	{
 		SleepEx(0, true);
 	}

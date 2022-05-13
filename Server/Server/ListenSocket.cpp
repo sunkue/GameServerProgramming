@@ -3,33 +3,33 @@
 #include "Server.h"
 
 
-void ListenSocket::init(HANDLE iocp)
+void ListenSocket::Init(HANDLE iocp)
 {
-	listen_socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	ListenSocket_ = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	SOCKADDR_IN server_addr; ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = ::htons(SERVER_PORT);
 	server_addr.sin_addr.s_addr = ::htonl(INADDR_ANY);
-	auto res = ::bind(listen_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	auto res = ::bind(ListenSocket_, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	SocketUtil::CheckError(res, "bind");
-	res = ::listen(listen_socket, SOMAXCONN);
+	res = ::listen(ListenSocket_, SOMAXCONN);
 	SocketUtil::CheckError(res, "listen");
-	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(listen_socket), iocp, 0, 0);
+	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(ListenSocket_), iocp, 0, 0);
 };
 
 ListenSocket::~ListenSocket()
 {
-	auto res = ::closesocket(listen_socket);
+	auto res = ::closesocket(ListenSocket_);
 	SocketUtil::CheckError(res, "listen closesocket");
 }
 
-void ListenSocket::do_accept()
+void ListenSocket::DoAccept()
 {
-	newface_socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	ZeroMemory(&accept_over.over, sizeof(WSAOVERLAPPED));
+	NewfaceSocket_ = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	ZeroMemory(&AcceptOver_.Over, sizeof(WSAOVERLAPPED));
 	constexpr auto len = sizeof(SOCKADDR_IN) + 16;
-	*reinterpret_cast<SOCKET*>(accept_over.buf.data()) = newface_socket;
+	*reinterpret_cast<SOCKET*>(AcceptOver_.Buf.data()) = NewfaceSocket_;
 	DWORD received{};
-	auto res = ::AcceptEx(listen_socket, newface_socket, accept_buf.data(), 0, len, len, &received, &accept_over.over);
+	auto res = ::AcceptEx(ListenSocket_, NewfaceSocket_, AcceptBuf_.data(), 0, len, len, &received, &AcceptOver_.Over);
 	SocketUtil::CheckErrorEx(res, "listen AcceptEx");
 }

@@ -3,13 +3,13 @@
 
 Server::Server()
 {
-	for (int i = 0; i < clients.size(); i++)
+	for (int i = 0; i < Clients_.size(); i++)
 	{
-		clients[i].id = i;
+		Clients_[i].Id_ = i;
 	}
 
 	WSADATA WSAData; int res = ::WSAStartup(MAKEWORD(2, 2), &WSAData); SocketUtil::CheckError(res, "WSAStartup");
-	iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+	Iocp_ = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
 }
 
 Server::~Server()
@@ -23,25 +23,25 @@ void Server::ProcessQueuedCompleteOperationLoop()
 {
 	while (true)
 	{
-		DWORD returned_bytes{}; ID id{}; ExpOverlapped* exover{};
+		DWORD returned_bytes{}; ID Id_{}; ExpOverlapped* exover{};
 		//	cerr << "GQCSTART::";
-		auto res = GetQueuedCompletionStatus(iocp, &returned_bytes, reinterpret_cast<PULONG_PTR>(&id), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
+		auto res = GetQueuedCompletionStatus(Iocp_, &returned_bytes, reinterpret_cast<PULONG_PTR>(&Id_), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
 		//	cout << this_thread::get_id() << endl;
 	//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
 		if (FALSE == res) [[unlikely]]
 		{
 			cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
-			clients[id].do_disconnect();
+			Clients_[Id_].DoDisconnect();
 			continue;
 		};
 
-		switch (exover->op)
+		switch (exover->Op)
 		{
-		case COMP_OP::OP_RECV: OnRecvComplete(id, returned_bytes); break;
-		case COMP_OP::OP_SEND: OnSendComplete(id, exover); break;
+		case COMP_OP::OP_RECV: OnRecvComplete(Id_, returned_bytes); break;
+		case COMP_OP::OP_SEND: OnSendComplete(Id_, exover); break;
 		case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
-		case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(id, exover); break;
+		case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(Id_, exover); break;
 		default: cerr << "[[[??]]]" << endl; break;
 		}
 	}
@@ -58,7 +58,7 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 	{
 		exovers.fill({});
 		//	cerr << "GQCSTART::";
-		auto res = GetQueuedCompletionStatusEx(iocp, exovers.data(), exovers.size(), &returned_ios, INFINITE, FALSE);
+		auto res = GetQueuedCompletionStatusEx(Iocp_, exovers.data(), exovers.size(), &returned_ios, INFINITE, FALSE);
 		//	cout << this_thread::get_id() << endl;
 //	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
@@ -74,22 +74,22 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 		for (int i = 0; i < returned_ios; i++)
 		{
 			DWORD returned_bytes = exovers[i].dwNumberOfBytesTransferred;
-			ID id = exovers[i].lpCompletionKey;
+			ID Id_ = exovers[i].lpCompletionKey;
 			ExpOverlapped* exover = reinterpret_cast<ExpOverlapped*>(exovers[i].lpOverlapped);
 
 			if (FALSE == res) [[unlikely]]
 			{
 				cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
-				clients[id].do_disconnect();
+				Clients_[Id_].DoDisconnect();
 				continue;
 			};
 
-			switch (exover->op)
+			switch (exover->Op)
 			{
-			case COMP_OP::OP_RECV: OnRecvComplete(id, returned_bytes); break;
-			case COMP_OP::OP_SEND: OnSendComplete(id, exover); break;
+			case COMP_OP::OP_RECV: OnRecvComplete(Id_, returned_bytes); break;
+			case COMP_OP::OP_SEND: OnSendComplete(Id_, exover); break;
 			case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
-			case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(id, exover); break;
+			case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(Id_, exover); break;
 			default: cerr << "[[[??]]]" << endl; break;
 			}
 		}
@@ -98,8 +98,8 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 
 void Server::StartAccept()
 {
-	ListenSocket::get().init(iocp);
-	ListenSocket::get().do_accept();
+	ListenSocket::Get().Init(Iocp_);
+	ListenSocket::Get().DoAccept();
 }
 
 void Server::RepeatSendLoop(milliseconds repeat_time)
@@ -117,7 +117,7 @@ void Server::RepeatSendLoop(milliseconds repeat_time)
 			continue;
 		}
 
-		for (auto& s : clients)
+		for (auto& s : Clients_)
 		{
 			//sc_test_heart_bit x;
 			//x.time_after_send = TimeAfterSend;
@@ -130,12 +130,12 @@ void Server::RepeatSendLoop(milliseconds repeat_time)
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void Server::OnRecvComplete(ID id, DWORD transfered)
+void Server::OnRecvComplete(ID Id_, DWORD transfered)
 {
 	// cerr << "[recv]" << endl;
 
-	auto& client = clients[id];
-	auto& recvbuf = client.recv_over.buf;
+	auto& client = Clients_[Id_];
+	auto& recvbuf = client.RecvOver_.Buf;
 
 
 #ifdef RINGBUFFER
@@ -143,9 +143,9 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 	if (0 == transfered)
 	{
 		// cerr << " zero recv " << endl;
-		if (recvbuf.bytes_to_recv())
+		if (recvbuf.BytesToRecv())
 		{
-			client.do_disconnect();
+			client.DoDisconnect();
 		}
 		else
 		{
@@ -154,35 +154,35 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 		return;
 	}
 
-	recvbuf.move_rear(transfered);
+	recvbuf.MoveRear(transfered);
 
-	auto pck_start = recvbuf.begin();
-	auto remain_bytes = recvbuf.size();
+	auto pck_start = recvbuf.Begin();
+	auto remain_bytes = recvbuf.Size();
 
 	for (auto need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 		need_bytes <= remain_bytes && 0 != remain_bytes;)
 	{
 		// 링버퍼경계에 걸친 패킷
-		if (recvbuf.check_overflow_when_read(need_bytes))
+		if (recvbuf.CheckOverflowOnRead(need_bytes))
 		{
 			// cerr << "[RingBuffer]::CollideOnEdge" << endl;
 			// 미완성 패킷임
-			if (recvbuf.size() < need_bytes)
+			if (recvbuf.Size() < need_bytes)
 				continue;
 
 			std::byte temp_packet[MAX_PACKET_SIZE];
-			auto packetsize1 = recvbuf.filled_edgespace();
+			auto packetsize1 = recvbuf.FilledEdgespace();
 			memcpy(temp_packet, pck_start, packetsize1);
 			auto packetsize2 = need_bytes - packetsize1;
 			memcpy(temp_packet + packetsize1, &recvbuf, packetsize2);
 			pck_start = temp_packet;
 		}
 
-		ProcessPacket(id, pck_start);
-		recvbuf.move_front(need_bytes);
+		ProcessPacket(Id_, pck_start);
+		recvbuf.MoveFront(need_bytes);
 
-		pck_start = recvbuf.begin();
-		remain_bytes = recvbuf.size();
+		pck_start = recvbuf.Begin();
+		remain_bytes = recvbuf.Size();
 		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
 	}
 #else
@@ -211,10 +211,10 @@ void Server::OnRecvComplete(ID id, DWORD transfered)
 #endif // RINGBUFFER
 
 
-	client.do_recv();
+	client.DoRecv();
 }
 
-void Server::OnSendComplete(ID id, ExpOverlapped* exover)
+void Server::OnSendComplete(ID Id_, ExpOverlapped* exover)
 {
 	//cerr << "send" << endl;
 	/*
@@ -228,12 +228,12 @@ void Server::OnSendComplete(ID id, ExpOverlapped* exover)
 	delete exover;
 }
 
-ID Server::get_free_id()
+ID Server::GetFreeId()
 {
-	for (ID i = 0; i < clients.size(); i++)
+	for (ID i = 0; i < Clients_.size(); i++)
 	{
 		auto expect = SESSION_STATE::FREE;
-		if (clients[i].state.compare_exchange_strong(expect, SESSION_STATE::ACCEPTED))
+		if (Clients_[i].State_.compare_exchange_strong(expect, SESSION_STATE::ACCEPTED))
 		{
 			return i;
 		}
@@ -245,33 +245,33 @@ ID Server::get_free_id()
 
 void Server::OnAcceptComplete(ExpOverlapped* exover)
 {
-	SOCKET new_socket = *reinterpret_cast<SOCKET*>(exover->buf.data());
-	ID id = get_free_id();
-	__analysis_assume(id == 0);
+	SOCKET new_socket = *reinterpret_cast<SOCKET*>(exover->Buf.data());
+	ID Id_ = GetFreeId();
+	__analysis_assume(Id_ == 0);
 
-	if (-1 == id) [[unlikely]]
+	if (-1 == Id_) [[unlikely]]
 	{
-		cerr << "Clients Full [" << clients.size() << "]" << endl;
+		cerr << "Clients Full [" << Clients_.size() << "]" << endl;
 		int res = ::closesocket(new_socket);
 		SocketUtil::CheckError(res, "full->close_socket");
 	}
 
 		// cerr << "accept ::" << id << endl;
 
-	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), iocp, id, 0);
-	clients[id].init(new_socket);
+	::CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_socket), Iocp_, Id_, 0);
+	Clients_[Id_].Init(new_socket);
 	//	cerr << "[ " << clients.size() << " ] on_line" << endl;
-	clients[id].do_recv();
+	Clients_[Id_].DoRecv();
 
-	ListenSocket::get().do_accept();
+	ListenSocket::Get().DoAccept();
 }
 
-void Server::OnDisconnectComplete(ID id, ExpOverlapped* exover)
+void Server::OnDisconnectComplete(ID Id_, ExpOverlapped* exover)
 {
 	// cerr << "diconnect::" << id << "::" << endl;
-	int res = ::closesocket(clients[id].socket);
+	int res = ::closesocket(Clients_[Id_].Socket_);
 	SocketUtil::CheckError(res, "close socket");
-	clients[id].state = SESSION_STATE::FREE;
+	Clients_[Id_].State_ = SESSION_STATE::FREE;
 	delete exover;
 }
 

@@ -8,7 +8,7 @@ struct SocketUtil
 	static void terminate();
 	static void CheckErrorEx(BOOL ret_val, const char* msg);
 	static void CheckError(int ret_val, const char* msg);
-	static void CheckError(const SOCKET& socket, const char* msg);
+	static void CheckError(const SOCKET& Socket_, const char* msg);
 	static void ReportErrorWhere(const char* file_name, int line, auto func, std::string_view msg = "", std::ostream& os = std::cerr)
 	{
 		os << "[ERROR] " << file_name << " line::" << line << " F::" << func

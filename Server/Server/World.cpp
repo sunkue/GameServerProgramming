@@ -35,8 +35,8 @@ void Sector::EraseObjFromSector(StaticObj* obj)
 {
 	if (auto player = dynamic_cast<Player*>(obj))
 	{
-		unique_lock lck{ playerLock };
-		players_.unsafe_erase(player);
+		unique_lock lck{ PlayerLock };
+		Players_.unsafe_erase(player);
 	}
 }
 
@@ -44,8 +44,8 @@ void Sector::InsertObjSector(StaticObj* obj)
 {
 	if (auto player = dynamic_cast<Player*>(obj))
 	{
-		shared_lock lck{ playerLock };
-		players_.insert(player);
+		shared_lock lck{ PlayerLock };
+		Players_.insert(player);
 	}
 }
 
@@ -59,14 +59,14 @@ void World::ChangeSector(StaticObj* obj, Position newSectorIdx)
 {
 	if (!obj) return;
 
-	auto& oldSector = GetSector(obj->get_sector());
+	auto& oldSector = GetSector(obj->GetSectorIdx());
 	auto& newSector = GetSector(newSectorIdx);
 
 	oldSector.EraseObjFromSector(obj);
 	// 여기서 오브젝트 어느섹터에도 존재하지 않을 수 있음.
 	newSector.InsertObjSector(obj);
 
-	obj->set_sector(newSectorIdx);
+	obj->SetSectorIdx(newSectorIdx);
 }
 
 array<Sector*, 4> World::GetNearSectors4(Position pos, Position sectorIdx)

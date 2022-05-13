@@ -6,14 +6,14 @@
 
 /////////////////////////////////////////
 
-#define TEMPLATE_SHADER_SET(type) template<> inline void Shader::set<type>(const string& uniform_var_name, const type& value)const
+#define TEMPLATE_SHADER_SET(type) template<> inline void Shader::Set<type>(const string& uniform_var_name, const type& value)const
 #define UNIFORM_LOCATION glGetUniformLocation(shader_id_, uniform_var_name.data())
 #define UNIFORM_LOCATION_STRUCT(mem) glGetUniformLocation(shader_id_, uniform_var_name.data() + #mem)
 
 /////////////////////////////////////////
 
 template<class T>
-inline void Shader::set(const string& uniform_var, const T& value)const
+inline void Shader::Set(const string& uniform_var, const T& value)const
 {
 	static_assert(always_false<T>, "Shader::set T&, come to Shader.hpp and specialize template for type.");
 }

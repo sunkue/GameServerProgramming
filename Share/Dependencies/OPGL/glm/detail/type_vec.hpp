@@ -9,11 +9,11 @@
 namespace glm{
 namespace detail
 {
-	template <typename T, std::size_t size, bool aligned>
+	template <typename T, std::size_t Size, bool aligned>
 	struct storage
 	{
 		typedef struct type {
-			uint8 data[size];
+			uint8 Data[Size];
 		} type;
 	};
 
@@ -21,7 +21,7 @@ namespace detail
 		template <typename T> \
 		struct storage<T, x, true> { \
 			GLM_ALIGNED_STRUCT(x) type { \
-				uint8 data[x]; \
+				uint8 Data[x]; \
 			}; \
 		};
 

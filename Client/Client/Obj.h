@@ -20,15 +20,18 @@ enum class OBJ_TYPE : int
 class StaticObj
 {
 public:
-	StaticObj(OBJ_TYPE type, Position pos) : type_{ type }, pos_{ pos } {}
+	StaticObj(OBJ_TYPE type, Position pos) : Type_{ type }, Pos_{ pos } {}
 public:
-	GET(pos);
-	SET(pos);
-	GET(type);
+	GET(Pos);
+	SET(Pos);
+	GET(Type);
 protected:
-	OBJ_TYPE type_{};
-	Position pos_{};
+	OBJ_TYPE Type_{};
+	Position Pos_{};
 };
+
+
+inline int RequireExp(int HP) { return 50 * pow(2, HP); }
 
 class DynamicObj : public StaticObj
 {
@@ -36,8 +39,12 @@ public:
 	DynamicObj(OBJ_TYPE type, Position pos) : StaticObj{ type ,pos } {}
 private:
 public:
+	GET(Hp);
+	GET(Level);
 protected:
-	shared_mutex lock;
+	int Hp_{};
+	int Level_{};
+
 private:
 };
 

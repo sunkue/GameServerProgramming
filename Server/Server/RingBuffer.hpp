@@ -8,61 +8,61 @@ class RingBuffer : protected Contanier
 {
 	using value_type = Contanier::value_type;
 public:
-	value_type* data() { return &Contanier::operator[](begin_idx_); }
-	size_t size() const { return size_; }
-	size_t capacity() const { return Contanier::size(); }
-	size_t write(const void* _src, size_t bytes)
+	value_type* Data() { return &Contanier::operator[](BeginIdx_); }
+	size_t Size() const { return Size_; }
+	size_t Capacity() const { return Contanier::Size(); }
+	size_t Write(const void* _src, size_t bytes)
 	{
 		auto src = reinterpret_cast<const std::byte*>(_src);
-		auto data = Contanier::data();
-		auto capacity = this->capacity();
-		auto bytes_to_write = std::min(bytes, capacity - size_);
+		auto Data = Contanier::Data();
+		auto Capacity = this->Capacity();
+		auto bytes_to_write = std::min(bytes, Capacity - Size_);
 
-		if (bytes_to_write <= capacity - end_idx_)
+		if (bytes_to_write <= Capacity - EndIdx_)
 		{
-			memcpy(data + end_idx_, src, bytes_to_write);
-			end_idx_ += bytes_to_write;
-			if (end_idx_ == capacity) end_idx_ = 0;
+			memcpy(Data + EndIdx_, src, bytes_to_write);
+			EndIdx_ += bytes_to_write;
+			if (EndIdx_ == Capacity) EndIdx_ = 0;
 		}
 		else
 		{
-			auto size_1 = capacity - end_idx_;
-			memcpy(data + end_idx_, src, size_1);
+			auto size_1 = Capacity - EndIdx_;
+			memcpy(Data + EndIdx_, src, size_1);
 			auto size_2 = bytes_to_write - size_1;
-			memcpy(data, src + size_1, size_2);
-			end_idx_ = size_2;
+			memcpy(Data, src + size_1, size_2);
+			EndIdx_ = size_2;
 		}
 
-		size_ += bytes_to_write;
+		Size_ += bytes_to_write;
 		return bytes_to_write;
 	}
-	size_t read(void* _dst, size_t bytes)
+	size_t Read(void* _dst, size_t bytes)
 	{
-		auto data = Contanier::data();
+		auto Data = Contanier::Data();
 		auto dst = reinterpret_cast<std::byte*>(_dst);
-		auto capacity = this->capacity();
-		auto bytes_to_read = std::min(bytes, size_);
+		auto Capacity = this->Capacity();
+		auto bytes_to_read = std::min(bytes, Size_);
 
-		if (bytes_to_read <= capacity - begin_idx_)
+		if (bytes_to_read <= Capacity - BeginIdx_)
 		{
-			memcpy(dst, data + begin_idx_, bytes_to_read);
-			begin_idx_ += bytes_to_read;
-			if (begin_idx_ == capacity) begin_idx_ = 0;
+			memcpy(dst, Data + BeginIdx_, bytes_to_read);
+			BeginIdx_ += bytes_to_read;
+			if (BeginIdx_ == Capacity) BeginIdx_ = 0;
 		}
 		else
 		{
-			auto size_1 = capacity - begin_idx_;
-			memcpy(dst, data + begin_idx_, size_1);
+			auto size_1 = Capacity - BeginIdx_;
+			memcpy(dst, Data + BeginIdx_, size_1);
 			auto size_2 = bytes_to_read - size_1;
-			memcpy(dst + size_1, data, size_2);
-			begin_idx_ = size_2;
+			memcpy(dst + size_1, Data, size_2);
+			BeginIdx_ = size_2;
 		}
 
-		size_ -= bytes_to_read;
+		Size_ -= bytes_to_read;
 		return bytes_to_read;
 	}
 private:
-	size_t begin_idx_{}, end_idx_{}, size_{};
+	size_t BeginIdx_{}, EndIdx_{}, Size_{};
 };
 
 
@@ -73,43 +73,43 @@ class RecvRingBuffer : protected Contanier
 {
 	using value_type = Contanier::value_type;
 public:
-	value_type* begin() { return &Contanier::operator[](begin_idx_); }
-	value_type* end() { return &Contanier::operator[](end_idx_); }
-	size_t size() const { return size_; }
-	size_t capacity() const { return Contanier::size(); }
-	bool full() const { return capacity() == size(); }
-	size_t filled_edgespace() const { return capacity() - begin_idx_; }
-	size_t empty_edgespace() const { return capacity() - end_idx_; }
-	size_t bytes_to_recv() const
+	value_type* Begin() { return &Contanier::operator[](BeginIdx_); }
+	value_type* End() { return &Contanier::operator[](EndIdx_); }
+	size_t Size() const { return Size_; }
+	size_t Capacity() const { return Contanier::size(); }
+	bool Full() const { return Capacity() == Size(); }
+	size_t FilledEdgespace() const { return Capacity() - BeginIdx_; }
+	size_t EmptyEdgespace() const { return Capacity() - EndIdx_; }
+	size_t BytesToRecv() const
 	{
-		if (full()) [[unlikely]]
+		if (Full()) [[unlikely]]
 			return 0;
 
-		if (end_idx_ < begin_idx_) [[unlikely]]
-			return begin_idx_ - end_idx_;
+		if (EndIdx_ < BeginIdx_) [[unlikely]]
+			return BeginIdx_ - EndIdx_;
 
-		return empty_edgespace();
+		return EmptyEdgespace();
 	}
 	// write
-	void move_rear(size_t bytes)
+	void MoveRear(size_t bytes)
 	{
-		auto capacity = this->capacity();
-		end_idx_ = (end_idx_ + bytes) % capacity;
-		size_ += bytes;
+		auto Capacity = this->Capacity();
+		EndIdx_ = (EndIdx_ + bytes) % Capacity;
+		Size_ += bytes;
 	}
 	// read :: return true when overflowed
-	void move_front(size_t bytes)
+	void MoveFront(size_t bytes)
 	{
-		auto capacity = this->capacity();
-		begin_idx_ = (begin_idx_ + bytes) % capacity;
-		size_ -= bytes;
+		auto Capacity = this->Capacity();
+		BeginIdx_ = (BeginIdx_ + bytes) % Capacity;
+		Size_ -= bytes;
 	}
 
-	bool check_overflow_when_read(size_t bytes) const
+	bool CheckOverflowOnRead(size_t bytes) const
 	{
-		bool overflowed = filled_edgespace() < bytes;
+		bool overflowed = FilledEdgespace() < bytes;
 		return overflowed;
 	}
 private:
-	size_t begin_idx_{}, end_idx_{}, size_{};
+	size_t BeginIdx_{}, EndIdx_{}, Size_{};
 };

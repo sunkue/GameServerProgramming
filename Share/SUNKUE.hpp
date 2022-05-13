@@ -40,7 +40,7 @@ namespace MY_NAME_SPACE
 #define SINGLE_TON(CLASS)								\
 		DISABLE_COPY(CLASS)								\
 		public:											\
-			static CLASS& get()							\
+			static CLASS& Get()							\
 			{											\
 				static CLASS _instance;					\
 				return _instance;						\
@@ -48,15 +48,15 @@ namespace MY_NAME_SPACE
 		private:										\
 			CLASS()
 
-#define GET(var) auto get_##var()const { return var##_; }
-#define GET_REF(var) const auto& get_##var()const { return var##_; }
-#define GET_REF_UNSAFE(var) auto& get_##var() { return var##_; }
-#define SET(var) void set_##var(const auto& value) { var##_ = value; }
+#define GET(var) auto Get##var()const { return var##_; }
+#define GET_REF(var) const auto& Get##var()const { return var##_; }
+#define GET_REF_UNSAFE(var) auto& Get##var() { return var##_; }
+#define SET(var) void Set##var(const auto& value) { var##_ = value; }
 
 #define CREATE_SHARED(CLASS)										\
 		public:																\
 		template<typename ...Arg>											\
-		static shared_ptr<CLASS> create(Arg&&...arg)									\
+		static shared_ptr<CLASS> Create(Arg&&...arg)									\
 		{																	\
 			struct enabler : public CLASS									\
 			{ enabler(Arg&&...arg) :CLASS(std::forward<Arg>(arg)...) {} };	\
@@ -66,7 +66,7 @@ namespace MY_NAME_SPACE
 #define CREATE_UNIQUE(CLASS)										\
 		public:																\
 		template<typename ...Arg>											\
-		static unique_ptr<CLASS> create(Arg&&...arg)									\
+		static unique_ptr<CLASS> Create(Arg&&...arg)									\
 		{																	\
 			struct enabler : public CLASS									\
 			{ enabler(Arg&&...arg) :CLASS(std::forward<Arg>(arg)...) {} };	\
@@ -89,7 +89,7 @@ namespace MY_NAME_SPACE
 
 		bool try_push(const T& value)
 		{
-			if (N == this->size())
+			if (N == this->Size())
 			{
 				return false;
 			}
@@ -125,7 +125,7 @@ namespace MY_NAME_SPACE
 				_stop_watch = clk::now();
 			}
 
-			void end(std::string_view mess = ""sv, std::ostream& os = std::cout) {
+			void End(std::string_view mess = ""sv, std::ostream& os = std::cout) {
 				auto t = clk::now();
 				_lap = duration_cast<milliseconds>(t - _stop_watch);
 				os << mess << " : " << _lap << std::endl;
@@ -241,7 +241,7 @@ namespace MY_NAME_SPACE {
 
 
 	// 컨테이너 [b,e) macro
-#define ALLOF(cont)(std::begin(cont)),(std::end(cont))
+#define ALLOF(cont)(std::Begin(cont)),(std::End(cont))
 #define cALLOF(cont)(std::cbegin(cont)),(std::cend(cont))
 
 

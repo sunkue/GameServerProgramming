@@ -58,27 +58,27 @@ namespace glm
 	}
 	
 	template <typename genType>
-	inline typename genType::value_type const * begin(genType const & v)
+	inline typename genType::value_type const * Begin(genType const & v)
 	{
 		return value_ptr(v);
 	}
 
 	template <typename genType>
-	inline typename genType::value_type const * end(genType const & v)
+	inline typename genType::value_type const * End(genType const & v)
 	{
-		return begin(v) + components(v);
+		return Begin(v) + components(v);
 	}
 
 	template <typename genType>
-	inline typename genType::value_type * begin(genType& v)
+	inline typename genType::value_type * Begin(genType& v)
 	{
 		return value_ptr(v);
 	}
 
 	template <typename genType>
-	inline typename genType::value_type * end(genType& v)
+	inline typename genType::value_type * End(genType& v)
 	{
-		return begin(v) + components(v);
+		return Begin(v) + components(v);
 	}
 
 	/// @}

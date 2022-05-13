@@ -9,9 +9,9 @@ bool DynamicObj::Move(const Position diff)
 	Position sector;
 
 	{
-		shared_lock lck(positionLock);
-		pos = get_pos();
-		sector = get_sector();
+		shared_lock lck(PositionLock);
+		pos = GetPos();
+		sector = GetSectorIdx();
 	}
 
 	pos += diff;
@@ -26,13 +26,13 @@ bool DynamicObj::Move(const Position diff)
 	auto newSector = GetSectorByPosition(pos);
 
 	{
-		unique_lock lck(positionLock);
-		set_pos(pos);
+		unique_lock lck(PositionLock);
+		SetPos(pos);
 	}
 
 	if (sector != newSector)
 	{
-		World::get().ChangeSector(this, newSector);
+		World::Get().ChangeSector(this, newSector);
 	}
 
 	return true;
@@ -40,9 +40,9 @@ bool DynamicObj::Move(const Position diff)
 
 bool StaticObj::IsInSight(Position target)
 {
-	auto diff = target - pos_;
+	auto diff = target - Pos_;
 	auto maxCompDiff = glm::compMax(glm::abs(diff));
-	return maxCompDiff <= sight_ / 2;
+	return maxCompDiff <= SightRange_ / 2;
 }
 
 

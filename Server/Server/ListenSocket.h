@@ -7,12 +7,12 @@ class ListenSocket
 	SINGLE_TON(ListenSocket) = default;
 	~ListenSocket();
 private:
-	SOCKET listen_socket{};
-	SOCKET newface_socket{};
-	ExpOverlapped accept_over{ COMP_OP::OP_ACCEPT };
-	array<char, 64> accept_buf{};
+	SOCKET ListenSocket_{};
+	SOCKET NewfaceSocket_{};
+	ExpOverlapped AcceptOver_{ COMP_OP::OP_ACCEPT };
+	array<char, 64> AcceptBuf_{};
 public:
-	void init(HANDLE iocp);
-	void do_accept();
+	void Init(HANDLE iocp);
+	void DoAccept();
 };
 

@@ -4,27 +4,27 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void Server::ProcessPacket(ID id, const void* const packet)
+void Server::ProcessPacket(ID Id_, const void* const packet)
 {
 	// conditional funtion => 함수객체 전달해서 처리.
-	auto SND2ME = [this, id](const void* const packet)
+	auto SND2ME = [this, Id_](const void* const packet)
 	{
-		clients[id].do_send(packet);
+		Clients_[Id_].DoSend(packet);
 	};
 
-	auto SND2OTHERS = [this, id](const void* const packet)
+	auto SND2OTHERS = [this, Id_](const void* const packet)
 	{
-		for (int i = 0; i < clients.size(); i++)
+		for (int i = 0; i < Clients_.size(); i++)
 		{
-			if (i != id) { clients[i].do_send(packet); }
+			if (i != Id_) { Clients_[i].DoSend(packet); }
 		}
 	};
 
 	auto SND2EVERY = [this](const void* const packet)
 	{
-		for (auto& c : clients)
+		for (auto& c : Clients_)
 		{
-			c.do_send(packet);
+			c.DoSend(packet);
 		}
 	};
 
@@ -36,22 +36,22 @@ void Server::ProcessPacket(ID id, const void* const packet)
 		{
 			{
 				sc_hi hi;
-				hi.id = NetID(id);
+				hi.id = NetID(Id_);
 				SND2ME(&hi);
 			}
 
 			//if (PlayerManager::get().Move(id, Position{}))
-			if (PlayerManager::get().Move(id, Position{ rand() % MAP_SIZE, rand() % MAP_SIZE }))
+			if (PlayerManager::Get().Move(Id_, Position{ rand() % MAP_SIZE, rand() % MAP_SIZE }))
 			{
 				sc_set_position set_pos;
-				auto pos = PlayerManager::get().GetPosition(id);
-				set_pos.id = NetID(id);
+				auto pos = PlayerManager::Get().GetPosition(Id_);
+				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
 				SND2ME(&set_pos);
 			}
 			else
 			{
-				cerr << "[!!!]OverflowedInitPosition" << PlayerManager::get().GetPosition(id).x << " " << PlayerManager::get().GetPosition(id).y << endl;
+				cerr << "[!!!]OverflowedInitPosition" << PlayerManager::Get().GetPosition(Id_).x << " " << PlayerManager::Get().GetPosition(Id_).y << endl;
 			}
 			
 
@@ -83,16 +83,16 @@ void Server::ProcessPacket(ID id, const void* const packet)
 				SND2ME(&ready);
 			}
 
-			PlayerManager::get().Enable(id);
+			PlayerManager::Get().Enable(Id_);
 		}
 		CASE PACKET_TYPE::CS_INPUT :
 		{
 			auto pck = reinterpret_cast<const cs_input*>(packet);
-			if (PlayerManager::get().Move(id, pck->input))
+			if (PlayerManager::Get().Move(Id_, pck->input))
 			{
 				sc_set_position set_pos;
-				auto pos = PlayerManager::get().GetPosition(id);
-				set_pos.id = NetID(id);
+				auto pos = PlayerManager::Get().GetPosition(Id_);
+				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
 				set_pos.timestamp = pck->timestamp;
 				SND2ME(&set_pos);

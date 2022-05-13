@@ -29,6 +29,7 @@ const uint16_t SERVER_PORT = 8282;
 
 //====================================
 constexpr int MAX_PLAYER = 50000;
+constexpr int MAX_PARTY = 4;
 constexpr int MAP_SIZE = 400;
 constexpr int SIGHT_SIZE = 11;
 constexpr int WINDOW_SIZE = 16;

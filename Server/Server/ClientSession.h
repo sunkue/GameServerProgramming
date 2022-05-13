@@ -21,24 +21,24 @@ public:
 	~ClientSession();
 
 public:
-	void init(SOCKET s);
+	void Init(SOCKET s);
 
 public:
-	void do_recv();
-	void do_send(const void* const packet);
-	void do_disconnect();
+	void DoRecv();
+	void DoSend(const void* const packet);
+	void DoDisconnect();
 
 public:
-	bool IsGood() { return SESSION_STATE::__GOOD__ <= state; }
+	bool IsGood() { return SESSION_STATE::__GOOD__ <= State_; }
 	bool IsBad() { return !IsGood(); }
-	bool IsFree() { return SESSION_STATE::FREE == state; }
+	bool IsFree() { return SESSION_STATE::FREE == State_; }
 	bool IsUnFree() { return !IsFree(); }
 
 private:
-	SOCKET socket{};
-	ID id{ -1 };
-	RecvExpOverlapped recv_over{};
-	atomic<SESSION_STATE> state{ SESSION_STATE::FREE };
+	SOCKET Socket_{};
+	ID Id_{ -1 };
+	RecvExpOverlapped RecvOver_{};
+	atomic<SESSION_STATE> State_{ SESSION_STATE::FREE };
 #ifndef RINGBUFFER
 	packet_size_t prerecv_size{};
 #endif // RINGBUFFER

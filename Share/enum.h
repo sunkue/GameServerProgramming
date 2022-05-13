@@ -142,12 +142,12 @@
 #   include BETTER_ENUMS_MACRO_FILE
 #else
 
-#define BETTER_ENUMS_PP_MAP(macro, data, ...) \
+#define BETTER_ENUMS_PP_MAP(macro, Data, ...) \
     BETTER_ENUMS_ID( \
         BETTER_ENUMS_APPLY( \
             BETTER_ENUMS_PP_MAP_VAR_COUNT, \
             BETTER_ENUMS_PP_COUNT(__VA_ARGS__)) \
-        (macro, data, __VA_ARGS__))
+        (macro, Data, __VA_ARGS__))
 
 #define BETTER_ENUMS_PP_MAP_VAR_COUNT(count) BETTER_ENUMS_M ## count
 
@@ -431,12 +431,12 @@ namespace better_enums {
     struct _iterable {
         typedef const Element* iterator;
 
-        BETTER_ENUMS_CONSTEXPR_ iterator begin() const { return iterator(_array); }
-        BETTER_ENUMS_CONSTEXPR_ iterator end() const
+        BETTER_ENUMS_CONSTEXPR_ iterator Begin() const { return iterator(_array); }
+        BETTER_ENUMS_CONSTEXPR_ iterator End() const
         {
             return iterator(_array + _size);
         }
-        BETTER_ENUMS_CONSTEXPR_ std::size_t size() const { return _size; }
+        BETTER_ENUMS_CONSTEXPR_ std::size_t Size() const { return _size; }
         BETTER_ENUMS_CONSTEXPR_ const Element& operator [](std::size_t index) const
         {
             return _array[index];

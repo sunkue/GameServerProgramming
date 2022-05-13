@@ -46,19 +46,20 @@ public:
 	StaticObj() {}
 	virtual ~StaticObj() = default;
 	bool IsInSight(Position target);
-	GET(pos);
-	SET(pos);
-	GET(sector);
-	GET(sight);
-	SET(sector);
-	GET_REF(enable);
+	GET(Pos);
+	SET(Pos);
+	GET(SightRange);
+	GET(SectorIdx);
+	SET(SectorIdx);
+	GET_REF(Enable);
 protected:
-	atomic_bool enable_{};
+	atomic_bool Enable_{};
 private:
-	Position pos_{};
-	int sight_{ SIGHT_SIZE };
-	Position sector_{};
+	Position Pos_{};
+	int SightRange_{ SIGHT_SIZE };
+	Position SectorIdx_{};
 };
+
 
 class DynamicObj : public StaticObj
 {
@@ -68,8 +69,12 @@ public:
 private:
 
 public:
-
+	GET_REF(Hp);
+	GET_REF(Level);
 protected:
-	shared_mutex positionLock;
+	atomic_int Hp_{};
+	atomic_int Level_{};
+protected:
+	shared_mutex PositionLock;
 private:
 };

@@ -23,14 +23,14 @@ private:
 public:
 	void EraseObjFromSector(StaticObj* obj);
 	void InsertObjSector(StaticObj* obj);
-	GET_REF(players);
+	GET_REF(Players);
 public:
-	shared_mutex playerLock;
-	shared_mutex monsterLock;
+	shared_mutex PlayerLock;
+	shared_mutex MonsterLock;
 private:
-	vector<StaticObj> obstacles_; // 고정데이터..
-	concurrent_vector<DynamicObj> monsters_; // 고정크기..
-	concurrent_unordered_set<Player*> players_;
+	vector<StaticObj> Obstacles_; // 고정데이터..
+	concurrent_vector<DynamicObj> Monsters_; // 고정크기..
+	concurrent_unordered_set<Player*> Players_;
 };
 
 /////////////////////////////////////////////
@@ -44,11 +44,11 @@ class World
 	SINGLE_TON(World) = default;
 public:
 	void ChangeSector(StaticObj* obj, Position newSector);
-	Sector& GetSector(Position sector) { return sectors_[sector.y][sector.x]; }
+	Sector& GetSector(Position sector) { return Sectors_[sector.y][sector.x]; }
 	array<Sector*, 4> GetNearSectors4(Position pos, Position sector);
 public:
 
 private:
-	Sector sectors_[SECTOR_NUM][SECTOR_NUM];
+	Sector Sectors_[SECTOR_NUM][SECTOR_NUM];
 };
 

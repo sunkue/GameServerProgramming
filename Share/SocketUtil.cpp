@@ -41,9 +41,9 @@ void SocketUtil::CheckError(int ret_val, const char* msg)
 	}
 }
 
-void SocketUtil::CheckError(const SOCKET& socket, const char* msg)
+void SocketUtil::CheckError(const SOCKET& Socket_, const char* msg)
 {
-	if (SOCKET_SUCCESS == socket)
+	if (SOCKET_SUCCESS == Socket_)
 	{
 		if (ERROR_IO_PENDING == WSAGetLastError())return;
 		ReportError(msg); terminate();

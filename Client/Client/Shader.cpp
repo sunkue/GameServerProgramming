@@ -137,7 +137,7 @@ GLuint Shader::compile_shader(vector<string>& filenameVS, vector<string>& filena
 
 /// //////////////////////////////////////////////
 
-void Shader::use()const
+void Shader::Use()const
 {
 	glUseProgram(shader_id_);
 }

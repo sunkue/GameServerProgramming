@@ -5,15 +5,15 @@ class Shader
 {
 public:
 
-	void use()const;
+	void Use()const;
 
-	template<class T> void set(const string& uniform_var_name, const T& value)const;
+	template<class T> void Set(const string& uniform_var_name, const T& value)const;
 
 	GET(shader_id);
 
 	CREATE_SHARED(Shader);
 
-	static ShaderPtr basic()
+	static ShaderPtr Basic()
 	{
 		vector<string> VS;
 		vector<string> FS;
@@ -21,8 +21,8 @@ public:
 		VS.clear(); VS.emplace_back("./Shader/test_vertex.glsl");
 		FS.clear(); FS.emplace_back("./Shader/default_fragment.glsl");
 		GS.clear(); 
-		static ShaderPtr basic = Shader::create(VS, FS, GS);
-		return basic;
+		static ShaderPtr Basic = Shader::Create(VS, FS, GS);
+		return Basic;
 	}
 	
 private:

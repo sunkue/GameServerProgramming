@@ -13,7 +13,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static tvec4<uint32, P> call(tvec4<uint32, P> const & v, uint32 Mask, uint32 Shift)
 		{
-			__m128i const set0 = v.data;
+			__m128i const set0 = v.Data;
 
 			__m128i const set1 = _mm_set1_epi32(Mask);
 			__m128i const and1 = _mm_and_si128(set0, set1);
@@ -34,7 +34,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static tvec4<uint32, P> call(tvec4<uint32, P> const & v, uint32 Mask, uint32 Shift)
 		{
-			__m128i const set0 = v.data;
+			__m128i const set0 = v.Data;
 
 			__m128i const set1 = _mm_set1_epi32(Mask);
 			__m128i const and0 = _mm_and_si128(set0, set1);

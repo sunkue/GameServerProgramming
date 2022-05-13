@@ -16,10 +16,10 @@ int main()
 	for (int i = 0; i < workers.capacity(); i++)
 	{
 #ifdef GQCPEX
-		workers.emplace_back([&]() { Server::get().ProcessQueuedCompleteOperationLoopEx(); });
+		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoopEx(); });
 #else
-		workers.emplace_back([&]() { Server::get().ProcessQueuedCompleteOperationLoop(); });
+		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoop(); });
 #endif // GQCPEX
 	}
-	Server::get().StartAccept();
+	Server::Get().StartAccept();
 }
