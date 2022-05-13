@@ -31,6 +31,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 
 		if (FALSE == res) [[unlikely]]
 		{
+			cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
 			clients[id].do_disconnect();
 			continue;
 		};
@@ -48,11 +49,11 @@ void Server::ProcessQueuedCompleteOperationLoop()
 
 void Server::ProcessQueuedCompleteOperationLoopEx()
 {
-	constexpr size_t MAX_GQCS_IO_ENTRY{ 50 };
+	constexpr size_t MAX_GQCS_IO_ENTRY{ 10 };
 
 	ULONG returned_ios{};
 	array<OVERLAPPED_ENTRY, MAX_GQCS_IO_ENTRY> exovers{};
-	sizeof(exovers);
+	
 	while (true)
 	{
 		exovers.fill({});

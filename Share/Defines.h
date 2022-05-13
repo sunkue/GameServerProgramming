@@ -1,7 +1,7 @@
 #pragma once
 
 #define RINGBUFFER
-#define GQCPEX
+//#define GQCPEX
 
 //====================================
 
@@ -29,7 +29,7 @@ const uint16_t SERVER_PORT = 8282;
 
 //====================================
 constexpr int MAX_PLAYER = 50000;
-constexpr int MAP_SIZE = 100;
+constexpr int MAP_SIZE = 400;
 constexpr int SIGHT_SIZE = 11;
 constexpr int WINDOW_SIZE = 16;
 constexpr int SECTOR_SIZE = 20;
