@@ -8,9 +8,6 @@
 // 
 /////////////////////////////////
 
-inline int RequireExp(int HP) { return 50 * pow(2, HP); }
-
-
 class Player : public DynamicObj
 {
 	friend class PlayerManager;
@@ -36,6 +33,8 @@ protected:
 	shared_mutex ViewLock;
 	ID Id_{ -1 };
 	atomic_int Exp_{};
+private:
+	void HpRegen();
 private:
 	concurrent_unordered_set<ID> ViewList_;
 

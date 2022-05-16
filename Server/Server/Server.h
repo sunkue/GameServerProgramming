@@ -16,6 +16,7 @@ private:
 	void OnSendComplete(ID Id_, ExpOverlapped* exover);
 	void OnAcceptComplete(ExpOverlapped* exover);
 	void OnDisconnectComplete(ID Id_, ExpOverlapped* exover);
+	void OnEventTimerComplete(ExpOverlapped* exover);
 public:
 	void ProcessPacket(ID Id_, const void* const packet);
 private:

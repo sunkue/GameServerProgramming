@@ -19,18 +19,19 @@ BETTER_ENUM
 	, NONE = 0
 	/* Client 2 Server */
 
-	, CS_NONE = 10
-	, CS_HI
-	, CS_INPUT
+	, Cs_none = 10
+	, Cs_hi
+	, Cs_input
 
 
 	/* Server 2 Client */
 
-	, SC_NONE = 100
-	, SC_HI
-	, SC_READY
-	, SC_SET_POSITION
-	, SC_REMOVE_OBJ
+	, Sc_none = 100
+	, Sc_hi
+	, Sc_ready
+	, Sc_set_position
+	, Sc_remove_obj
+	, Sc_set_hp
 );
 
 // 가용길이 패킷 
@@ -72,6 +73,12 @@ PACKET(sc_set_position)
 	NetID id;
 	Position pos;
 	milliseconds timestamp;
+};
+
+PACKET(sc_set_hp)
+{
+	NetID id;
+	int hp;
 };
 
 PACKET(sc_remove_obj)

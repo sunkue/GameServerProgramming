@@ -32,6 +32,7 @@ protected:
 
 
 inline int RequireExp(int HP) { return 50 * pow(2, HP); }
+inline int MaxHP(int Level) { return Level * 100; }
 
 class DynamicObj : public StaticObj
 {
@@ -40,7 +41,9 @@ public:
 private:
 public:
 	GET(Hp);
+	SET(Hp);
 	GET(Level);
+	SET(Level);
 protected:
 	int Hp_{};
 	int Level_{};

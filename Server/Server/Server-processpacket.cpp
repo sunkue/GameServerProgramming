@@ -32,7 +32,7 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	// cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
 	switch (packet_type)
 	{
-		CASE PACKET_TYPE::CS_HI :
+		CASE PACKET_TYPE::Cs_hi :
 		{
 			{
 				sc_hi hi;
@@ -85,7 +85,7 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 
 			PlayerManager::Get().Enable(Id_);
 		}
-		CASE PACKET_TYPE::CS_INPUT :
+		CASE PACKET_TYPE::Cs_input :
 		{
 			auto pck = reinterpret_cast<const cs_input*>(packet);
 			if (PlayerManager::Get().Move(Id_, pck->input))

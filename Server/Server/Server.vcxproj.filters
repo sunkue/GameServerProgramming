@@ -41,6 +41,9 @@
     <Filter Include="Game\World">
       <UniqueIdentifier>{95f8aa58-58f8-4e47-a8b1-64077dcfffae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\TimerEvent">
+      <UniqueIdentifier>{a6fe6be5-30e4-4139-8fa2-33b00171a042}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>Game\World</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerEvent.cpp">
+      <Filter>Game\TimerEvent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +132,9 @@
     </ClInclude>
     <ClInclude Include="World.h">
       <Filter>Game\World</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerEvent.h">
+      <Filter>Game\TimerEvent</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

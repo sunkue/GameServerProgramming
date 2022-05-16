@@ -53,6 +53,26 @@ void Renderer::ReadyDraw()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
+void DrawGui()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	gui::NewFrame();
+	gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	auto& player = Game::Get().GetPlayer();
+	auto pos = player.GetPos();
+	auto HP = player.GetHp();
+	auto EXP = player.GetExp();
+	auto Level = player.GetLevel();
+	gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHP(Level))).c_str());
+	gui::Text(("LEVEL :: "s + to_string(Level) + "  EXP :: "s + to_string(EXP) + "/"s + to_string(RequireExp(Level))).c_str());
+	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
+	gui::End();
+
+	gui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
+}
+
 void Renderer::Draw()
 {
 	ReadyDraw();
@@ -82,6 +102,8 @@ void Renderer::Draw()
 	{
 		draw_obj(other.second);
 	}
+
+	DrawGui();
 }
 
 void Renderer::Init()

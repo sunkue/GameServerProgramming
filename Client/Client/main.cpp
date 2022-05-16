@@ -5,8 +5,6 @@
 #include "Renderer.h"
 #include "Networker.h"
 
-void DrawGui();
-
 void DoNextFrame()
 {
 	KEY_BOARD_EVENT_MANAGER::Get().ProcessInput();
@@ -14,30 +12,11 @@ void DoNextFrame()
 	System::Get().Update();
 	Game::Get().update();
 	Renderer::Get().Draw();
-
+	
 	SleepEx(0, true);
-
-	DrawGui();
 
 	glfwPollEvents();
 	glfwSwapBuffers(System::Get().Window);
-}
-
-void DrawGui()
-{
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	gui::NewFrame();
-	gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	auto pos = Game::Get().GetPlayer().GetPos();
-	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
-	// HP x/x
-	// LEVEL 
-	// EXP x/x
-	gui::End();
-
-	gui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
 }
 
 void BindDefaultInputFuncs()

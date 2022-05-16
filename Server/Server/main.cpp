@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Server.h"
+#include "TimerEvent.h"
 
 struct RaiiThread
 {
@@ -13,7 +14,7 @@ struct RaiiThread
 int main()
 {
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
-	for (int i = 0; i < workers.capacity(); i++)
+	for (int i = 0; i < workers.capacity() - 1; i++)
 	{
 #ifdef GQCPEX
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoopEx(); });
@@ -22,4 +23,6 @@ int main()
 #endif // GQCPEX
 	}
 	Server::Get().StartAccept();
+
+	TimerEvent::Get().ProcessEventQueueLoop();
 }

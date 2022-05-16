@@ -2,12 +2,29 @@
 #include "Player.h"
 #include "World.h"
 #include "Server.h"
+#include "TimerEvent.h"
 
 /////////////////////////////////
 // 
 //			Player
 // 
 /////////////////////////////////
+
+void Player::HpRegen()
+{
+	auto maxHp = MaxHP(Level_);
+	Hp_ += maxHp / 10;
+
+	if (maxHp <= Hp_)
+		Hp_ = maxHp;
+	else
+		TimerEvent::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
+
+	sc_set_hp set_hp;
+	set_hp.id = Id_;
+	set_hp.hp = Hp_;
+	Server::Get().GetClients()[Id_].DoSend(&set_hp);
+}
 
 void Player::Enable()
 {
@@ -65,7 +82,7 @@ void Player::UpdateViewList()
 			// 나한테 보내기는 타입스탬프때문에 processpacket에서 처리.
 			if (this == p)
 				continue;
-			
+
 			auto otherPos = p->GetPos();
 			auto diff = otherPos - pos;
 			auto otherId = p->GetId();
@@ -146,8 +163,6 @@ bool Player::InsertToViewList(ID Id_)
 
 	return inserted;
 }
-
-
 
 /////////////////////////////////
 // 

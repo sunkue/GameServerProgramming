@@ -42,6 +42,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 		case COMP_OP::OP_SEND: OnSendComplete(Id_, exover); break;
 		case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
 		case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(Id_, exover); break;
+		case COMP_OP::OP_EVENT: OnEventTimerComplete(exover); break;
 		default: cerr << "[[[??]]]" << endl; break;
 		}
 	}
@@ -90,6 +91,7 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 			case COMP_OP::OP_SEND: OnSendComplete(Id_, exover); break;
 			case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
 			case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(Id_, exover); break;
+			case COMP_OP::OP_EVENT: OnEventTimerComplete(exover); break;
 			default: cerr << "[[[??]]]" << endl; break;
 			}
 		}
@@ -272,6 +274,15 @@ void Server::OnDisconnectComplete(ID Id_, ExpOverlapped* exover)
 	int res = ::closesocket(Clients_[Id_].Socket_);
 	SocketUtil::CheckError(res, "close socket");
 	Clients_[Id_].State_ = SESSION_STATE::FREE;
+	delete exover;
+}
+
+#include "TimerEvent.h"
+
+void Server::OnEventTimerComplete(ExpOverlapped* exover)
+{
+	auto e = reinterpret_cast<EventExpOverlapped*>(exover);
+	e->EventFunc();
 	delete exover;
 }
 

@@ -60,6 +60,8 @@ private:
 	Position SectorIdx_{};
 };
 
+inline int RequireExp(int HP) { return 50 * pow(2, HP); }
+inline int MaxHP(int Level) { return Level * 100; }
 
 class DynamicObj : public StaticObj
 {
