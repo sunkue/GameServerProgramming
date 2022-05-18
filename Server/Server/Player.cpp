@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Server.h"
 #include "TimerEvent.h"
+#include "CharacterManager.h"
 
 /////////////////////////////////
 // 
@@ -18,7 +19,7 @@ void Player::HpRegen()
 	if (maxHp <= Hp_)
 		Hp_ = maxHp;
 	else
-		TimerEvent::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
+		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
 
 	sc_set_hp set_hp;
 	set_hp.id = Id_;
@@ -26,17 +27,28 @@ void Player::HpRegen()
 	Server::Get().GetClients()[Id_].DoSend(&set_hp);
 }
 
-void Player::Enable()
+bool Player::Move(Position diff)
 {
-	auto sector = GetSectorByPosition(GetPos());
-	SetSectorIdx(sector);
-	Enable_ = true;
-	World::Get().ChangeSector(this, sector);
+	bool moved = DynamicObj::Move(diff);
+	if (moved) { UpdateViewList(); }
+	return moved;
 }
 
-void Player::Disable()
+bool Player::Enable()
 {
-	Enable_ = false;
+	if (!DynamicObj::Enable()) return false;
+
+	return true;
+}
+
+void Player::Update()
+{
+
+}
+
+bool Player::Disable()
+{
+	if (!DynamicObj::Disable()) return false;
 
 	{
 		auto& sector = World::Get().GetSector(GetSectorIdx());
@@ -45,19 +57,11 @@ void Player::Disable()
 
 	{
 		unique_lock lck{ ViewLock };
-		sc_remove_obj remove;
-		remove.id = Id_;
-
-		for (auto& p : ViewList_)
-		{
-			Server::Get().GetClients()[p].DoSend(&remove);
-		}
-
 		ViewList_.clear();
 	}
 
-	Id_ = -1;
 	SetPos(Position{ 0 });
+	return true;
 }
 
 void Player::UpdateViewList()
@@ -74,41 +78,77 @@ void Player::UpdateViewList()
 
 	for (auto& ns : nearSectors)
 	{
-		shared_lock lck{ ns->PlayerLock };
-
-		auto& players = ns->GetPlayers();
-		for (auto& p : players)
 		{
-			// 나한테 보내기는 타입스탬프때문에 processpacket에서 처리.
-			if (this == p)
-				continue;
-
-			auto otherPos = p->GetPos();
-			auto diff = otherPos - pos;
-			auto otherId = p->GetId();
-			if (IsInSight(otherPos))
+			shared_lock lck{ ns->PlayerLock };
+			auto& players = ns->GetPlayers();
+			for (auto& p : players)
 			{
-				// in the sight
-				if (nearList.insert(otherId).second)
+				// 나한테 보내기는 타입스탬프때문에 processpacket에서 처리.
+				if (this == p)
+					continue;
+
+				auto otherPos = p->GetPos();
+				auto otherId = p->GetId();
+				if (IsInSightAndEnable(otherPos))
 				{
-					sc_set_position setPositioon;
-					setPositioon.id = otherId;
-					setPositioon.pos = PlayerManager::Get().GetPosition(otherId);
-					Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+					// in the sight
+					if (nearList.insert(otherId).second)
+					{
+						sc_set_position setPositioon;
+						setPositioon.id = otherId;
+						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
+						Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+					}
+
+					p->InsertToViewList(Id_);
 				}
-
-				p->InsertToViewList(Id_);
-			}
-			else
-			{
-				// out of the sight
-				if (nearList.unsafe_erase(otherId))
+				else
 				{
-					sc_remove_obj remove;
-					remove.id = otherId;
-					Server::Get().GetClients()[Id_].DoSend(&remove);
+					// out of the sight
+					if (nearList.unsafe_erase(otherId))
+					{
+						sc_remove_obj remove;
+						remove.id = otherId;
+						Server::Get().GetClients()[Id_].DoSend(&remove);
 
-					p->EraseFromViewList(Id_);
+						p->EraseFromViewList(Id_);
+					}
+				}
+			}
+		}
+
+		{
+		MostersIteratorCouldDangling:
+			shared_lock lck{ ns->MonsterLock };
+			auto& monsters = ns->GetMonsters();
+			for (auto& m : monsters)
+			{
+				auto otherPos = m->GetPos();
+				auto otherId = m->GetId();
+				if (IsInSight(otherPos))
+				{
+					lck.unlock();
+					if (m->Enable())
+					{
+						goto MostersIteratorCouldDangling;
+					}
+					lck.lock();
+					if (nearList.insert(otherId).second)
+					{
+						sc_set_position setPositioon;
+						setPositioon.id = otherId;
+						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
+						Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+					}
+				}
+				else
+				{
+					if (nearList.unsafe_erase(otherId))
+					{
+						sc_remove_obj remove;
+						remove.id = otherId;
+						Server::Get().GetClients()[Id_].DoSend(&remove);
+					}
 				}
 			}
 		}
@@ -118,71 +158,47 @@ void Player::UpdateViewList()
 		unique_lock lck{ ViewLock };
 		ViewList_ = nearList;
 	}
-
 }
 
-bool Player::EraseFromViewList(ID Id_)
+bool Player::EraseFromViewList(ID Id)
 {
 	bool erased = false;
 	bool contain = false;
 
 	{
 		shared_lock lck{ ViewLock };
-		contain = ViewList_.count(Id_);
+		contain = ViewList_.count(Id);
 	}
 
 	if (contain)
 	{
 		unique_lock lck{ ViewLock };
-		erased = ViewList_.unsafe_erase(Id_);
+		erased = ViewList_.unsafe_erase(Id);
 	}
 
 	if (erased)
 	{
 		sc_remove_obj remove;
-		remove.id = Id_;
+		remove.id = Id;
 		Server::Get().GetClients()[Id_].DoSend(&remove);
 	}
 
 	return erased;
 }
 
-bool Player::InsertToViewList(ID Id_)
+bool Player::InsertToViewList(ID Id)
 {
 	bool inserted = false;
 
 	{
 		shared_lock lck{ ViewLock };
-		inserted = ViewList_.insert(Id_).second;
+		inserted = ViewList_.insert(Id).second;
 	}
 
 	sc_set_position setPositioon;
-	setPositioon.id = Id_;
-	setPositioon.pos = PlayerManager::Get().GetPosition(Id_);
+	setPositioon.id = Id;
+	setPositioon.pos = CharacterManager::Get().GetPosition(Id);
 	Server::Get().GetClients()[Id_].DoSend(&setPositioon);
 
 	return inserted;
 }
-
-/////////////////////////////////
-// 
-//			PlayerManager
-// 
-/////////////////////////////////
-
-bool PlayerManager::Move(ID Id_, move_oper oper)
-{
-	const Position MOVE_OPER_TABLE[4]
-	{ { 0, -1 }, { 0, 1 } ,{ 1, 0 } ,{ -1, 0 } };
-	auto moved = players_[Id_].Move(MOVE_OPER_TABLE[static_cast<int>(oper)]);
-	if (moved) { players_[Id_].UpdateViewList(); }
-	return moved;
-}
-
-bool PlayerManager::Move(ID Id_, Position to)
-{
-	auto moved = players_[Id_].Move(to);
-	if (moved) { players_[Id_].UpdateViewList(); }
-	return moved;
-}
-

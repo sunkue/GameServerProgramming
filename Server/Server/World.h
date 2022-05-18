@@ -2,6 +2,7 @@
 
 #include "Obj.h"
 #include "Player.h"
+#include "Monster.h"
 
 // [ min, max )
 pair<Position, Position> GetSectorRange(Position sector);
@@ -24,12 +25,14 @@ public:
 	void EraseObjFromSector(StaticObj* obj);
 	void InsertObjSector(StaticObj* obj);
 	GET_REF(Players);
+	GET_REF(Monsters);
 public:
 	shared_mutex PlayerLock;
 	shared_mutex MonsterLock;
 private:
-	vector<StaticObj> Obstacles_; // 고정데이터..
-	concurrent_vector<DynamicObj> Monsters_; // 고정크기..
+	vector<StaticObj> Obstacles_;					// 고정데이터..
+	concurrent_unordered_set<Monster*> Monsters_;	// 고정크기..
+	concurrent_unordered_set<DynamicObj*> Npcs_;		// 고정크기..
 	concurrent_unordered_set<Player*> Players_;
 };
 
@@ -46,6 +49,7 @@ public:
 	void ChangeSector(StaticObj* obj, Position newSector);
 	Sector& GetSector(Position sector) { return Sectors_[sector.y][sector.x]; }
 	array<Sector*, 4> GetNearSectors4(Position pos, Position sector);
+	array<Sector*, 9> GetNearSectors9(Position pos, Position sector);
 public:
 
 private:

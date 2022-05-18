@@ -33,7 +33,12 @@ void Sector::Update()
 
 void Sector::EraseObjFromSector(StaticObj* obj)
 {
-	if (auto player = dynamic_cast<Player*>(obj))
+	if (auto monster = dynamic_cast<Monster*>(obj))
+	{
+		unique_lock lck{ MonsterLock };
+		Monsters_.unsafe_erase(monster);
+	}
+	else if (auto player = dynamic_cast<Player*>(obj))
 	{
 		unique_lock lck{ PlayerLock };
 		Players_.unsafe_erase(player);
@@ -42,7 +47,12 @@ void Sector::EraseObjFromSector(StaticObj* obj)
 
 void Sector::InsertObjSector(StaticObj* obj)
 {
-	if (auto player = dynamic_cast<Player*>(obj))
+	if (auto monster = dynamic_cast<Monster*>(obj))
+	{
+		shared_lock lck{ MonsterLock };
+		Monsters_.insert(monster);
+	}
+	else if (auto player = dynamic_cast<Player*>(obj))
 	{
 		shared_lock lck{ PlayerLock };
 		Players_.insert(player);
@@ -58,12 +68,11 @@ void Sector::InsertObjSector(StaticObj* obj)
 void World::ChangeSector(StaticObj* obj, Position newSectorIdx)
 {
 	if (!obj) return;
-
 	auto& oldSector = GetSector(obj->GetSectorIdx());
 	auto& newSector = GetSector(newSectorIdx);
 
 	oldSector.EraseObjFromSector(obj);
-	// 여기서 오브젝트 어느섹터에도 존재하지 않을 수 있음.
+	// 여기서 오브젝트는 어느섹터에도 존재하지 않을 수 있음.
 	newSector.InsertObjSector(obj);
 
 	obj->SetSectorIdx(newSectorIdx);
@@ -83,14 +92,14 @@ array<Sector*, 4> World::GetNearSectors4(Position pos, Position sectorIdx)
 		if (isLess.y)
 		{
 			// LU
-			return array<Sector*, 4>{&GetSector(sectorIdx), &GetSector(sectorIdx + Position{ -1, -1 }*isNotLimit_DiffMultyflier)
-				, &GetSector(sectorIdx + Position{ -1, 0 }*isNotLimit_DiffMultyflier), &GetSector(sectorIdx + Position{ 0, -1 }*isNotLimit_DiffMultyflier) };
+			return array<Sector*, 4>{&GetSector(sectorIdx), & GetSector(sectorIdx + Position{ -1, -1 }*isNotLimit_DiffMultyflier)
+				, & GetSector(sectorIdx + Position{ -1, 0 }*isNotLimit_DiffMultyflier), & GetSector(sectorIdx + Position{ 0, -1 }*isNotLimit_DiffMultyflier) };
 		}
 		else
 		{
 			// LD
-			return array<Sector*, 4>{&GetSector(sectorIdx), &GetSector(sectorIdx + Position{ -1, 1 }*isNotLimit_DiffMultyflier)
-				, &GetSector(sectorIdx + Position{ -1, 0 }*isNotLimit_DiffMultyflier), &GetSector(sectorIdx + Position{ 0, 1 }*isNotLimit_DiffMultyflier) };
+			return array<Sector*, 4>{&GetSector(sectorIdx), & GetSector(sectorIdx + Position{ -1, 1 }*isNotLimit_DiffMultyflier)
+				, & GetSector(sectorIdx + Position{ -1, 0 }*isNotLimit_DiffMultyflier), & GetSector(sectorIdx + Position{ 0, 1 }*isNotLimit_DiffMultyflier) };
 		}
 	}
 	else
@@ -98,16 +107,33 @@ array<Sector*, 4> World::GetNearSectors4(Position pos, Position sectorIdx)
 		if (isLess.y)
 		{
 			// RU
-			return array<Sector*, 4>{&GetSector(sectorIdx), &GetSector(sectorIdx + Position{ 1, -1 }*isNotLimit_DiffMultyflier)
-				, &GetSector(sectorIdx + Position{ 1, 0 }*isNotLimit_DiffMultyflier), &GetSector(sectorIdx + Position{ 0, -1 }*isNotLimit_DiffMultyflier) };
+			return array<Sector*, 4>{&GetSector(sectorIdx), & GetSector(sectorIdx + Position{ 1, -1 }*isNotLimit_DiffMultyflier)
+				, & GetSector(sectorIdx + Position{ 1, 0 }*isNotLimit_DiffMultyflier), & GetSector(sectorIdx + Position{ 0, -1 }*isNotLimit_DiffMultyflier) };
 		}
 		else
 		{
 			// RD
-			return array<Sector*, 4>{&GetSector(sectorIdx), &GetSector(sectorIdx + Position{ 1, 1 }*isNotLimit_DiffMultyflier)
-				, &GetSector(sectorIdx + Position{ 1, 0 }*isNotLimit_DiffMultyflier), &GetSector(sectorIdx + Position{ 0, 1 }*isNotLimit_DiffMultyflier) };
+			return array<Sector*, 4>{&GetSector(sectorIdx), & GetSector(sectorIdx + Position{ 1, 1 }*isNotLimit_DiffMultyflier)
+				, & GetSector(sectorIdx + Position{ 1, 0 }*isNotLimit_DiffMultyflier), & GetSector(sectorIdx + Position{ 0, 1 }*isNotLimit_DiffMultyflier) };
 		}
 	}
+}
+
+array<Sector*, 9> World::GetNearSectors9(Position pos, Position sectorIdx)
+{
+	Position isNotLimitMin{ !IsLimitSectorIdxMin(sectorIdx.x) ,  !IsLimitSectorIdxMin(sectorIdx.y) };
+	Position isNotLimitMax{ !IsLimitSectorIdxMax(sectorIdx.x) ,  !IsLimitSectorIdxMax(sectorIdx.y) };
+
+	return array<Sector*, 9>{&GetSector(sectorIdx)
+		, & GetSector(sectorIdx + Position{ -1, -1 } *Position{ isNotLimitMin.x	, isNotLimitMin.y })
+		, & GetSector(sectorIdx + Position{ +0, -1 } *Position{ 0				, isNotLimitMin.y })
+		, & GetSector(sectorIdx + Position{ +1, -1 } *Position{ isNotLimitMax.x	, isNotLimitMin.y })
+		, & GetSector(sectorIdx + Position{ -1, +0 } *Position{ isNotLimitMin.x	, 0 })
+		, & GetSector(sectorIdx + Position{ +1, +0 } *Position{ isNotLimitMax.x	, 0 })
+		, & GetSector(sectorIdx + Position{ -1, +1 } *Position{ isNotLimitMin.x	, isNotLimitMax.y })
+		, & GetSector(sectorIdx + Position{ +0, +1 } *Position{ 0				, isNotLimitMax.y })
+		, & GetSector(sectorIdx + Position{ +1, +1 } *Position{ isNotLimitMax.x	, isNotLimitMax.y })
+	};
 }
 
 

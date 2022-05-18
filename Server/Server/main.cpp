@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Server.h"
 #include "TimerEvent.h"
+#include "CharacterManager.h"
 
 struct RaiiThread
 {
@@ -22,7 +23,8 @@ int main()
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoop(); });
 #endif // GQCPEX
 	}
+	CharacterManager::Get();
 	Server::Get().StartAccept();
-
-	TimerEvent::Get().ProcessEventQueueLoop();
+	cout << "ready 2 accept" << endl;
+	EventManager::Get().ProcessEventQueueLoop();
 }

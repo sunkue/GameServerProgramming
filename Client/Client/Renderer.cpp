@@ -93,14 +93,22 @@ void Renderer::Draw()
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
 	auto draw_obj = [&](const StaticObj& obj)
 	{
-		ObjShader_->Set("u_type", int(obj.GetType()));
-		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 });
-		ScreenQuad::Get().DrawQuad();
+		
 	};
 
 	for (const auto& other : Game::Get().GetPlayers())
 	{
-		draw_obj(other.second);
+		auto& id = other.first;
+		auto& obj = other.second;
+		
+		OBJ_TYPE type;
+		if (id < MAX_PLAYER) type = OBJ_TYPE::Wlook;
+		if (id == Game::Get().GetId()) type = OBJ_TYPE::Wknight;
+		if (MAX_PLAYER <= id && id < MAX_PLAYER + MAX_MONSTER) type = OBJ_TYPE::Bpawn;
+
+		ObjShader_->Set("u_type", int(type));
+		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 });
+		ScreenQuad::Get().DrawQuad();
 	}
 
 	DrawGui();

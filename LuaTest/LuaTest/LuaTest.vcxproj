@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3c7621e0-ed53-4e7c-8988-98f14be7ca96}</ProjectGuid>
-    <RootNamespace>Server</RootNamespace>
+    <ProjectGuid>{80d9a1b4-29c1-4916-b1fd-8e51229f16bf}</ProjectGuid>
+    <RootNamespace>LuaTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -116,7 +116,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,8 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,46 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Share\Defines.h" />
-    <ClInclude Include="..\..\Share\enum.h" />
-    <ClInclude Include="..\..\Share\Includes.h" />
-    <ClInclude Include="..\..\Share\PacketZip.h" />
-    <ClInclude Include="..\..\Share\Protocol.h" />
-    <ClInclude Include="..\..\Share\Share.h" />
-    <ClInclude Include="..\..\Share\SocketUtil.h" />
-    <ClInclude Include="..\..\Share\SUNKUE.hpp" />
-    <ClInclude Include="CharacterManager.h" />
-    <ClInclude Include="ClientSession.h" />
-    <ClInclude Include="ExpOverlapped.h" />
-    <ClInclude Include="Monster.h" />
-    <ClInclude Include="TimerEvent.h" />
-    <ClInclude Include="World.h" />
-    <ClInclude Include="ListenSocket.h" />
-    <ClInclude Include="Obj.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="RingBuffer.hpp" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClCompile Include="소스.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Share\SocketUtil.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="CharacterManager.cpp" />
-    <ClCompile Include="ClientSession.cpp" />
-    <ClCompile Include="ExpOverlapped.cpp" />
-    <ClCompile Include="Monster.cpp" />
-    <ClCompile Include="TimerEvent.cpp" />
-    <ClCompile Include="World.cpp" />
-    <ClCompile Include="ListenSocket.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Obj.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Server-processpacket.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
+    <None Include="ex1.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

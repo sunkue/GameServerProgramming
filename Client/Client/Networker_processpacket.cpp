@@ -7,7 +7,7 @@ void Networker::ProcessPacket(const void* const packet)
 {
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	auto& game = Game::Get();
-	//	cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
+	// cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
 	switch (packet_type)
 	{
 	case PACKET_TYPE::Sc_hi:
@@ -20,6 +20,15 @@ void Networker::ProcessPacket(const void* const packet)
 	CASE PACKET_TYPE::Sc_ready :
 	{
 		Ready_ = true;
+		cs_input pck;
+		pck.input = move_oper::up;
+		Networker::Get().DoSend(&pck);
+		pck.input = move_oper::down;
+		Networker::Get().DoSend(&pck);
+		pck.input = move_oper::right;
+		Networker::Get().DoSend(&pck);
+		pck.input = move_oper::left;
+		Networker::Get().DoSend(&pck);
 	}
 	CASE PACKET_TYPE::Sc_set_position :
 	{

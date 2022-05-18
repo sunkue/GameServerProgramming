@@ -2,7 +2,7 @@
 #include "ClientSession.h"
 #include "Server.h"
 #include "Player.h"
-
+#include "CharacterManager.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ void ClientSession::DoDisconnect()
 	if (IsBad())
 		return;
 	State_ = SESSION_STATE::ON_DISCONNECT;
-	PlayerManager::Get().Disable(Id_);
+	CharacterManager::Get().Disable(Id_);
 
 	auto exover = new ExpOverlapped{ COMP_OP::OP_DISCONNECT };
 	PostQueuedCompletionStatus(Server::Get().GetIocp(), 0, Id_, &exover->Over);

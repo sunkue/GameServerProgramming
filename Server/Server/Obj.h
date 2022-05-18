@@ -20,14 +20,34 @@ inline bool IsOverFlowedPosition(Position pos)
 	return IsOverFlowedPosition(pos.x) || IsOverFlowedPosition(pos.y);
 }
 
+inline bool IsLimitSectorIdxMin(Position::value_type N)
+{
+	return N <= 0;
+}
+
+inline bool IsLimitSectorIdxMax(Position::value_type N)
+{
+	return SECTOR_NUM - 1 <= N;
+}
+
+inline bool IsOverFlowedSectorIdxMin(Position::value_type N)
+{
+	return N < 0;
+}
+
+inline bool IsOverFlowedSectorIdxMax(Position::value_type N)
+{
+	return SECTOR_NUM <= N;
+}
+
 inline bool IsLimitSectorIdx(Position::value_type N)
 {
-	return N <= 0 || SECTOR_NUM - 1 <= N;
+	return IsLimitSectorIdxMin(N) || IsLimitSectorIdxMax(N);
 }
 
 inline bool IsOverFlowedSectorIdx(Position::value_type N)
 {
-	return N < 0 || SECTOR_NUM <= N;
+	return IsOverFlowedSectorIdxMin(N) || IsOverFlowedSectorIdxMax(N);
 }
 
 inline bool IsLimitSectorIdx(Position sectorIdx)
@@ -45,6 +65,7 @@ class StaticObj
 public:
 	StaticObj() {}
 	virtual ~StaticObj() = default;
+	bool IsInSightAndEnable(Position target);
 	bool IsInSight(Position target);
 	GET(Pos);
 	SET(Pos);
@@ -65,17 +86,23 @@ inline int MaxHP(int Level) { return Level * 100; }
 
 class DynamicObj : public StaticObj
 {
+	friend class CharacterManager;
 public:
-	bool Move(Position diff);
 	virtual ~DynamicObj() = default;
+	virtual bool Move(Position diff);
+	virtual void Update();
+	virtual bool Enable();
+	virtual bool Disable();
 private:
 
 public:
+	GET(Id);
 	GET_REF(Hp);
 	GET_REF(Level);
 protected:
 	atomic_int Hp_{};
 	atomic_int Level_{};
+	ID Id_{ -1 };
 protected:
 	shared_mutex PositionLock;
 private:

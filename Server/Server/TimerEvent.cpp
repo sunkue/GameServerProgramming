@@ -2,19 +2,23 @@
 #include "TimerEvent.h"
 #include "Server.h"
 
-void TimerEvent::ProcessEventQueueLoop()
+void EventManager::ProcessEventQueueLoop()
 {
 	HANDLE iocp = Server::Get().GetIocp();
 	while (true)
 	{
 		this_thread::sleep_for(1s);
-		while (!EventQueue_.empty())
+		Event e{ []() {},{} };
+		auto now = clk::now();
+		while (EventQueue_.try_pop(e))
 		{
-			auto now = clk::now();
-			Event e = EventQueue_.top();
+			 // e = EventQueue_.top();
 			if (now < e.ActionTime)
+			{
+				EventQueue_.push(e);
 				break;
-			EventQueue_.pop();
+			}
+			// EventQueue_.pop();
 			auto exover = new EventExpOverlapped{ e.EventFunc };
 			PostQueuedCompletionStatus(iocp, 0, 0, &exover->Over);
 		}

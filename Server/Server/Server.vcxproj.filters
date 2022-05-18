@@ -17,9 +17,6 @@
     <Filter Include="Game\Obj">
       <UniqueIdentifier>{11af24d2-537f-4990-8b5a-3c85b3009f2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Player">
-      <UniqueIdentifier>{ee324b9a-a523-4b9f-b1f1-2461f8f250b1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Network">
       <UniqueIdentifier>{ad18a53c-692a-40f6-a13b-10a6eee5f6e0}</UniqueIdentifier>
     </Filter>
@@ -44,6 +41,21 @@
     <Filter Include="Game\TimerEvent">
       <UniqueIdentifier>{a6fe6be5-30e4-4139-8fa2-33b00171a042}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Obj\Character">
+      <UniqueIdentifier>{bc41549f-d943-4fa3-8615-70e0aac9fa0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Character\CharacterManager">
+      <UniqueIdentifier>{f33105f2-ed0a-4cc0-9440-71411fd3334a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Character\Monster">
+      <UniqueIdentifier>{041754fe-5872-433e-a7ff-73630e1e320f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Character\Player">
+      <UniqueIdentifier>{ee324b9a-a523-4b9f-b1f1-2461f8f250b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Obj">
+      <UniqueIdentifier>{07189d24-5fde-44d9-83e4-a580e73eb8a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -56,11 +68,8 @@
     <ClCompile Include="..\..\Share\SocketUtil.cpp">
       <Filter>Share</Filter>
     </ClCompile>
-    <ClCompile Include="Obj.cpp">
-      <Filter>Game\Obj</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Game\Player</Filter>
+      <Filter>Game\Obj\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="ListenSocket.cpp">
       <Filter>Network\ListenSocket</Filter>
@@ -79,6 +88,15 @@
     </ClCompile>
     <ClCompile Include="TimerEvent.cpp">
       <Filter>Game\TimerEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>Game\Obj\Character\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterManager.cpp">
+      <Filter>Game\Obj\Character\CharacterManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj.cpp">
+      <Filter>Game\Obj\Obj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,11 +127,8 @@
     <ClInclude Include="..\..\Share\enum.h">
       <Filter>Share</Filter>
     </ClInclude>
-    <ClInclude Include="Obj.h">
-      <Filter>Game\Obj</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Game\Player</Filter>
+      <Filter>Game\Obj\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Server.h">
       <Filter>Network\Server</Filter>
@@ -135,6 +150,15 @@
     </ClInclude>
     <ClInclude Include="TimerEvent.h">
       <Filter>Game\TimerEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>Game\Obj\Character\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterManager.h">
+      <Filter>Game\Obj\Character\CharacterManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj.h">
+      <Filter>Game\Obj\Obj</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

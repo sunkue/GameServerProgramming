@@ -5,7 +5,7 @@
 class Player : public DynamicObj
 {
 public:
-	Player(Position pos = {}) :DynamicObj{ OBJ_TYPE::Wknight, pos } {};
+	Player(Position pos = {}) :DynamicObj{ pos } {};
 	bool ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key);
 	GET(Exp);
 protected:

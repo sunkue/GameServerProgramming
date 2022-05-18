@@ -27,7 +27,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 		//	cerr << "GQCSTART::";
 		auto res = GetQueuedCompletionStatus(Iocp_, &returned_bytes, reinterpret_cast<PULONG_PTR>(&Id_), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
 		//	cout << this_thread::get_id() << endl;
-	//	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
+		// cerr << "GQCS::" << (SOCKET)Id_ << "::" << returned_bytes << "::" << endl;
 
 		if (FALSE == res) [[unlikely]]
 		{

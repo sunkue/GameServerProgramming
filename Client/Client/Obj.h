@@ -20,13 +20,11 @@ enum class OBJ_TYPE : int
 class StaticObj
 {
 public:
-	StaticObj(OBJ_TYPE type, Position pos) : Type_{ type }, Pos_{ pos } {}
+	StaticObj(Position pos) : Pos_{ pos } {}
 public:
 	GET(Pos);
 	SET(Pos);
-	GET(Type);
 protected:
-	OBJ_TYPE Type_{};
 	Position Pos_{};
 };
 
@@ -37,7 +35,7 @@ inline int MaxHP(int Level) { return Level * 100; }
 class DynamicObj : public StaticObj
 {
 public:
-	DynamicObj(OBJ_TYPE type, Position pos) : StaticObj{ type ,pos } {}
+	DynamicObj(Position pos) : StaticObj{ pos } {}
 private:
 public:
 	GET(Hp);

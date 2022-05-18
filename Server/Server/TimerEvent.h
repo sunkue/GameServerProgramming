@@ -9,15 +9,16 @@ struct Event
 };
 
 constexpr bool operator<(const Event& l, const Event& r) { return l.ActionTime < r.ActionTime; }
+constexpr bool operator>(const Event& l, const Event& r) { return l.ActionTime > r.ActionTime; }
 
 
-class TimerEvent
+class EventManager
 {
-	SINGLE_TON(TimerEvent) = default;
+	SINGLE_TON(EventManager) = default;
 public:
 	void AddEvent(Event e) { EventQueue_.push(e); }
 	void ProcessEventQueueLoop();
 private:
-	priority_queue<Event> EventQueue_;
+	concurrent_priority_queue<Event,greater<Event>> EventQueue_;
 };
 

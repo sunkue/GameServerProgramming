@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Server.h"
 #include "World.h"
+#include "CharacterManager.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +30,9 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	};
 
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
+	
 	// cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
+	
 	switch (packet_type)
 	{
 		CASE PACKET_TYPE::Cs_hi :
@@ -41,19 +44,19 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 			}
 
 			//if (PlayerManager::get().Move(id, Position{}))
-			if (PlayerManager::Get().Move(Id_, Position{ rand() % MAP_SIZE, rand() % MAP_SIZE }))
+			if (CharacterManager::Get().Move(Id_, Position{ rand() % MAP_SIZE, rand() % MAP_SIZE }))
 			{
 				sc_set_position set_pos;
-				auto pos = PlayerManager::Get().GetPosition(Id_);
+				auto pos = CharacterManager::Get().GetPosition(Id_);
 				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
 				SND2ME(&set_pos);
 			}
 			else
 			{
-				cerr << "[!!!]OverflowedInitPosition" << PlayerManager::Get().GetPosition(Id_).x << " " << PlayerManager::Get().GetPosition(Id_).y << endl;
+				cerr << "[!!!]OverflowedInitPosition" << CharacterManager::Get().GetPosition(Id_).x << " " << CharacterManager::Get().GetPosition(Id_).y << endl;
 			}
-			
+
 
 			/*
 			for (int i = 0; i < clients.size(); i++)
@@ -67,7 +70,7 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 				SND2ME(&other_pos);
 			}
 			*/
-			
+
 			/*
 			{
 				sc_set_position set_pos;
@@ -83,15 +86,15 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 				SND2ME(&ready);
 			}
 
-			PlayerManager::Get().Enable(Id_);
+			CharacterManager::Get().Enable(Id_);
 		}
 		CASE PACKET_TYPE::Cs_input :
 		{
 			auto pck = reinterpret_cast<const cs_input*>(packet);
-			if (PlayerManager::Get().Move(Id_, pck->input))
+			if (CharacterManager::Get().Move(Id_, pck->input))
 			{
 				sc_set_position set_pos;
-				auto pos = PlayerManager::Get().GetPosition(Id_);
+				auto pos = CharacterManager::Get().GetPosition(Id_);
 				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
 				set_pos.timestamp = pck->timestamp;

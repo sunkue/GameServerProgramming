@@ -53,6 +53,9 @@
     <Filter Include="Gui\imgui">
       <UniqueIdentifier>{d6014188-722f-42ec-a351-5b7b5ba952be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Obj\Monster">
+      <UniqueIdentifier>{10879494-028f-4421-bb66-05b31882a422}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
