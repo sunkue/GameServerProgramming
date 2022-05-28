@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "CharacterManager.h"
+#include "Character.h"
 #include "TimerEvent.h"
 #include "Monster.h"
 #include "Player.h"
@@ -13,31 +13,36 @@
 CharacterManager::CharacterManager()
 {
 	// Players
+	cerr << "initiallize Players..";
 	for (ID _id = 0; _id < MAX_PLAYER; _id++)
 	{
 		auto id = _id;
-		Characters_[id] = make_unique<Player>();
-		Characters_[id]->Id_ = id;
+		Characters_[id] = make_unique<Player>(id);
 	}
+	cerr << "..done" << endl;
+
 	// Monsters
+	cerr << "initiallize Monsters..";
 	for (ID _id = 0; _id < MAX_MONSTER; _id++)
 	{
 		auto id = _id + MAX_PLAYER;
-		Characters_[id] = make_unique<Monster>();
-		Characters_[id]->Id_ = id;
+		Characters_[id] = make_unique<Monster>(id);
 		Characters_[id]->Move({ rand() % MAP_SIZE, rand() % MAP_SIZE });
 	}
+	cerr << "..done" << endl;
+
 	// NPCs
+	cerr << "initiallize NPCs..";
 	for (ID _id = 0; _id < MAX_NPC; _id++)
 	{
 		auto id = _id + MAX_PLAYER + MAX_MONSTER;
-		Characters_[id] = make_unique<DynamicObj>();
-		Characters_[id]->Id_ = id;
+		Characters_[id] = make_unique<Character>(id);
 		//		Characters_[id]->Enable();
 	}
+	cerr << "..done" << endl;
 }
 
-bool CharacterManager::Move(ID Id_, move_oper oper)
+bool CharacterManager::Move(ID Id_, eMoveOper oper)
 {
 	const Position MOVE_OPER_TABLE[4]
 	{ { 0, -1 }, { 0, 1 } ,{ 1, 0 } ,{ -1, 0 } };

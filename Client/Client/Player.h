@@ -11,5 +11,5 @@ public:
 protected:
 	int Exp_{};
 private:
-	array<ID, MAX_PARTY - 1> PartyCrews_;
+	array<ID, MAX_PARTY - 1> PartyCrews_{ -1 };
 };

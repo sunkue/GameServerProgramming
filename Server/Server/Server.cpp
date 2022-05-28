@@ -31,7 +31,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 
 		if (FALSE == res) [[unlikely]]
 		{
-			cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
+			// cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
 			Clients_[Id_].DoDisconnect();
 			continue;
 		};
@@ -80,7 +80,7 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 
 			if (FALSE == res) [[unlikely]]
 			{
-				cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
+				// cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
 				Clients_[Id_].DoDisconnect();
 				continue;
 			};

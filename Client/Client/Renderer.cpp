@@ -3,6 +3,7 @@
 #include "System.h"
 #include "Game.h"
 #include "Texture.h"
+#include "Chat.h"
 
 ////////////////////////////////////////////////////////////////
 
@@ -49,7 +50,7 @@ void Renderer::ScreenQuad::DrawQuad()
 ////////////////////////////////////////////////////////////////
 void Renderer::ReadyDraw()
 {
-	glClearColor(0.2, 0, 0.3, 1);
+	glClearColor(0.2f, 0, 0.3f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -58,16 +59,26 @@ void DrawGui()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	gui::NewFrame();
-	gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-	auto& player = Game::Get().GetPlayer();
-	auto pos = player.GetPos();
-	auto HP = player.GetHp();
-	auto EXP = player.GetExp();
-	auto Level = player.GetLevel();
-	gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHP(Level))).c_str());
-	gui::Text(("LEVEL :: "s + to_string(Level) + "  EXP :: "s + to_string(EXP) + "/"s + to_string(RequireExp(Level))).c_str());
-	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
-	gui::End();
+
+	// PLAYER INFO
+	{
+		gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+		auto& player = Game::Get().GetPlayer();
+		auto pos = player.GetPos();
+		auto HP = player.GetHp();
+		auto EXP = player.GetExp();
+		auto Level = player.GetLevel();
+		gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHP(Level))).c_str());
+		gui::Text(("LEVEL :: "s + to_string(Level) + "  EXP :: "s + to_string(EXP) + "/"s + to_string(RequireExp(Level))).c_str());
+		gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
+		gui::End();
+	}
+
+	// CHAT
+	{
+		ChatManager::Get().RenderChat();
+	}
+
 
 	gui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
@@ -93,14 +104,14 @@ void Renderer::Draw()
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
 	auto draw_obj = [&](const StaticObj& obj)
 	{
-		
+
 	};
 
 	for (const auto& other : Game::Get().GetPlayers())
 	{
 		auto& id = other.first;
 		auto& obj = other.second;
-		
+
 		OBJ_TYPE type;
 		if (id < MAX_PLAYER) type = OBJ_TYPE::Wlook;
 		if (id == Game::Get().GetId()) type = OBJ_TYPE::Wknight;

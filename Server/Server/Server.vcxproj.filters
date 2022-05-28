@@ -44,9 +44,6 @@
     <Filter Include="Game\Obj\Character">
       <UniqueIdentifier>{bc41549f-d943-4fa3-8615-70e0aac9fa0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Obj\Character\CharacterManager">
-      <UniqueIdentifier>{f33105f2-ed0a-4cc0-9440-71411fd3334a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Obj\Character\Monster">
       <UniqueIdentifier>{041754fe-5872-433e-a7ff-73630e1e320f}</UniqueIdentifier>
     </Filter>
@@ -55,6 +52,18 @@
     </Filter>
     <Filter Include="Game\Obj\Obj">
       <UniqueIdentifier>{07189d24-5fde-44d9-83e4-a580e73eb8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Script">
+      <UniqueIdentifier>{ae043adb-1297-4cf8-bfdd-0b0ba82687f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Script\LuaScript">
+      <UniqueIdentifier>{092cb335-4fc2-4443-aaed-025649e9b9db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Script\Scriptable">
+      <UniqueIdentifier>{4b89a97e-1028-4d11-a55d-1c0327c1aaba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Character\Character">
+      <UniqueIdentifier>{f33105f2-ed0a-4cc0-9440-71411fd3334a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -92,11 +101,14 @@
     <ClCompile Include="Monster.cpp">
       <Filter>Game\Obj\Character\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterManager.cpp">
-      <Filter>Game\Obj\Character\CharacterManager</Filter>
+    <ClCompile Include="Character.cpp">
+      <Filter>Game\Obj\Character\Character</Filter>
     </ClCompile>
     <ClCompile Include="Obj.cpp">
       <Filter>Game\Obj\Obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Game\Script\Scriptable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,11 +166,19 @@
     <ClInclude Include="Monster.h">
       <Filter>Game\Obj\Character\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="CharacterManager.h">
-      <Filter>Game\Obj\Character\CharacterManager</Filter>
+    <ClInclude Include="Character.h">
+      <Filter>Game\Obj\Character\Character</Filter>
     </ClInclude>
     <ClInclude Include="Obj.h">
       <Filter>Game\Obj\Obj</Filter>
     </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Game\Script\Scriptable</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LuaScript\Monster\monsterAi.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
   </ItemGroup>
 </Project>

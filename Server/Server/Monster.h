@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Obj.h"
+#include "Character.h"
 
 /////////////////////////////////
 // 
@@ -8,16 +8,19 @@
 // 
 /////////////////////////////////
 
-class Monster : public DynamicObj
+class Monster : public Character
 {
 public:
-	virtual ~Monster() = default;
+	Monster(ID id);
+	virtual ~Monster();
 	virtual bool Move(Position diff) override;
 	virtual void Update() override;
 	virtual bool Enable() override;
 	virtual bool Disable() override;
+	virtual void CompileScript() override;
 private:
 public:
+protected:
 private:
 };
 

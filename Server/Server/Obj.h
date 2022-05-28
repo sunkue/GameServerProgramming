@@ -81,13 +81,14 @@ private:
 	Position SectorIdx_{};
 };
 
-inline int RequireExp(int HP) { return 50 * pow(2, HP); }
+inline int RequireExp(int HP) { return static_cast<int>(50 * pow(2, HP)); }
 inline int MaxHP(int Level) { return Level * 100; }
 
 class DynamicObj : public StaticObj
 {
 	friend class CharacterManager;
 public:
+	DynamicObj(ID id) : Id_{ id } {};
 	virtual ~DynamicObj() = default;
 	virtual bool Move(Position diff);
 	virtual void Update();

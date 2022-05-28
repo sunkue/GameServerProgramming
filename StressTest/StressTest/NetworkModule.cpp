@@ -345,10 +345,10 @@ void Test_Thread()
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			cs_input my_packet;
 			switch (rand() % 4) {
-			case 0: my_packet.input = move_oper::up; break;
-			case 1: my_packet.input = move_oper::down; break;
-			case 2: my_packet.input = move_oper::right; break;
-			case 3: my_packet.input = move_oper::left; break;
+			case 0: my_packet.input = eMoveOper::up; break;
+			case 1: my_packet.input = eMoveOper::down; break;
+			case 2: my_packet.input = eMoveOper::right; break;
+			case 3: my_packet.input = eMoveOper::left; break;
 			}
 			my_packet.timestamp = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch());
 			SendPacket(i, &my_packet);

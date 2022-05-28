@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Obj.h"
+#include "Character.h"
 
 /////////////////////////////////
 // 
@@ -8,9 +8,10 @@
 // 
 /////////////////////////////////
 
-class Player : public DynamicObj
+class Player : public Character
 {
 public:
+	Player(ID id) : Character{ id } {};
 	virtual ~Player() = default;
 	virtual bool Move(Position diff) override;
 	virtual bool Enable() override;
@@ -38,6 +39,6 @@ private:
 	concurrent_unordered_set<ID> ViewList_;
 
 	// 자주 변화되지 않으므로 atomic 혹은 lock써도 됨.
-	array<ID, MAX_PARTY - 1> PartyCrews_;
+	array<ID, MAX_PARTY - 1> PartyCrews_{ -1 };
 };
 

@@ -5,9 +5,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Event">
-      <UniqueIdentifier>{8c903655-3a16-48e4-82c9-e84a12e46536}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game">
       <UniqueIdentifier>{7f22f07d-5c4e-4fc7-bd91-19d39fd1678a}</UniqueIdentifier>
     </Filter>
@@ -23,24 +20,6 @@
     <Filter Include="Dependence">
       <UniqueIdentifier>{4ec8b57e-f058-428d-a9fd-3f8c53db1e3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{531135bc-4f8c-41f6-bb7e-926eb23ea8af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Texture">
-      <UniqueIdentifier>{94e1d383-b5fe-46e8-9e33-a694305dacbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\glsl">
-      <UniqueIdentifier>{cbe0fbff-af68-45f9-a307-6006edd4d43a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Obj">
-      <UniqueIdentifier>{59f210bd-0f5a-4346-a529-8eaa7a04fc7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Obj\Player">
-      <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Obj\Obj">
-      <UniqueIdentifier>{453c32b5-d86c-4c1d-bd47-4a300d801421}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Share">
       <UniqueIdentifier>{21587028-6169-420c-966d-ed8eb5456c34}</UniqueIdentifier>
     </Filter>
@@ -53,13 +32,43 @@
     <Filter Include="Gui\imgui">
       <UniqueIdentifier>{d6014188-722f-42ec-a351-5b7b5ba952be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Obj\Monster">
+    <Filter Include="Game\Chat">
+      <UniqueIdentifier>{5db769f5-6099-4b7f-8624-50133ca9f9f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Game">
+      <UniqueIdentifier>{3f2fe1fb-9ce9-4aa8-b827-4e2ebc57586b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputEvent">
+      <UniqueIdentifier>{8c903655-3a16-48e4-82c9-e84a12e46536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shader">
+      <UniqueIdentifier>{531135bc-4f8c-41f6-bb7e-926eb23ea8af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shader\glsl">
+      <UniqueIdentifier>{cbe0fbff-af68-45f9-a307-6006edd4d43a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Renderer">
+      <UniqueIdentifier>{18d3115d-b39a-4f1f-8bd8-3862a13f9560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Texture">
+      <UniqueIdentifier>{94e1d383-b5fe-46e8-9e33-a694305dacbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj">
+      <UniqueIdentifier>{59f210bd-0f5a-4346-a529-8eaa7a04fc7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Player">
+      <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Obj">
+      <UniqueIdentifier>{453c32b5-d86c-4c1d-bd47-4a300d801421}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Monster">
       <UniqueIdentifier>{10879494-028f-4421-bb66-05b31882a422}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
-      <Filter>Event</Filter>
+      <Filter>InputEvent</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -68,26 +77,20 @@
     <ClCompile Include="System.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Dependencies\glad\src\glad.c">
       <Filter>Dependence</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>Shader</Filter>
+      <Filter>Renderer\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>Texture</Filter>
+      <Filter>Renderer\Texture</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Obj\Player</Filter>
+      <Filter>Game\Obj\Player</Filter>
     </ClCompile>
     <ClCompile Include="Obj.cpp">
-      <Filter>Obj\Obj</Filter>
+      <Filter>Game\Obj\Obj</Filter>
     </ClCompile>
     <ClCompile Include="Networker.cpp">
       <Filter>Network</Filter>
@@ -119,10 +122,19 @@
     <ClCompile Include="Dependencies\imgui\imgui_widgets.cpp">
       <Filter>Gui\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Chat.cpp">
+      <Filter>Game\Chat</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyboardEvent.h">
-      <Filter>Event</Filter>
+      <Filter>InputEvent</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>stdafx</Filter>
@@ -130,29 +142,23 @@
     <ClInclude Include="System.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Shader</Filter>
+      <Filter>Renderer\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Shader.hpp">
-      <Filter>Shader</Filter>
+      <Filter>Renderer\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Texture</Filter>
+      <Filter>Renderer\Texture</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
-      <Filter>Texture</Filter>
+      <Filter>Renderer\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Obj\Player</Filter>
+      <Filter>Game\Obj\Player</Filter>
     </ClInclude>
     <ClInclude Include="Obj.h">
-      <Filter>Obj\Obj</Filter>
+      <Filter>Game\Obj\Obj</Filter>
     </ClInclude>
     <ClInclude Include="Networker.h">
       <Filter>Network</Filter>
@@ -205,19 +211,28 @@
     <ClInclude Include="Dependencies\imgui\imstb_truetype.h">
       <Filter>Gui\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Chat.h">
+      <Filter>Game\Chat</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Shader\background.vert">
-      <Filter>Shader\glsl</Filter>
+      <Filter>Renderer\Shader\glsl</Filter>
     </None>
     <None Include="Resource\Shader\background.frag">
-      <Filter>Shader\glsl</Filter>
+      <Filter>Renderer\Shader\glsl</Filter>
     </None>
     <None Include="Resource\Shader\obj.frag">
-      <Filter>Shader\glsl</Filter>
+      <Filter>Renderer\Shader\glsl</Filter>
     </None>
     <None Include="Resource\Shader\obj.vert">
-      <Filter>Shader\glsl</Filter>
+      <Filter>Renderer\Shader\glsl</Filter>
     </None>
   </ItemGroup>
 </Project>

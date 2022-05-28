@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Server.h"
 #include "World.h"
-#include "CharacterManager.h"
+#include "Character.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 

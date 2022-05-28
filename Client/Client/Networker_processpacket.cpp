@@ -2,6 +2,7 @@
 #include "Networker.h"
 #include "Game.h"
 #include "System.h"
+#include "Chat.h"
 
 void Networker::ProcessPacket(const void* const packet)
 {
@@ -21,13 +22,13 @@ void Networker::ProcessPacket(const void* const packet)
 	{
 		Ready_ = true;
 		cs_input pck;
-		pck.input = move_oper::up;
+		pck.input = eMoveOper::up;
 		Networker::Get().DoSend(&pck);
-		pck.input = move_oper::down;
+		pck.input = eMoveOper::down;
 		Networker::Get().DoSend(&pck);
-		pck.input = move_oper::right;
+		pck.input = eMoveOper::right;
 		Networker::Get().DoSend(&pck);
-		pck.input = move_oper::left;
+		pck.input = eMoveOper::left;
 		Networker::Get().DoSend(&pck);
 	}
 	CASE PACKET_TYPE::Sc_set_position :
@@ -48,6 +49,16 @@ void Networker::ProcessPacket(const void* const packet)
 	{
 		auto pck = reinterpret_cast<const sc_remove_obj*>(packet);
 		game.GetPlayers().erase(pck->id);
+	}
+	CASE PACKET_TYPE::Sc_chat :
+	{
+		auto pck = reinterpret_cast<const sc_chat*>(packet);
+		auto chatSize = sizeof(sc_chat::chat) - (sizeof(sc_chat) - pck->size);
+		Chat chat;
+		chat.speaker = pck->id;
+		chat.timestamp = pck->time;
+		memcpy(chat.mess, pck->chat, chatSize);
+		ChatManager::Get().AddChat(chat);
 	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}

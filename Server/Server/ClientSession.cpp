@@ -2,7 +2,7 @@
 #include "ClientSession.h"
 #include "Server.h"
 #include "Player.h"
-#include "CharacterManager.h"
+#include "Character.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ void ClientSession::DoRecv()
 	ZeroMemory(&RecvOver_.Over, sizeof(WSAOVERLAPPED));
 #ifdef RINGBUFFER
 	RecvOver_.Wsabuf.buf = reinterpret_cast<CHAR*>(RecvOver_.Buf.End());
-	RecvOver_.Wsabuf.len = RecvOver_.Buf.BytesToRecv();
+	RecvOver_.Wsabuf.len = static_cast<ULONG>(RecvOver_.Buf.BytesToRecv());
 #else
 	recv_over.wsabuf.buf = reinterpret_cast<CHAR*>(recv_over.buf.data()) + prerecv_size;
 	recv_over.wsabuf.len = sizeof(recv_over.buf) - prerecv_size;

@@ -30,7 +30,7 @@ const uint16_t SERVER_PORT = 8282;
 //====================================
 constexpr int MAX_PLAYER = 5'0000;
 constexpr int MAX_MONSTER = 20'0000;
-constexpr int MAX_NPC = 200;
+constexpr int MAX_NPC = 0;
 constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
 
 constexpr int MAX_PARTY = 4;
@@ -39,6 +39,7 @@ constexpr int SIGHT_SIZE = 11;
 constexpr int WINDOW_SIZE = 16;
 constexpr int SECTOR_SIZE = 20;
 constexpr int SECTOR_NUM = MAP_SIZE / SECTOR_SIZE;
+
 
 static_assert(SIGHT_SIZE % 2);
 static_assert(SIGHT_SIZE < SECTOR_SIZE);
@@ -53,4 +54,5 @@ static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 static_assert(MAX_PLAYER < std::numeric_limits<ID>::max(), "Player ID could overflow");
 constexpr int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max();
 constexpr int MAX_BUFFER_SIZE = MAX_PACKET_SIZE * 4;
+constexpr int MAX_CHAT_SIZE = 50;
 static_assert(MAX_PACKET_SIZE <= MAX_BUFFER_SIZE, "Net Buffer could overflow");

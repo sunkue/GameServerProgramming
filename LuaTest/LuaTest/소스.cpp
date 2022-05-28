@@ -12,22 +12,75 @@ extern "C" {
 
 using namespace std;
 
+
+int addnum_c(lua_State* L)
+{
+	int a = (int)lua_tonumber(L, -2);
+	int b = (int)lua_tonumber(L, -1);
+	lua_pop(L, 3);
+	int result = a + b;
+	lua_pushnumber(L, result);
+	return 1;
+}
+
+int API_SendMessage(lua_State* L)
+{
+	cout << "@@" << endl;
+	int clinetId = lua_tonumber(L, -3);
+	int npcId = lua_tonumber(L, -2);
+	const char* mess = lua_tostring(L, -1);
+	lua_pop(L, 4);
+
+	cout << "PAPI_SendMessage" << endl;
+	cout << clinetId << endl;
+	cout << npcId << endl;
+	cout << mess << endl;
+	// Server::Get().GetClients()[clinetId].DoSend();
+	return 0;
+}
+
+int API_GetPos(lua_State* L)
+{
+	cout << "!!" << endl;
+	int objectId = lua_tonumber(L, -1);
+	lua_pop(L, 2);
+	lua_pushnumber(L, 11);
+	lua_pushnumber(L, 22);
+	cout << "POS OID" << objectId << endl;
+	return 2;
+}
+
+int F(lua_State* L)
+{
+	int ID = lua_tonumber(L, -1);
+	cout << "TESTERER " << ID << endl;
+	return 0;
+}
+
 int main()
 {
-	int x, y;
-	lua_State* L = luaL_newstate();	//  루아 오픈
-	luaL_openlibs(L);				//  루아 라이브러리 오픈
+	lua_State* AiScript_ = luaL_newstate();
+	luaL_openlibs(AiScript_);
+	luaL_dofile(AiScript_, "ex1.lua");
+//	luaL_loadfile(AiScript_, "ex1.lua");
+//	lua_pcall(AiScript_, 0, 0, 0);
 
-	luaL_dofile(L, "ex1.lua");		//  스크립트파일 실행
-//	luaL_loadfile(L, "ex1.lua");	//  스크립트파일 로드
-//	lua_pcall(L, 0, 0, 0);			//  프로그램 실행
-	lua_getglobal(L, "pos_x");		//  스택에 ""값 쌓기
-	lua_getglobal(L, "pos_y");		//  스택에 ""값 쌓기
-	x = (int)lua_tonumber(L, -2);	//  스택N번째에서 peek
-	y = (int)lua_tonumber(L, -1);	//  스택N번째에서 peek
-	printf("X %d, Y %d\n", x, y);
-	lua_pop(L, 2);					//  스택에서 n개 제거
-	lua_close(L);					//  루아 닫기
+	lua_register(AiScript_, "F", F);
+	lua_register(AiScript_, "API_Chat", API_SendMessage);
+	lua_register(AiScript_, "API_GetPos", API_GetPos);
+
+	lua_getglobal(AiScript_, "SetObjectId");
+	lua_pushnumber(AiScript_, 111);
+	lua_pcall(AiScript_, 1, 0, 0);
+
+	lua_getglobal(AiScript_, "EventPlayerMove");
+	lua_pushnumber(AiScript_, 33);
+	lua_pcall(AiScript_, 1, 0, 0);
+
+
+	lua_getglobal(AiScript_, "F");
+	lua_getglobal(AiScript_, "myId");
+	lua_pcall(AiScript_, 1, 0, 0);
 }
 
 

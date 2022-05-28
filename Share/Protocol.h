@@ -22,6 +22,7 @@ BETTER_ENUM
 	, Cs_none = 10
 	, Cs_hi
 	, Cs_input
+	, Cs_chat
 
 
 	/* Server 2 Client */
@@ -32,6 +33,7 @@ BETTER_ENUM
 	, Sc_set_position
 	, Sc_remove_obj
 	, Sc_set_hp
+	, Sc_chat
 );
 
 // 가용길이 패킷 
@@ -86,7 +88,7 @@ PACKET(sc_remove_obj)
 	NetID id = -1;
 };
 
-enum class move_oper : uint8
+enum class eMoveOper : uint8
 {
 	up,
 	down,
@@ -96,8 +98,22 @@ enum class move_oper : uint8
 
 PACKET(cs_input)
 {
-	move_oper input;
+	eMoveOper input;
 	milliseconds timestamp;
+};
+
+PACKET(cs_chat)
+{
+	char chat[MAX_CHAT_SIZE]{};
+};
+
+
+// dynamic size packet
+PACKET(sc_chat)
+{
+	NetID id;
+	system_clock::time_point time;
+	char chat[MAX_CHAT_SIZE]{}; // should be last member
 };
 
 #pragma pack(pop)
