@@ -82,12 +82,14 @@ void DrawGui()
 	{
 		gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 		auto& player = Game::Get().GetPlayer();
+		auto id = Game::Get().GetId();
 		auto pos = player.GetPos();
-		auto HP = player.GetHp();
-		auto EXP = player.GetExp();
-		auto Level = player.GetLevel();
-		gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHp(Level))).c_str());
-		gui::Text(("LEVEL :: "s + to_string(Level) + "  EXP :: "s + to_string(EXP) + "/"s + to_string(RequireExp(Level))).c_str());
+		auto hp = player.GetHp();
+		auto exp = player.GetExp();
+		auto level = player.GetLevel();
+		gui::Text(("ID :: "s + VisualizationId(id)).c_str());
+		gui::Text(("HP :: "s + to_string(hp) + "/"s + to_string(MaxHp(level))).c_str());
+		gui::Text(("LEVEL :: "s + to_string(level) + "  EXP :: "s + to_string(exp) + "/"s + to_string(RequireExp(level))).c_str());
 		gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
 		gui::End();
 	}
@@ -99,23 +101,23 @@ void DrawGui()
 
 	{
 		gui::StyleColorsLight();
-		auto PlayerPos = Game::Get().GetPlayer().GetPos();
+		auto playerPos = Game::Get().GetPlayer().GetPos();
 		for (auto& c : Game::Get().GetCharacters())
 		{
-			auto& SpeechBubble = c.second.GetSpeechBubble();
-			if (SpeechBubble.second <= system_clock::now())
+			auto& speechBubble = c.second.GetSpeechBubble();
+			if (speechBubble.second <= system_clock::now())
 				continue;
 
 			auto str = "SpeechBubble"s + to_string(c.first);
 			gui::Begin(str.c_str(), 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-			gui::Text(SpeechBubble.first.c_str());
+			gui::Text(speechBubble.first.c_str());
 			gui::End();
 
-			ImVec2 BubblePos;
-			BubblePos = ImGuiGetCenterPosOfTile(Position{ c.second.GetPos() - PlayerPos } + Position{ 10, 10 });
-			BubblePos.x += (-10 - 3 * static_cast<int>(SpeechBubble.first.size())) * (TileSize().x / 25);
-			BubblePos.y += -40 * (TileSize().y / 25);
-			gui::SetWindowPos(str.c_str(), BubblePos);
+			ImVec2 bubblePos;
+			bubblePos = ImGuiGetCenterPosOfTile(Position{ c.second.GetPos() - playerPos } + Position{ 10, 10 });
+			bubblePos.x += (-10 - 3 * static_cast<int>(speechBubble.first.size())) * (TileSize().x / 25);
+			bubblePos.y += -40 * (TileSize().y / 25);
+			gui::SetWindowPos(str.c_str(), bubblePos);
 		}
 		gui::StyleColorsDark();
 	}
@@ -128,18 +130,18 @@ void Renderer::Draw()
 {
 	ReadyDraw();
 	auto pos = Game::Get().GetPlayer().GetPos();
-	bool start_with_dark = (pos.x + pos.y) % 2;
+	bool startWithDark = (pos.x + pos.y) % 2;
 
 	BgShader_->Use();
 	BgShader_->Set("u_texture", BgTiles_);
-	BgShader_->Set("u_start_with_dark", start_with_dark);
+	BgShader_->Set("u_start_with_dark", startWithDark);
 	BgShader_->Set("u_focus_center", FocusCenter_);
 	BgShader_->Set("u_raw_col", WINDOW_SIZE);
 	ScreenQuad::Get().DrawQuad();
 
 	ObjShader_->Use();
 	ObjShader_->Set("u_texture", ObjTiles_);
-	ObjShader_->Set("u_start_with_dark", start_with_dark);
+	ObjShader_->Set("u_start_with_dark", startWithDark);
 	ObjShader_->Set("u_focus_center", FocusCenter_);
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
 
@@ -148,12 +150,12 @@ void Renderer::Draw()
 		auto& id = other.first;
 		auto& obj = other.second;
 
-		OBJ_TYPE type{};
-		if (id < MAX_PLAYER) type = OBJ_TYPE::Wlook;
-		if (id == Game::Get().GetId()) type = OBJ_TYPE::Wknight;
-		if (MAX_PLAYER <= id && id < MAX_PLAYER + MAX_MONSTER) type = OBJ_TYPE::Bpawn;
+		OBJ_TYPE Type{};
+		if (id < MAX_PLAYER) Type = OBJ_TYPE::Wlook;
+		if (id == Game::Get().GetId()) Type = OBJ_TYPE::Wknight;
+		if (MAX_PLAYER <= id && id < MAX_PLAYER + MAX_MONSTER) Type = OBJ_TYPE::Bpawn;
 
-		ObjShader_->Set("u_type", int(type));
+		ObjShader_->Set("u_type", int(Type));
 		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
 		ScreenQuad::Get().DrawQuad();
 	}

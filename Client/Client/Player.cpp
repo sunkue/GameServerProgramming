@@ -10,25 +10,25 @@ bool Character::ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key)
 	{
 		switch (key.key)
 		{
-		case GLFW_KEY_UP: case GLFW_KEY_W:
+		case GLFW_KEY_UP:
 		{
 			cs_input pck;
 			pck.input = eMoveOper::up;
 			Networker::Get().DoSend(&pck);
 		}
-		CASE GLFW_KEY_DOWN : case GLFW_KEY_S:
+		CASE GLFW_KEY_DOWN:
 		{
 			cs_input pck;
 			pck.input = eMoveOper::down;
 			Networker::Get().DoSend(&pck);
 		}
-		CASE GLFW_KEY_RIGHT : case GLFW_KEY_D:
+		CASE GLFW_KEY_RIGHT:
 		{
 			cs_input pck;
 			pck.input = eMoveOper::right;
 			Networker::Get().DoSend(&pck);
 		}
-		CASE GLFW_KEY_LEFT : case GLFW_KEY_A:
+		CASE GLFW_KEY_LEFT:
 		{
 			cs_input pck;
 			pck.input = eMoveOper::left;

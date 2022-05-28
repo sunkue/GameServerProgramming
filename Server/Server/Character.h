@@ -28,7 +28,7 @@ public:
 	GET_REF(Hp);
 	GET_REF(Level);
 protected:
-	Position StartPosition_;
+	Position StartPosition_{};
 	atomic_int Hp_{};
 	atomic_int Level_{};
 	milliseconds MovementCooltime_{ 500ms };

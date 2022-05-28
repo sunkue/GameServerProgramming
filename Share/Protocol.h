@@ -131,7 +131,7 @@ PACKET(cs_input_timestamp)
 
 PACKET(cs_chat)
 {
-	char chat[MAX_CHAT_SIZE]{};
+	char chat[MAX_CHAT_BUFFER_SIZE]{};
 };
 
 
@@ -140,7 +140,7 @@ PACKET(sc_chat)
 {
 	NetID id;
 	system_clock::time_point time;
-	char chat[MAX_CHAT_SIZE]{}; // should be last member
+	char chat[MAX_CHAT_BUFFER_SIZE]{};
 };
 
 #pragma pack(pop)

@@ -1,13 +1,6 @@
 #include "stdafx.h"
 #include "Chat.h"
-
-inline string VisualizationId(ID id)
-{
-	if (id < MAX_PLAYER) return "P_" + to_string(id);
-	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
-	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
-	else return "ERR_ID";
-}
+#include "Networker.h"
 
 void ChatManager::RenderChat() const
 {
@@ -29,6 +22,19 @@ void ChatManager::RenderChat() const
 		str += c.mess;
 		gui::Text(str.c_str());
 	}
-	gui::SetScrollHereY(1);
+	if (!gui::IsWindowFocused())
+		gui::SetScrollHereY(1);
+	gui::End();
+
+	gui::Begin("ChatInput", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
+	static char chatBuffer[MAX_CHAT_BUFFER_SIZE]{};
+	if (gui::InputText("ENTER", chatBuffer, MAX_CHAT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
+	{
+		cs_chat chat;
+		strcpy_s(chat.chat, MAX_CHAT_SIZE, chatBuffer);
+		chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - strlen(chat.chat));
+		Networker::Get().DoSend(&chat);
+		ZeroMemory(chatBuffer, sizeof(chatBuffer));
+	}
 	gui::End();
 }

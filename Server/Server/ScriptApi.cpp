@@ -19,8 +19,8 @@ int API_SendMessage(lua_State* L)
 			sc_chat chat;
 			chat.id = speakerId;
 			chat.time = system_clock::now();
-			strcpy_s(chat.chat, mess);
-			chat.size -= static_cast<decltype(chat.size)>(sizeof(chat.chat) - strlen(chat.chat));
+			strcpy_s(chat.chat, sizeof(chat.chat) - 1, mess);
+			chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - strlen(chat.chat));
 			// assert(strlen(chat.chat) < MAX_CHAT_SIZE);
 			Server::Get().GetClients()[clinetId].DoSend(&chat);
 	}, seconds{ delaySec } });

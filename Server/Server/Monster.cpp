@@ -70,9 +70,9 @@ void Monster::Regen()
 
 bool Monster::Move(Position diff)
 {
-	constexpr size_t NearListReserveHint = 20;
-	unordered_set<Player*> oldNearList; oldNearList.reserve(NearListReserveHint);
-	unordered_set<Player*> newNearList; newNearList.reserve(NearListReserveHint);
+	constexpr size_t NEARLIST_RESERVE_HINT = 20;
+	unordered_set<Player*> oldNearList; oldNearList.reserve(NEARLIST_RESERVE_HINT);
+	unordered_set<Player*> newNearList; newNearList.reserve(NEARLIST_RESERVE_HINT);
 
 	{
 		auto oldPos = GetPos();

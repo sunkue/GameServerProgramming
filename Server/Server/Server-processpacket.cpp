@@ -29,10 +29,84 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 		}
 	};
 
+	auto SND2OEVERY_NEARSECTOR4 = [this](ID Id, const void* const packet)
+	{
+		auto& player = CharacterManager::Get().GetCharacters()[Id];
+		auto Ns = World::Get().GetNearSectors4(player->GetPos(), player->GetSectorIdx());
+		unordered_set<ID> Ids;
+		for (auto& ns : Ns)
+		{
+			for (auto& p : ns->GetPlayers())
+			{
+				Ids.insert(p->GetId());
+			}
+		}
+
+		for (auto id : Ids)
+			Clients_[id].DoSend(packet);
+	};
+
+	auto SND2OTHERS_NEARSECTOR4 = [this](ID Id, const void* const packet)
+	{
+		auto& player = CharacterManager::Get().GetCharacters()[Id];
+		auto Ns = World::Get().GetNearSectors4(player->GetPos(), player->GetSectorIdx());
+		unordered_set<ID> Ids;
+		for (auto& ns : Ns)
+		{
+			for (auto& p : ns->GetPlayers())
+			{
+				Ids.insert(p->GetId());
+			}
+		}
+
+		for (auto id : Ids)
+		{
+			if (id == Id) continue;
+			Clients_[id].DoSend(packet);
+		}
+	};
+
+	auto SND2OEVERY_NEARSECTOR9 = [this](ID Id, const void* const packet)
+	{
+		auto& player = CharacterManager::Get().GetCharacters()[Id];
+		auto Ns = World::Get().GetNearSectors9(player->GetPos(), player->GetSectorIdx());
+		unordered_set<ID> Ids;
+		for (auto& ns : Ns)
+		{
+			for (auto& p : ns->GetPlayers())
+			{
+				Ids.insert(p->GetId());
+			}
+		}
+
+		for (auto id : Ids)
+			Clients_[id].DoSend(packet);
+	};
+
+	auto SND2OTHERS_NEARSECTOR9 = [this](ID Id, const void* const packet)
+	{
+		auto& player = CharacterManager::Get().GetCharacters()[Id];
+		auto Ns = World::Get().GetNearSectors9(player->GetPos(), player->GetSectorIdx());
+		unordered_set<ID> Ids;
+		for (auto& ns : Ns)
+		{
+			for (auto& p : ns->GetPlayers())
+			{
+				Ids.insert(p->GetId());
+			}
+		}
+
+		for (auto id : Ids)
+		{
+			if (id == Id) continue;
+			Clients_[id].DoSend(packet);
+		}
+	};
+
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
-	
+
 	// cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
-	
+
 	switch (packet_type)
 	{
 		CASE PACKET_TYPE::Cs_hi :
@@ -50,6 +124,7 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 				auto pos = CharacterManager::Get().GetPosition(Id_);
 				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
+				cout << pos.x << " " << pos.y << endl;
 				SND2ME(&set_pos);
 			}
 			else
@@ -81,6 +156,17 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 				set_pos.timestamp = pck->timestamp;
 				SND2ME(&set_pos);
 			}
+		}
+		CASE PACKET_TYPE::Cs_chat :
+		{
+			auto pck = reinterpret_cast<const cs_chat*>(packet);
+
+			sc_chat chat;
+			chat.id = Id_;
+			chat.time = system_clock::now();
+			strcpy_s(chat.chat, MAX_CHAT_SIZE, pck->chat);
+			chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - strlen(chat.chat));
+			SND2OEVERY_NEARSECTOR4(Id_, &chat);
 		}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}

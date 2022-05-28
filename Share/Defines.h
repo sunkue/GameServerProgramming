@@ -55,4 +55,5 @@ static_assert(MAX_PLAYER < std::numeric_limits<ID>::max(), "Player ID could over
 constexpr int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max();
 constexpr int MAX_BUFFER_SIZE = MAX_PACKET_SIZE * 4;
 constexpr int MAX_CHAT_SIZE = 50;
+constexpr int MAX_CHAT_BUFFER_SIZE = MAX_CHAT_SIZE + 1;
 static_assert(MAX_PACKET_SIZE <= MAX_BUFFER_SIZE, "Net Buffer could overflow");
