@@ -22,6 +22,7 @@ BETTER_ENUM
 	, Cs_none = 10
 	, Cs_hi
 	, Cs_input
+	, Cs_input_timestamp
 	, Cs_chat
 
 
@@ -31,8 +32,11 @@ BETTER_ENUM
 	, Sc_hi
 	, Sc_ready
 	, Sc_set_position
+	, Sc_set_position_timestamp
 	, Sc_remove_obj
 	, Sc_set_hp
+	, Sc_set_exp
+	, Sc_set_level
 	, Sc_chat
 );
 
@@ -74,6 +78,12 @@ PACKET(sc_set_position)
 {
 	NetID id;
 	Position pos;
+};
+
+PACKET(sc_set_position_timestamp)
+{
+	NetID id;
+	Position pos;
 	milliseconds timestamp;
 };
 
@@ -81,6 +91,18 @@ PACKET(sc_set_hp)
 {
 	NetID id;
 	int hp;
+};
+
+PACKET(sc_set_exp)
+{
+	NetID id;
+	int exp;
+};
+
+PACKET(sc_set_level)
+{
+	NetID id;
+	int level;
 };
 
 PACKET(sc_remove_obj)
@@ -97,6 +119,11 @@ enum class eMoveOper : uint8
 };
 
 PACKET(cs_input)
+{
+	eMoveOper input;
+};
+
+PACKET(cs_input_timestamp)
 {
 	eMoveOper input;
 	milliseconds timestamp;

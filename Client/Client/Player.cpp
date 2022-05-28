@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "NetWorker.h"
 
-bool Player::ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key)
+bool Character::ProcessInput(const KEY_BOARD_EVENT_MANAGER::key_event& key)
 {
 	bool pressed = (key.action != GLFW_RELEASE);
 

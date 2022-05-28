@@ -15,7 +15,7 @@ void Networker::ProcessPacket(const void* const packet)
 	{
 		auto pck = reinterpret_cast<const sc_hi*>(packet);
 		game.SetId(pck->id);
-		game.GetPlayers()[game.GetId()];
+		game.GetCharacters()[game.GetId()];
 		game.init();
 	}
 	CASE PACKET_TYPE::Sc_ready :
@@ -36,19 +36,33 @@ void Networker::ProcessPacket(const void* const packet)
 		auto pck = reinterpret_cast<const sc_set_position*>(packet);
 		auto pos = pck->pos;
 		auto id = pck->id;
-		game.GetPlayers()[id].SetPos(pos);
+		game.GetCharacters()[id].SetPos(pos);
 	}
 	CASE PACKET_TYPE::Sc_set_hp :
 	{
 		auto pck = reinterpret_cast<const sc_set_hp*>(packet);
 		auto hp = pck->hp;
 		auto id = pck->id;
-		game.GetPlayers()[id].SetHp(hp);
+		game.GetCharacters()[id].SetHp(hp);
+	}
+	CASE PACKET_TYPE::Sc_set_exp :
+	{
+		auto pck = reinterpret_cast<const sc_set_exp*>(packet);
+		auto exp = pck->exp;
+		auto id = pck->id;
+		game.GetCharacters()[id].SetExp(exp);
+	}
+	CASE PACKET_TYPE::Sc_set_level :
+	{
+		auto pck = reinterpret_cast<const sc_set_level*>(packet);
+		auto level = pck->level;
+		auto id = pck->id;
+		game.GetCharacters()[id].SetLevel(level);
 	}
 	CASE PACKET_TYPE::Sc_remove_obj :
 	{
 		auto pck = reinterpret_cast<const sc_remove_obj*>(packet);
-		game.GetPlayers().erase(pck->id);
+		game.GetCharacters().erase(pck->id);
 	}
 	CASE PACKET_TYPE::Sc_chat :
 	{
@@ -59,6 +73,10 @@ void Networker::ProcessPacket(const void* const packet)
 		chat.timestamp = pck->time;
 		memcpy(chat.mess, pck->chat, chatSize);
 		ChatManager::Get().AddChat(chat);
+		if (chatSize < 10)
+			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(chat.mess, pck->time + 1500ms));
+		else
+			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("...", pck->time + 1500ms));
 	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}

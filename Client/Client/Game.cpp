@@ -11,5 +11,5 @@ void Game::init()
 {
 	KEY_BOARD_EVENT_MANAGER::Get().BindMainKeyFunc(
 		[this](const KEY_BOARD_EVENT_MANAGER::key_event& key)->bool
-		{ return Players_[Id_].ProcessInput(key); });
+		{ return Characters_[Id_].ProcessInput(key); });
 }

@@ -5,14 +5,14 @@
 
 class Game
 {
-	SINGLE_TON(Game) { Players_.reserve(MAX_PLAYER); }
+	SINGLE_TON(Game) { Characters_.reserve(MAX_PLAYER); }
 public:
 	void update();
 	void init();
 	GET(Id); SET(Id);
-	GET_REF_UNSAFE(Players);
-	Player& GetPlayer() { return Players_[Id_]; }
+	GET_REF_UNSAFE(Characters);
+	Character& GetPlayer() { return Characters_[Id_]; }
 private:
 	ID Id_{};
-	unordered_map<ID, Player> Players_;
+	unordered_map<ID, Character> Characters_;
 };

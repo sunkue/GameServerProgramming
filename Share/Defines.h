@@ -30,14 +30,14 @@ const uint16_t SERVER_PORT = 8282;
 //====================================
 constexpr int MAX_PLAYER = 5'0000;
 constexpr int MAX_MONSTER = 20'0000;
-constexpr int MAX_NPC = 0;
+constexpr int MAX_NPC = 10;
 constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
 
 constexpr int MAX_PARTY = 4;
 constexpr int MAP_SIZE = 2000;
-constexpr int SIGHT_SIZE = 11;
-constexpr int WINDOW_SIZE = 16;
-constexpr int SECTOR_SIZE = 20;
+constexpr int SIGHT_SIZE = 15;
+constexpr int WINDOW_SIZE = 20;
+constexpr int SECTOR_SIZE = 50;
 constexpr int SECTOR_NUM = MAP_SIZE / SECTOR_SIZE;
 
 

@@ -127,8 +127,8 @@ void ProcessPacket(int ci, unsigned char packet[])
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	switch (packet_type)
 	{
-	case PACKET_TYPE::Sc_set_position: {
-		auto move_packet = reinterpret_cast<sc_set_position*>(packet);
+	case PACKET_TYPE::Sc_set_position_timestamp: {
+		auto move_packet = reinterpret_cast<sc_set_position_timestamp*>(packet);
 		if (move_packet->id < MAX_CLIENTS) {
 			int my_id = client_map[move_packet->id];
 			if (-1 != my_id) {
@@ -343,7 +343,7 @@ void Test_Thread()
 			if (false == g_clients[i].connected) continue;
 			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
-			cs_input my_packet;
+			cs_input_timestamp my_packet;
 			switch (rand() % 4) {
 			case 0: my_packet.input = eMoveOper::up; break;
 			case 1: my_packet.input = eMoveOper::down; break;

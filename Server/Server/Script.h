@@ -16,3 +16,9 @@ public:
 protected:
 	map<eScriptType, lua_State*> Scripts_;
 };
+
+///////////////////////////////////////////
+
+#define lua_toint(L, i ) static_cast<int>(lua_tonumber(L, i))
+
+#include "ScriptApi.h"

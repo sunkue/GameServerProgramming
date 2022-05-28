@@ -54,6 +54,24 @@ void Renderer::ReadyDraw()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
+ImVec2 TileSize()
+{
+	auto wOffsetPerUnit = static_cast<float>(System::Get().Screen.width - 20) / WINDOW_SIZE;
+	auto hOffsetPerUnit = static_cast<float>(System::Get().Screen.height - 20) / WINDOW_SIZE;
+	return { wOffsetPerUnit , hOffsetPerUnit };
+}
+
+ImVec2 ImGuiGetCenterPosOfTile(Position tilePos)
+{
+	ImVec2 ret{};
+	ret.x += 10;
+	ret.y += 10;
+	auto tileSize = TileSize();
+	ret.x += tilePos.x * tileSize.x;
+	ret.y += tilePos.y * tileSize.y;
+	return ret;
+}
+
 void DrawGui()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -68,7 +86,7 @@ void DrawGui()
 		auto HP = player.GetHp();
 		auto EXP = player.GetExp();
 		auto Level = player.GetLevel();
-		gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHP(Level))).c_str());
+		gui::Text(("HP :: "s + to_string(HP) + "/"s + to_string(MaxHp(Level))).c_str());
 		gui::Text(("LEVEL :: "s + to_string(Level) + "  EXP :: "s + to_string(EXP) + "/"s + to_string(RequireExp(Level))).c_str());
 		gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
 		gui::End();
@@ -79,6 +97,28 @@ void DrawGui()
 		ChatManager::Get().RenderChat();
 	}
 
+	{
+		gui::StyleColorsLight();
+		auto PlayerPos = Game::Get().GetPlayer().GetPos();
+		for (auto& c : Game::Get().GetCharacters())
+		{
+			auto& SpeechBubble = c.second.GetSpeechBubble();
+			if (SpeechBubble.second <= system_clock::now())
+				continue;
+
+			auto str = "SpeechBubble"s + to_string(c.first);
+			gui::Begin(str.c_str(), 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+			gui::Text(SpeechBubble.first.c_str());
+			gui::End();
+
+			ImVec2 BubblePos;
+			BubblePos = ImGuiGetCenterPosOfTile(Position{ c.second.GetPos() - PlayerPos } + Position{ 10, 10 });
+			BubblePos.x += (-10 - 3 * static_cast<int>(SpeechBubble.first.size())) * (TileSize().x / 25);
+			BubblePos.y += -40 * (TileSize().y / 25);
+			gui::SetWindowPos(str.c_str(), BubblePos);
+		}
+		gui::StyleColorsDark();
+	}
 
 	gui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
@@ -102,23 +142,19 @@ void Renderer::Draw()
 	ObjShader_->Set("u_start_with_dark", start_with_dark);
 	ObjShader_->Set("u_focus_center", FocusCenter_);
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
-	auto draw_obj = [&](const StaticObj& obj)
-	{
 
-	};
-
-	for (const auto& other : Game::Get().GetPlayers())
+	for (const auto& other : Game::Get().GetCharacters())
 	{
 		auto& id = other.first;
 		auto& obj = other.second;
 
-		OBJ_TYPE type;
+		OBJ_TYPE type{};
 		if (id < MAX_PLAYER) type = OBJ_TYPE::Wlook;
 		if (id == Game::Get().GetId()) type = OBJ_TYPE::Wknight;
 		if (MAX_PLAYER <= id && id < MAX_PLAYER + MAX_MONSTER) type = OBJ_TYPE::Bpawn;
 
 		ObjShader_->Set("u_type", int(type));
-		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 });
+		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
 		ScreenQuad::Get().DrawQuad();
 	}
 

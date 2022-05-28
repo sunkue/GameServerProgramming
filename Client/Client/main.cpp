@@ -66,12 +66,11 @@ int main()
 	{
 		IMGUI_CHECKVERSION();
 		gui::CreateContext();
-
-		ImGuiIO& io = gui::GetIO();
-
 		gui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+		auto& io = gui::GetIO();
+		io.Fonts->AddFontFromFileTTF("Resource/Font/³ª´®¼Õ±Û¾¾ ´ÞÀÇ±Ëµµ.ttf", 15.f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 
 

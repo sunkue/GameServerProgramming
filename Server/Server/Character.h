@@ -10,11 +10,31 @@
 // 
 /////////////////////////////////
 
+inline int RequireExp(int HP) { return static_cast<int>(50 * pow(2, HP)); }
+inline int MaxHp(int Level) { return Level * 100; }
+
 struct Character : public DynamicObj, public Scriptable
 {
+	friend class CharacterManager;
 public:
+	virtual void Regen();
 	Character(ID id) :DynamicObj{ id } { CompileScript(); };
 	virtual ~Character() = default;
+	virtual void HpDecrease(ID agent, int amount) {};
+	virtual void HpIncrease(ID agent, int amount) {};
+	void Attack();
+	virtual void AttackImpl() {};
+	virtual bool Move(Position diff) override;
+	GET_REF(Hp);
+	GET_REF(Level);
+protected:
+	Position StartPosition_;
+	atomic_int Hp_{};
+	atomic_int Level_{};
+	milliseconds MovementCooltime_{ 500ms };
+	milliseconds AttackCooltime_{ 1s };
+	atomic_bool Moveable_{ true };
+	atomic_bool Attackable_{ true };
 };
 
 class CharacterManager
@@ -23,9 +43,9 @@ class CharacterManager
 public:
 	bool Move(ID Id_, eMoveOper oper);
 	bool Move(ID Id_, Position to);
+	bool InitialMove(ID Id_, Position to);
 	Position GetPosition(ID Id_) { return Characters_[Id_]->GetPos(); }
 	void SetPosition(ID Id_, Position pos) { Characters_[Id_]->SetPos(pos); }
-public:
 	void Enable(ID Id_) { Characters_[Id_]->Enable(); }
 	void Disable(ID Id_) { Characters_[Id_]->Disable(); }
 	GET_REF_UNSAFE(Characters);

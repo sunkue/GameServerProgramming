@@ -30,7 +30,7 @@ protected:
 
 
 inline int RequireExp(int HP) { return static_cast<int>(50 * pow(2, HP)); }
-inline int MaxHP(int Level) { return Level * 100; }
+inline int MaxHp(int Level) { return Level * 100; }
 
 class DynamicObj : public StaticObj
 {
@@ -45,6 +45,7 @@ public:
 protected:
 	int Hp_{};
 	int Level_{};
+	int Exp_{};
 
 private:
 };

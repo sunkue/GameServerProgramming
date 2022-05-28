@@ -13,23 +13,15 @@
 
 void Player::HpRegen()
 {
-	auto maxHp = MaxHP(Level_);
-	Hp_ += maxHp / 10;
+	HpIncrease(Id_, MaxHp(Level_) / 10);
 
-	if (maxHp <= Hp_)
-		Hp_ = maxHp;
-	else
+	if (Hp_ < MaxHp(Level_))
 		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
-
-	sc_set_hp set_hp;
-	set_hp.id = Id_;
-	set_hp.hp = Hp_;
-	Server::Get().GetClients()[Id_].DoSend(&set_hp);
 }
 
 bool Player::Move(Position diff)
 {
-	bool moved = DynamicObj::Move(diff);
+	bool moved = Character::Move(diff);
 	if (moved) { UpdateViewList(); }
 	return moved;
 }
@@ -44,6 +36,13 @@ bool Player::Enable()
 void Player::Update()
 {
 
+}
+
+void Player::Regen()
+{
+	HpIncrease(Id_, 9999);
+	ExpSum(Id_, -Exp_ / 2);
+	Move(StartPosition_ - GetPos());
 }
 
 bool Player::Disable()
@@ -69,6 +68,11 @@ void Player::UpdateViewList()
 	auto pos = GetPos();
 	auto nearSectors = World::Get().GetNearSectors4(pos, GetSectorIdx());
 
+	sc_set_position setPositioon;
+	setPositioon.id = Id_;
+	setPositioon.pos = pos;
+	Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+
 	decltype(ViewList_) nearList;
 
 	{
@@ -83,7 +87,6 @@ void Player::UpdateViewList()
 			auto& players = ns->GetPlayers();
 			for (auto& p : players)
 			{
-				// 나한테 보내기는 타입스탬프때문에 processpacket에서 처리.
 				if (this == p)
 					continue;
 
@@ -140,9 +143,6 @@ void Player::UpdateViewList()
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
 						Server::Get().GetClients()[Id_].DoSend(&setPositioon);
 					}
-					/*
-					
-					*/
 				}
 				else
 				{
@@ -156,7 +156,6 @@ void Player::UpdateViewList()
 			}
 		}
 	}
-
 
 	for (auto& characterId : nearList)
 	{
@@ -177,7 +176,7 @@ void Player::UpdateViewList()
 				}, 0s });
 		}
 	}
-	
+
 	{
 		unique_lock lck{ ViewLock };
 		ViewList_ = nearList;
@@ -225,4 +224,46 @@ bool Player::InsertToViewList(ID Id)
 	Server::Get().GetClients()[Id_].DoSend(&setPositioon);
 
 	return inserted;
+}
+
+void Player::ExpSum(ID agent, int amount)
+{
+	auto requireExp = RequireExp(Hp_);
+	Exp_ += amount;
+	if (requireExp <= Exp_)
+	{
+		//LevelUp
+		Level_++; Exp_ -= requireExp;
+		sc_set_level set_level;
+		set_level.id = Id_;
+		set_level.level = Level_;
+		Server::Get().GetClients()[Id_].DoSend(&set_level);
+		HpIncrease(Id_, 9999);
+	}
+
+	Exp_ -= Exp_ * (Exp_ < 0);
+
+	sc_set_exp set_exp;
+	set_exp.id = Id_;
+	set_exp.exp = Exp_;
+	Server::Get().GetClients()[Id_].DoSend(&set_exp);
+}
+
+void Player::HpDecrease(ID agent, int dmg)
+{
+	Hp_ -= dmg;
+	if (Hp_ <= 0)
+	{
+		Regen();
+	}
+}
+
+void Player::HpIncrease(ID agent, int amount)
+{
+	Hp_ = std::max(Hp_ + amount, MaxHp(Level_));
+
+	sc_set_hp set_hp;
+	set_hp.id = Id_;
+	set_hp.hp = Hp_;
+	Server::Get().GetClients()[Id_].DoSend(&set_hp);
 }

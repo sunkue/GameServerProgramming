@@ -59,7 +59,7 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 	{
 		exovers.fill({});
 		//	cerr << "GQCSTART::";
-		auto res = GetQueuedCompletionStatusEx(Iocp_, exovers.data(), exovers.size(), &returned_ios, INFINITE, FALSE);
+		auto res = GetQueuedCompletionStatusEx(Iocp_, exovers.data(), static_cast<ULONG>(exovers.size()), &returned_ios, INFINITE, FALSE);
 		//	cout << this_thread::get_id() << endl;
 //	cerr << "GQCS::" << (SOCKET)id << "::" << returned_bytes << "::" << endl;
 
@@ -72,10 +72,10 @@ void Server::ProcessQueuedCompleteOperationLoopEx()
 			// cerr << "[!!io num] [ " << returned_ios << " ]" << endl;
 		}
 
-		for (int i = 0; i < returned_ios; i++)
+		for (ULONG i = 0; i < returned_ios; i++)
 		{
 			DWORD returned_bytes = exovers[i].dwNumberOfBytesTransferred;
-			ID Id_ = exovers[i].lpCompletionKey;
+			ID Id_ = static_cast<ID>(exovers[i].lpCompletionKey);
 			ExpOverlapped* exover = reinterpret_cast<ExpOverlapped*>(exovers[i].lpOverlapped);
 
 			if (FALSE == res) [[unlikely]]

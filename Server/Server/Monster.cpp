@@ -5,57 +5,6 @@
 #include "Character.h"
 #include "Server.h"
 
-#define lua_toint(L, i ) static_cast<int>(lua_tonumber(L, i))
-
-int API_SendMessage(lua_State* L)
-{
-	int clinetId = lua_toint(L, -4);
-	int speakerId = lua_toint(L, -3);
-	const char* mess = lua_tostring(L, -2);
-	int delaySec = lua_toint(L, -1);
-	lua_pop(L, 5);
-
-	EventManager::Get().AddEvent({[clinetId, speakerId, mess]()
-	{
-			sc_chat chat;
-			chat.id = speakerId;
-			chat.time = system_clock::now();
-			strcpy_s(chat.chat, mess);
-			chat.size -= sizeof(chat.chat) - strlen(chat.chat);
-			// assert(strlen(chat.chat) < MAX_CHAT_SIZE);
-			Server::Get().GetClients()[clinetId].DoSend(&chat);
-	}, seconds{ delaySec } });
-	return 0;
-}
-
-int API_MoveRandomly(lua_State* L)
-{
-	int actorId = lua_toint(L, -2);
-	int count = lua_toint(L, -1);
-	lua_pop(L, 3);
-
-	while (0 < count--)
-	{
-		EventManager::Get().AddEvent({[&manager = CharacterManager::Get(), actorId] ()
-		{
-			manager.Move(actorId, static_cast<eMoveOper>(rand() % 4));
-		}, seconds{ count } });
-	}
-	return 0;
-}
-
-int API_GetPos(lua_State* L)
-{
-	int objectId = lua_toint(L, -1);
-	lua_pop(L, 2);
-
-	auto pos = CharacterManager::Get().GetPosition(objectId);
-
-	lua_pushnumber(L, pos.x);
-	lua_pushnumber(L, pos.y);
-	return 2;
-}
-
 Monster::Monster(ID id) : Character{ id }
 {
 	CompileScript();
@@ -83,6 +32,42 @@ void Monster::CompileScript()
 	Scripts_[eScriptType::AI] = aiScript;
 }
 
+
+
+void Monster::HpDecrease(ID agent, int amount)
+{
+	Hp_ -= amount;
+	if (Hp_ <= 0)
+		Die(agent);
+}
+
+void Monster::HpIncrease(ID agent, int amount)
+{
+	Hp_ = max(Hp_ + amount, MaxHp(Level_));
+}
+
+void Monster::Die(ID agent)
+{
+	Died_ = true;
+	Disable();
+	EventManager::Get().AddEvent({ [this]()
+		{ Regen(); }, 30s });
+	if (auto killerAsPlayer = dynamic_cast<Player*>(CharacterManager::Get().GetCharacters()[agent].get()))
+	{
+		int exp = Level_ * Level_ * 2;
+		exp += exp * (eMonsterAggressionType::Agro == AggressionType_);
+		exp += exp * (eMonsterMovementType::Roaming == MovementType_);
+		killerAsPlayer->ExpSum(Id_, exp);
+	}
+}
+
+void Monster::Regen()
+{
+	HpIncrease(Id_, MaxHp(Level_));
+	Move(StartPosition_ - GetPos());
+	Died_ = false;
+}
+
 bool Monster::Move(Position diff)
 {
 	constexpr size_t NearListReserveHint = 20;
@@ -107,7 +92,7 @@ bool Monster::Move(Position diff)
 		}
 	}
 
-	auto ret = DynamicObj::Move(diff);
+	auto ret = Character::Move(diff);
 
 	Position newPos;
 	{
@@ -160,15 +145,15 @@ void Monster::Update()
 
 bool Monster::Enable()
 {
+	if (Died_) return false;
 	if (!DynamicObj::Enable()) return false;
-		EventManager::Get().AddEvent({ [this]() { Update(); }, 1s });
+	//EventManager::Get().AddEvent({ [this]() { Update(); }, 1s });
 	return true;
 }
 
 bool Monster::Disable()
 {
 	if (!DynamicObj::Disable()) return false;
-
 
 	return true;
 }

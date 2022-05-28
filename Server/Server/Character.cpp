@@ -27,7 +27,7 @@ CharacterManager::CharacterManager()
 	{
 		auto id = _id + MAX_PLAYER;
 		Characters_[id] = make_unique<Monster>(id);
-		Characters_[id]->Move({ rand() % MAP_SIZE, rand() % MAP_SIZE });
+		InitialMove(id, { rand() % MAP_SIZE, rand() % MAP_SIZE });
 	}
 	cerr << "..done" << endl;
 
@@ -56,3 +56,36 @@ bool CharacterManager::Move(ID Id_, Position to)
 	return moved;
 }
 
+bool CharacterManager::InitialMove(ID Id_, Position to)
+{
+	Characters_[Id_]->StartPosition_ = to;
+	return Move(Id_, to);
+}
+
+void Character::Regen()
+{
+	Hp_ = 1;
+	Move(StartPosition_ - GetPos());
+}
+
+void Character::Attack()
+{
+	if (!Attackable_) return;
+	Attackable_ = false;
+	AttackImpl();
+	EventManager::Get().AddEvent({ [&Attackable = Attackable_]()
+		{ Attackable = true; }, AttackCooltime_ });
+}
+
+bool Character::Move(Position diff)
+{
+	if (!Moveable_) return false;
+	auto ret = DynamicObj::Move(diff);
+	if (ret)
+	{
+		Moveable_ = false;
+		EventManager::Get().AddEvent({ [&Moveable = Moveable_]()
+			{ Moveable = true; }, MovementCooltime_ });
+	}
+	return ret;
+}

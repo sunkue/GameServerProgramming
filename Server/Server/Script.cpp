@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Script.h"
 
+
 Scriptable::~Scriptable()
 {
 	for (auto& s : Scripts_)
@@ -9,3 +10,4 @@ Scriptable::~Scriptable()
 		lua_close(s.second);
 	}
 };
+

@@ -2,7 +2,7 @@
 
 struct Chat
 {
-	ID speaker;
+	ID speaker{ -1 };
 	char mess[MAX_CHAT_SIZE + 1]{};
 	system_clock::time_point timestamp;
 };

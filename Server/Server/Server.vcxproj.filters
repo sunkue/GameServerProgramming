@@ -110,6 +110,9 @@
     <ClCompile Include="Script.cpp">
       <Filter>Game\Script\Scriptable</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptApi.cpp">
+      <Filter>Game\Script\Scriptable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -179,6 +182,9 @@
   <ItemGroup>
     <None Include="LuaScript\Monster\monsterAi.lua">
       <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="ScriptApi.h">
+      <Filter>Game\Script\Scriptable</Filter>
     </None>
   </ItemGroup>
 </Project>
