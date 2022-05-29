@@ -188,7 +188,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LuaScript\Monster\monsterAi.lua" />
+    <None Include="LuaScript\Monster\monsterAggressionAgro.lua" />
+    <None Include="LuaScript\Monster\monsterAggressionPeace.lua" />
+    <None Include="LuaScript\Monster\monsterAiTest.lua" />
+    <None Include="LuaScript\Monster\monsterBasicDeclaration.lua" />
+    <None Include="LuaScript\Monster\monsterMovementFixed.lua" />
+    <None Include="LuaScript\Monster\monsterMovementRoaming.lua" />
+    <None Include="LuaScript\Monster\monsterSpeech0.lua" />
     <None Include="ScriptApi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

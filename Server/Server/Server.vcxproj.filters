@@ -180,11 +180,29 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LuaScript\Monster\monsterAi.lua">
+    <None Include="LuaScript\Monster\monsterAiTest.lua">
       <Filter>Game\Script\LuaScript</Filter>
     </None>
     <None Include="ScriptApi.h">
       <Filter>Game\Script\Scriptable</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterAggressionAgro.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterAggressionPeace.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterBasicDeclaration.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterMovementFixed.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterMovementRoaming.lua">
+      <Filter>Game\Script\LuaScript</Filter>
+    </None>
+    <None Include="LuaScript\Monster\monsterSpeech0.lua">
+      <Filter>Game\Script\LuaScript</Filter>
     </None>
   </ItemGroup>
 </Project>

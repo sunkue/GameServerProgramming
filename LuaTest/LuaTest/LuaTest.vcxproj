@@ -144,6 +144,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ex1.lua" />
+    <None Include="ex2.lua" />
+    <None Include="Lua\monsterAggressionAgro.lua" />
+    <None Include="Lua\monsterAggressionPeace.lua" />
+    <None Include="Lua\monsterAiTest.lua" />
+    <None Include="Lua\monsterBasicDeclaration.lua" />
+    <None Include="Lua\monsterMovementFixed.lua" />
+    <None Include="Lua\monsterMovementRoaming.lua" />
+    <None Include="Lua\monsterSpeech0.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

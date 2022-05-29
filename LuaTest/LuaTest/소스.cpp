@@ -9,7 +9,8 @@ extern "C" {
 }
 
 #include <iostream>
-
+#include <fstream>
+#include <string>
 using namespace std;
 
 
@@ -61,26 +62,28 @@ int main()
 {
 	lua_State* AiScript_ = luaL_newstate();
 	luaL_openlibs(AiScript_);
-	luaL_dofile(AiScript_, "ex1.lua");
 //	luaL_loadfile(AiScript_, "ex1.lua");
-//	lua_pcall(AiScript_, 0, 0, 0);
 
-	lua_register(AiScript_, "F", F);
-	lua_register(AiScript_, "API_Chat", API_SendMessage);
-	lua_register(AiScript_, "API_GetPos", API_GetPos);
+	{
 
-	lua_getglobal(AiScript_, "SetObjectId");
-	lua_pushnumber(AiScript_, 111);
-	lua_pcall(AiScript_, 1, 0, 0);
+	ifstream luaFile{ "ex1.lua" , ios::binary };
+	auto str = string{ (std::istreambuf_iterator<char>(luaFile)), std::istreambuf_iterator<char>() };
+	ifstream luaFile2{ "ex2.lua" , ios::binary };
+	str += string{ (std::istreambuf_iterator<char>(luaFile2)), std::istreambuf_iterator<char>() };
+	}
+	string str; str.reserve(10000);
+	ifstream basicGlobalDeclaration{ "Lua/monsterBasicDeclaration.lua" , ios::binary };
+//	ifstream speech{ "Lua/monsterSpeech0.lua" , ios::binary };
+	ifstream movement{ "Lua/monsterMovementRoaming.lua" , ios::binary };
+	ifstream aggression{ "Lua/monsterAggressionPeace.lua" , ios::binary };
+	str += string{ (std::istreambuf_iterator<char>(basicGlobalDeclaration)), std::istreambuf_iterator<char>() };
+	//str += string{ (std::istreambuf_iterator<char>(speech)), std::istreambuf_iterator<char>() };
+	str += string{ (std::istreambuf_iterator<char>(movement)), std::istreambuf_iterator<char>() };
+	str += string{ (std::istreambuf_iterator<char>(aggression)), std::istreambuf_iterator<char>() };
+	luaL_loadstring(AiScript_, str.c_str());
+	lua_pcall(AiScript_, 0, 0, 0);
 
-	lua_getglobal(AiScript_, "EventPlayerMove");
-	lua_pushnumber(AiScript_, 33);
-	lua_pcall(AiScript_, 1, 0, 0);
 
-
-	lua_getglobal(AiScript_, "F");
-	lua_getglobal(AiScript_, "myId");
-	lua_pcall(AiScript_, 1, 0, 0);
 }
 
 

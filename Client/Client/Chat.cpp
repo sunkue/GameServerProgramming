@@ -30,10 +30,13 @@ void ChatManager::RenderChat() const
 	static char chatBuffer[MAX_CHAT_BUFFER_SIZE]{};
 	if (gui::InputText("ENTER", chatBuffer, MAX_CHAT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
 	{
-		cs_chat chat;
-		strcpy_s(chat.chat, MAX_CHAT_SIZE, chatBuffer);
-		chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - strlen(chat.chat));
-		Networker::Get().DoSend(&chat);
+		if (auto chatLen = strlen(chatBuffer))
+		{
+			cs_chat chat;
+			strcpy_s(chat.chat, MAX_CHAT_SIZE, chatBuffer);
+			chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - chatLen);
+			Networker::Get().DoSend(&chat);
+		}
 		ZeroMemory(chatBuffer, sizeof(chatBuffer));
 	}
 	gui::End();

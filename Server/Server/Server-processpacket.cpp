@@ -124,7 +124,6 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 				auto pos = CharacterManager::Get().GetPosition(Id_);
 				set_pos.id = NetID(Id_);
 				set_pos.pos = pos;
-				cout << pos.x << " " << pos.y << endl;
 				SND2ME(&set_pos);
 			}
 			else

@@ -23,5 +23,29 @@
     <None Include="ex1.lua">
       <Filter>소스 파일</Filter>
     </None>
+    <None Include="ex2.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterAggressionAgro.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterAggressionPeace.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterAiTest.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterBasicDeclaration.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterMovementFixed.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterMovementRoaming.lua">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Lua\monsterSpeech0.lua">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

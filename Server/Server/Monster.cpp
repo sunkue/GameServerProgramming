@@ -21,14 +21,32 @@ void Monster::CompileScript()
 	lua_State* aiScript;
 	aiScript = luaL_newstate();
 	luaL_openlibs(aiScript);
-	luaL_dofile(aiScript, "LuaScript/Monster/monsterAi.lua");
-	lua_getglobal(aiScript, "SetObjectId");
-	lua_pushnumber(aiScript, Id_);
-	lua_pcall(aiScript, 1, 0, 0);
-	lua_pop(aiScript, 2);
-	lua_register(aiScript, "API_Chat", API_SendMessage);
-	lua_register(aiScript, "API_GetPos", API_GetPos);
-	lua_register(aiScript, "API_MoveRandomly", API_MoveRandomly);
+	{
+		string str; str.reserve(1500);
+		ifstream basicGlobalDeclaration{ "LuaScript/Monster/monsterBasicDeclaration.lua" , ios::binary };
+		ifstream movement{ "LuaScript/Monster/monsterMovementRoaming.lua" , ios::binary };
+		ifstream aggression{ "LuaScript/Monster/monsterAggressionPeace.lua" , ios::binary };
+		str += string{ (std::istreambuf_iterator<char>(basicGlobalDeclaration)), std::istreambuf_iterator<char>() };
+		str += string{ (std::istreambuf_iterator<char>(movement)), std::istreambuf_iterator<char>() };
+		str += string{ (std::istreambuf_iterator<char>(aggression)), std::istreambuf_iterator<char>() };
+		luaL_loadstring(aiScript, str.c_str());
+		lua_pcall(aiScript, 0, 0, 0);
+	}
+	{
+		lua_getglobal(aiScript, "SetObjectId");
+		lua_pushnumber(aiScript, Id_);
+		lua_pcall(aiScript, 1, 0, 0);
+		lua_pop(aiScript, 2);
+	}
+	{
+		lua_register(aiScript, "API_Chat", API_SendMessage);
+		lua_register(aiScript, "API_GetPos", API_GetPos);
+		lua_register(aiScript, "API_MoveRandomly", API_MoveRandomly);
+		lua_register(aiScript, "API_Move", API_Move);
+		lua_register(aiScript, "API_ReturnToStartPoint", API_ReturnToStartPoint);
+		lua_register(aiScript, "API_NavigateAstar", API_NavigateAstar);
+		lua_register(aiScript, "API_Attack", API_Attack);
+	}
 	Scripts_[eScriptType::AI] = aiScript;
 }
 
@@ -74,8 +92,12 @@ bool Monster::Move(Position diff)
 	unordered_set<Player*> oldNearList; oldNearList.reserve(NEARLIST_RESERVE_HINT);
 	unordered_set<Player*> newNearList; newNearList.reserve(NEARLIST_RESERVE_HINT);
 
+	auto oldPos = GetPos();
+
+	if (!IsInBoundary(oldPos + diff, StartPosition_, MOVEMENT_BOUNDRAY))
+		return false;
+
 	{
-		auto oldPos = GetPos();
 		auto oldSector = GetSectorIdx();
 		auto nearSector = World::Get().GetNearSectors4(oldPos, oldSector);
 		for (auto& ns : nearSector)
@@ -120,8 +142,17 @@ bool Monster::Move(Position diff)
 
 	for (auto& p : newNearList)
 	{
-		p->InsertToViewList(Id_);
-
+		if (p->InsertToViewList(Id_))
+		{
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerEnterSight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
+		}
 	}
 
 	for (auto& p : oldNearList)
@@ -137,17 +168,20 @@ bool Monster::Move(Position diff)
 
 void Monster::Update()
 {
-	CharacterManager::Get().Move(Id_, static_cast<eMoveOper>(rand() % 4));
-
-	if (GetEnable())
-		EventManager::Get().AddEvent({ [this]() { Update(); }, 1s });
+	if (!GetEnable()) return;
+	{
+		lock_guard lck{ ScriptLock[eScriptType::AI] };
+		lua_getglobal(Scripts_[eScriptType::AI], "Update");
+		lua_pcall(Scripts_[eScriptType::AI], 0, 0, 0);
+	}
+	EventManager::Get().AddEvent({ [this]() {Update(); }, 500ms });
 }
 
 bool Monster::Enable()
 {
 	if (Died_) return false;
 	if (!DynamicObj::Enable()) return false;
-	//EventManager::Get().AddEvent({ [this]() { Update(); }, 1s });
+	EventManager::Get().AddEvent({ [this]() { Update(); }, 100ms });
 	return true;
 }
 

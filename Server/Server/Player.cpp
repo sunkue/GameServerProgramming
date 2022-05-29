@@ -80,6 +80,8 @@ void Player::UpdateViewList()
 		nearList = ViewList_;
 	}
 
+	unordered_set<ID> newMonsters;
+
 	for (auto& ns : nearSectors)
 	{
 		{
@@ -138,6 +140,7 @@ void Player::UpdateViewList()
 					lck.lock();
 					if (nearList.insert(otherId).second)
 					{
+						newMonsters.insert(otherId);
 						sc_set_position setPositioon;
 						setPositioon.id = otherId;
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
@@ -157,24 +160,17 @@ void Player::UpdateViewList()
 		}
 	}
 
-	for (auto& characterId : nearList)
+	for (auto& newMonsterId : newMonsters)
 	{
-		// 연속으로 이동하면, 이벤트가 여러번 보내진다. 결과는 마지막에 실행되므로
-		// 각 이동에 대한 이벤트는 모든 이동을 마친 최종 위치에서 한번에 실행 될 수 있다.
-		// MOVE가 멀티쓰레드로 돌아갈 수 있는 함수이므로..
-
-		if (MAX_PLAYER <= characterId && characterId < MAX_MONSTER + MAX_PLAYER)
-		{
-			Monster* m = reinterpret_cast<Monster*>(CharacterManager::Get().GetCharacters()[characterId].get());
-			EventManager::Get().AddEvent(
-				{ [id = Id_, L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
-				{
-					lock_guard lck{ mutex };
-					lua_getglobal(L, "EventPlayerMove");
-					lua_pushnumber(L, id);
-					lua_pcall(L, 1, 0, 0);
-				}, 0s });
-		}
+		Monster* m = reinterpret_cast<Monster*>(CharacterManager::Get().GetCharacters()[newMonsterId].get());
+		EventManager::Get().AddEvent(
+			{ [id = Id_, L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
+			{
+				lock_guard lck{ mutex };
+				lua_getglobal(L, "EventPlayerEnterSight");
+				lua_pushnumber(L, id);
+				lua_pcall(L, 1, 0, 0);
+			}, 0s });
 	}
 
 	{

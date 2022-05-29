@@ -1,3 +1,5 @@
+print("ex1 -")
+
 myId = -1
 
 function SetObjectId(id)
@@ -14,5 +16,18 @@ function EventPlayerMove(playerId)
 	end
 end
 
+state = nil
 
+function Update()
+	state()
+end
 
+function Idle()
+	Move()
+end
+
+function Battle()
+	Chase()
+end
+
+print("- ex1")

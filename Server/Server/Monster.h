@@ -23,6 +23,7 @@ enum class eMonsterMovementType
 // 다형성을 스크립트로 구현해보자.
 class Monster : public Character
 {
+	static constexpr Position::value_type MOVEMENT_BOUNDRAY = 20;
 public:
 	Monster(ID id);
 	virtual ~Monster();

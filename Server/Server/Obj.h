@@ -1,5 +1,14 @@
 #pragma once
 
+inline bool IsInBoundary(Position pos, Position center, Position::value_type boundray)
+{
+	return
+		pos.x <= center.x + boundray &&
+		center.x - boundray <= pos.x &&
+		pos.y <= center.y + boundray &&
+		center.y - boundray <= pos.y;
+}
+
 inline bool IsLimitPosition(Position::value_type N)
 {
 	return N <= 0 || MAP_SIZE - 1 <= N;

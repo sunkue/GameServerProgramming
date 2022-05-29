@@ -22,8 +22,8 @@ public:
 	virtual ~Character() = default;
 	virtual void HpDecrease(ID agent, int amount) {};
 	virtual void HpIncrease(ID agent, int amount) {};
-	void Attack();
-	virtual void AttackImpl() {};
+	void Attack(const vector<ID>& target, int damage = -1);
+	virtual void AttackImpl(const vector<ID>& target, int damage = -1) {};
 	virtual bool Move(Position diff) override;
 	GET_REF(Hp);
 	GET_REF(Level);
@@ -31,7 +31,7 @@ protected:
 	Position StartPosition_{};
 	atomic_int Hp_{};
 	atomic_int Level_{};
-	milliseconds MovementCooltime_{ 500ms };
+	milliseconds MovementCooltime_{ 1s };
 	milliseconds AttackCooltime_{ 1s };
 	atomic_bool Moveable_{ true };
 	atomic_bool Attackable_{ true };
