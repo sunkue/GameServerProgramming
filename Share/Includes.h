@@ -42,6 +42,8 @@
 #include <concurrent_priority_queue.h>
 #include <concurrent_queue.h>
 #include <concurrent_vector.h>
+#include <sqlext.h>
+
 using namespace std;
 using namespace concurrency;
 #include "SocketUtil.h"

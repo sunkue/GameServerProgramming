@@ -64,13 +64,6 @@ int main()
 	luaL_openlibs(AiScript_);
 //	luaL_loadfile(AiScript_, "ex1.lua");
 
-	{
-
-	ifstream luaFile{ "ex1.lua" , ios::binary };
-	auto str = string{ (std::istreambuf_iterator<char>(luaFile)), std::istreambuf_iterator<char>() };
-	ifstream luaFile2{ "ex2.lua" , ios::binary };
-	str += string{ (std::istreambuf_iterator<char>(luaFile2)), std::istreambuf_iterator<char>() };
-	}
 	string str; str.reserve(10000);
 	ifstream basicGlobalDeclaration{ "Lua/monsterBasicDeclaration.lua" , ios::binary };
 //	ifstream speech{ "Lua/monsterSpeech0.lua" , ios::binary };

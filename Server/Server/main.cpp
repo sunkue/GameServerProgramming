@@ -2,6 +2,7 @@
 #include "Server.h"
 #include "TimerEvent.h"
 #include "Character.h"
+#include "DataBase.h"
 
 struct RaiiThread
 {
@@ -41,6 +42,15 @@ void StartCommandLoop()
 
 int main()
 {
+	SQLWCHAR userName[50];
+	SQLINTEGER userId, userLevel;
+	DataBase::Get().ExecuteQuery(L"EXEC SelectUserDataGreaterLevel 2"sv, [&]() 
+		{
+			wcout << "[ ] " << userId << " :: " << userName << " :: " << userLevel << endl;
+		}, & userId, userName, &userLevel);
+
+	return 0;
+
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
 	for (int i = 0; i < workers.capacity() - 2; i++)
 	{
