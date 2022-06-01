@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Server.h"
+#include "TimerEvent.h"
 
 Server::Server()
 {
@@ -43,6 +44,7 @@ void Server::ProcessQueuedCompleteOperationLoop()
 		case COMP_OP::OP_ACCEPT: OnAcceptComplete(exover); break;
 		case COMP_OP::OP_DISCONNECT: OnDisconnectComplete(Id_, exover); break;
 		case COMP_OP::OP_EVENT: OnEventTimerComplete(exover); break;
+		case COMP_OP::OP_DB_EVENT: OnDataBaseQueryComplete(exover); break;
 		default: cerr << "[[[??]]]" << endl; break;
 		}
 	}
@@ -277,12 +279,18 @@ void Server::OnDisconnectComplete(ID Id_, ExpOverlapped* exover)
 	delete exover;
 }
 
-#include "TimerEvent.h"
 
 void Server::OnEventTimerComplete(ExpOverlapped* exover)
 {
 	auto e = reinterpret_cast<EventExpOverlapped*>(exover);
 	e->EventFunc();
+	delete exover;
+}
+
+void Server::OnDataBaseQueryComplete(ExpOverlapped* exover)
+{
+	auto e = reinterpret_cast<DataBaseExpOverlapped*>(exover);
+	e->Func(e->Results);
 	delete exover;
 }
 

@@ -86,17 +86,12 @@ void DataBase::ProcessQueryQueueLoop()
 		QueryRequest e;
 		while (QueryRequestQueue_.try_pop(e))
 		{
-			cout << "!!!" << endl;
-		
-			ExecuteQuery(e.Query, [&iocp, e]()
-				{
-				//	auto exover = new DBEventExpOverlapped{ e.Func, e.Targets };
-				//	PostQueuedCompletionStatus(iocp, 0, 0, &exover->Over);
-					e.Func(*e.Targets);
-				}, e.Targets);
-
-//			e.Func(e.Targets);
-			cout << ":::" << endl;
+			ExecuteQuery(e.Query, [&iocp, f = e.Func, r = e.Targets]()
+			{
+				//e.Func(*e.Targets);
+				auto exover = new DataBaseExpOverlapped{ f, *r };
+				PostQueuedCompletionStatus(iocp, 0, 0, &exover->Over);
+			}, *e.Targets);
 		}
 	}
 }

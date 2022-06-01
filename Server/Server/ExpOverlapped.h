@@ -45,8 +45,10 @@ struct EventExpOverlapped : ExpOverlappedBasic
 	function<void()> EventFunc;
 };
 
-struct DBEventExpOverlapped : ExpOverlappedBasic
+struct DataBaseExpOverlapped : ExpOverlappedBasic
 {
-	DBEventExpOverlapped(function<void()> e) : ExpOverlappedBasic{ COMP_OP::OP_DB_EVENT }, Func{ e }{}
-	function<void()> Func;
+	DataBaseExpOverlapped(function<void(vector<any>)> f, vector<any> R)
+		: ExpOverlappedBasic{ COMP_OP::OP_DB_EVENT }, Func{ f } { Results = R; }
+	vector<any> Results;
+	function<void(vector<any>)> Func;
 };

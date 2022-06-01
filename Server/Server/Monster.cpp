@@ -7,7 +7,7 @@
 
 Monster::Monster(ID id) : Character{ id }
 {
-	CompileScript();
+//	CompileScript();
 }
 
 Monster::~Monster()

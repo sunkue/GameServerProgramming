@@ -2,7 +2,7 @@
 
 
 template<class ... Args>
-inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args*... targets)
+inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&... targets)
 {
 	SQLRETURN retcode = SQLExecDirect(Stmt_, (SQLWCHAR*)query.data(), SQL_NTS);
 
@@ -34,14 +34,14 @@ inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args*
 /
 ==========================================*/
 template<class SQL_t, class ...Args>
-inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQL_t* target, Args* ...targets)
+inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQL_t& target, Args& ...targets)
 {
 	SQLBindColAutoType(col, target);
 	return SQLBindColAutoType(++col, targets...);
 }
 
 template<class ...Args>
-inline SQLRETURN DataBase::SQLBindColAutoType(Args* ...targets)
+inline SQLRETURN DataBase::SQLBindColAutoType(Args& ...targets)
 {
 	return SQLBindColAutoType(1, targets...);
 }
@@ -54,17 +54,33 @@ inline SQLRETURN DataBase::SQLBindColAutoType(Args* ...targets)
 /
 /
 ==========================================*/
-template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLINTEGER* target)
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLINTEGER& target)
 {
 	SQLLEN cbTemp{}, lenTemp = 50;
-	return SQLBindCol(Stmt_, col, SQL_C_LONG, target, lenTemp, &cbTemp);
+	return SQLBindCol(Stmt_, col, SQL_C_LONG, &target, lenTemp, &cbTemp);
 }
 
-template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWCHAR* target)
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWCHAR& target)
+{
+	SQLLEN cbTemp{}, lenTemp = 50;
+	return SQLBindCol(Stmt_, col, SQL_C_WCHAR, &target, lenTemp, &cbTemp);
+}
+
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWCHAR*& target)
 {
 	SQLLEN cbTemp{}, lenTemp = 50;
 	return SQLBindCol(Stmt_, col, SQL_C_WCHAR, target, lenTemp, &cbTemp);
 }
+
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, wstring& target)
+{
+	SQLLEN cbTemp{}, lenTemp = 50;
+	target.resize(lenTemp);
+	auto ret = SQLBindCol(Stmt_, col, SQL_C_WCHAR, target.data(), lenTemp, &cbTemp);
+	//target.shrink_to_fit();
+	return ret;
+}
+
 
 
 /*========================================
@@ -75,11 +91,11 @@ template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWC
 /
 ==========================================*/
 
-template<> inline SQLRETURN DataBase::SQLBindColAutoType(vector<any>* targets)
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(vector<any>& targets)
 {
 	SQLRETURN ret{};
 	int col = 1;
-	for (auto& t : *targets)
+	for (auto& t : targets)
 	{
 		ret = SQLBindColAnyType(col++, t);
 	}
@@ -91,16 +107,16 @@ inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 	SQLLEN cbTemp{}, lenTemp = 50;
 	SQLRETURN ret{};
 	auto targetTypeCode = target.type().hash_code();
-	static const auto INTEGER_TYPECODE = typeid(SQLINTEGER*).hash_code();
-	static const auto WCHAR_TYPECODE = typeid(SQLWCHAR*).hash_code();
+	static const auto INTEGER_TYPECODE = typeid(SQLINTEGER).hash_code();
+	static const auto WSTR_TYPECODE = typeid(wstring).hash_code();
 
-	if (WCHAR_TYPECODE == targetTypeCode)
+	if (WSTR_TYPECODE == targetTypeCode)
 	{
-		ret = SQLBindColAutoType(col, any_cast<SQLWCHAR*>(target));
+		ret = SQLBindColAutoType(col, *target._Cast<wstring>());
 	}
 	else if (INTEGER_TYPECODE == targetTypeCode)
 	{
-		ret = SQLBindColAutoType(col, any_cast<SQLINTEGER*>(target));
+		ret = SQLBindColAutoType(col, *target._Cast<SQLINTEGER>());
 	}
 	else
 	{

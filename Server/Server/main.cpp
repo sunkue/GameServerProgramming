@@ -42,29 +42,7 @@ void StartCommandLoop()
 
 int main()
 {
-	//	=> send event DB
-	{
-		QueryRequest q;
-		q.Query = L"EXEC SelectCharacterDataGreaterLevel -1"sv;
-		q.Targets = new vector<any>(3);
-		(*q.Targets)[0] = make_any<SQLINTEGER*>(new SQLINTEGER);
-		(*q.Targets)[1] = make_any<SQLWCHAR*>(new SQLWCHAR[50]);
-		(*q.Targets)[2] = make_any<SQLINTEGER*>(new SQLINTEGER);
-		q.Func = [](const vector<any>& t)
-		{
-			wcout << "[ ] " << *any_cast<SQLINTEGER*>(t[0]) << " :: "
-				<< any_cast<SQLWCHAR*>(t[1]) << " :: "
-				<< *any_cast<SQLINTEGER*>(t[2]) << endl;
-		};
-		DataBase::Get().AddQueryRequest(move(q));
-	}
-
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
-
-	workers.emplace_back([&]() { DataBase::Get().ProcessQueryQueueLoop(); });
-	cout << "DB query ready" << endl;
-	return 0;
-
 
 	for (int i = 0; i < workers.capacity() - 3; i++)
 	{
@@ -77,6 +55,25 @@ int main()
 	CharacterManager::Get();
 	workers.emplace_back([&]() { EventManager::Get().ProcessEventQueueLoop(); });
 	cout << "event manager ready" << endl;
+
+	{
+		QueryRequest q;
+		q.Query = L"EXEC SelectCharacterDataGreaterLevel -1"sv;
+		q.Targets = make_shared<vector<any>>(); q.Targets->reserve(3);
+		q.Targets->emplace_back(make_any<SQLINTEGER>());
+		q.Targets->emplace_back(make_any<wstring>());
+		q.Targets->emplace_back(make_any<SQLINTEGER>());
+		q.Func = [](const vector<any>& t)
+		{
+			wcout << "[ ] " << any_cast<SQLINTEGER>(t[0]) << " :: "
+				<< any_cast<wstring>(t[1]) << " :: "
+				<< any_cast<SQLINTEGER>(t[2]) << endl;
+		};
+		DataBase::Get().AddQueryRequest(move(q));
+	}
+
+	workers.emplace_back([&]() { DataBase::Get().ProcessQueryQueueLoop(); });
+	cout << "DB query ready" << endl;
 
 	Server::Get().StartAccept();
 	cout << "ready 2 accept" << endl;
