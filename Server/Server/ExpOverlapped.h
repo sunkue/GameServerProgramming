@@ -7,7 +7,8 @@ enum class COMP_OP : int8
 	OP_RECV,
 	OP_SEND,
 	OP_DISCONNECT,
-	OP_EVENT
+	OP_EVENT,
+	OP_DB_EVENT
 };
 
 struct ExpOverlappedBasic
@@ -42,4 +43,10 @@ struct EventExpOverlapped : ExpOverlappedBasic
 {
 	EventExpOverlapped(function<void()> e) : ExpOverlappedBasic{ COMP_OP::OP_EVENT }, EventFunc{ e }{}
 	function<void()> EventFunc;
+};
+
+struct DBEventExpOverlapped : ExpOverlappedBasic
+{
+	DBEventExpOverlapped(function<void(vector<any>)> e) : ExpOverlappedBasic{ COMP_OP::OP_DB_EVENT }, Func{ e }{}
+	function<void(vector<any>)> Func;
 };

@@ -42,17 +42,35 @@ void StartCommandLoop()
 
 int main()
 {
-	SQLWCHAR userName[50];
-	SQLINTEGER userId, userLevel;
-	DataBase::Get().ExecuteQuery(L"EXEC SelectUserDataGreaterLevel 2"sv, [&]() 
-		{
-			wcout << "[ ] " << userId << " :: " << userName << " :: " << userLevel << endl;
-		}, & userId, userName, &userLevel);
+	SQLWCHAR* userName = new SQLWCHAR[50];
+	SQLINTEGER* userId = new SQLINTEGER;
+	SQLINTEGER* userLevel = new SQLINTEGER;
+//	=> send event DB
+	QueryRequest q;
+	q.Query = L"EXEC SelectCharacterDataGreaterLevel -1"sv;
+	q.Targets = new vector<any>(3);
+	q.Targets[0] = any{ new SQLINTEGER };
+	q.Targets[1] = make_any<SQLWCHAR>();
+	q.Targets[2] = make_any<SQLINTEGER>();
+	q.Func = [t = q.Targets]()
+	{
+		wcout << "[ ] " << *any_cast<SQLINTEGER*>(t[0]) << " :: "
+			<< *any_cast<SQLWCHAR*>(t[1]) << " :: "
+			<< *any_cast<SQLINTEGER*>(t[2]) << endl;
+	};
 
-	return 0;
+	//=> Do Query and func
+	DataBase::Get().ExecuteQuery(L"EXEC SelectCharacterDataGreaterLevel -1"sv, [&]()
+		{
+			wcout << "[ ] " << *userId << " :: " << userName << " :: " << *userLevel << endl;
+		}, userId, userName, userLevel);
+//	=> GQCP
+	delete[] userName;
+	delete userId;
+	delete userLevel;
 
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
-	for (int i = 0; i < workers.capacity() - 2; i++)
+	for (int i = 0; i < workers.capacity() - 3; i++)
 	{
 #ifdef GQCPEX
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoopEx(); });
@@ -61,9 +79,11 @@ int main()
 #endif // GQCPEX
 	}
 	CharacterManager::Get();
-	Server::Get().StartAccept();
-	cout << "ready 2 accept" << endl;
 	workers.emplace_back([&]() { EventManager::Get().ProcessEventQueueLoop(); });
 	cout << "event manager ready" << endl;
+	workers.emplace_back([&]() { DataBase::Get().ProcessQueryQueueLoop(); });
+	cout << "DB query ready" << endl;
+	Server::Get().StartAccept();
+	cout << "ready 2 accept" << endl;
 	StartCommandLoop();
 }
