@@ -81,18 +81,18 @@ template<> inline SQLRETURN DataBase::SQLBindColAutoType(vector<any>* targets)
 	int col = 1;
 	for (auto& t : *targets)
 	{
-		ret = SQLBindColAnyType(col++, &t);
+		ret = SQLBindColAnyType(col++, t);
 	}
 	return ret;
 }
 
-inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any target)
+inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 {
 	SQLLEN cbTemp{}, lenTemp = 50;
 	SQLRETURN ret{};
 	auto targetTypeCode = target.type().hash_code();
-	static const auto INTEGER_TYPECODE = typeid(SQLINTEGER).hash_code();
-	static const auto WCHAR_TYPECODE = typeid(SQLWCHAR).hash_code();
+	static const auto INTEGER_TYPECODE = typeid(SQLINTEGER*).hash_code();
+	static const auto WCHAR_TYPECODE = typeid(SQLWCHAR*).hash_code();
 
 	if (WCHAR_TYPECODE == targetTypeCode)
 	{
@@ -104,9 +104,8 @@ inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any target)
 	}
 	else
 	{
-		cerr << "[ERR] DB::SQLBindColAnyType::target type error." << endl;
+		cerr << "[ERR] DB::SQLBindColAnyType::target type error." << target.type().name() << endl;
 	}
 	return ret;
 }
-
 

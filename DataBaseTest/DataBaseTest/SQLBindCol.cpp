@@ -76,7 +76,7 @@ int main() {
 					retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 					//retcode = SQLExecDirect(hstmt, (SQLWCHAR*)L"SELECT UserID, UserName, UserLevel FROM UserData ORDER BY 1, 2, 3", SQL_NTS); // null terminate string
-					retcode = SQLExecDirect(hstmt, (SQLWCHAR*)L"EXEC SelectUserDataGreaterLevel 2", SQL_NTS); // null terminate string
+					retcode = SQLExecDirect(hstmt, (SQLWCHAR*)L"EXEC SelectCharacterDataGreaterLevel -1", SQL_NTS); // null terminate string
 
 					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 

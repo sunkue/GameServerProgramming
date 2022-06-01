@@ -3,7 +3,7 @@
 struct QueryRequest
 {
 	wstring_view Query;
-	function<void()> Func;	// delete params here
+	function<void(vector<any>)> Func;	// delete params here
 	vector<any>* Targets{};				// SQL types pointer.
 };
 
@@ -13,6 +13,8 @@ class DataBase
 	SINGLE_TON(DataBase);
 	~DataBase();
 public:
+	void AddQueryRequest(QueryRequest&& e) { QueryRequestQueue_.push(e); }
+protected:
 	template<class ... Args>
 	void ExecuteQuery(wstring_view query, function<void()> f, Args*... targets);
 private:
@@ -20,7 +22,7 @@ private:
 	SQLRETURN SQLBindColAutoType(SQLUSMALLINT col, SQL_t* target, Args*... targets);
 	template<class ...Args>
 	SQLRETURN SQLBindColAutoType(Args*... targets);
-	SQLRETURN SQLBindColAnyType(SQLUSMALLINT col, any target);
+	SQLRETURN SQLBindColAnyType(SQLUSMALLINT col, any& target);
 private:
 	static void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode);
 public:
