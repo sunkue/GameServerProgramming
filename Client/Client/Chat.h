@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Game.h"
+
 struct Chat
 {
 	ID speaker{ -1 };
@@ -7,13 +9,7 @@ struct Chat
 	system_clock::time_point timestamp;
 };
 
-inline string VisualizationId(ID id)
-{
-	if (id < MAX_PLAYER) return "P_" + to_string(id);
-	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
-	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
-	else return "ERR_ID";
-}
+inline string VisualizationId(ID id);
 
 class ChatManager
 {

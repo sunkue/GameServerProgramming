@@ -11,10 +11,17 @@ Networker::Networker()
 	SOCKADDR_IN server_addr; ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(SERVER_PORT);
+RETRY:
 	string sever_ip; cout << "서버 IP를 입력하세요 :: "; cin >> sever_ip;
 	inet_pton(AF_INET, sever_ip.c_str(), &server_addr.sin_addr);
 	res = WSAConnect(Socket_, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr), nullptr, nullptr, nullptr, nullptr);
+	system("cls");
 	SocketUtil::CheckError(res, "WSAConnect");
+	if (SocketUtil::SOCKET_SUCCESS != res)
+	{
+		cout << "[ERR] FAIL TO CONNECT SERVER. try again " << endl;
+		goto RETRY;
+	}
 }
 
 void Networker::DoRecv()
@@ -29,6 +36,8 @@ void Networker::DoRecv()
 
 void Networker::DoSend(const void* const packet)
 {
+	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
+	// cerr << "Send [PACKET::" << +packet_type._to_string() << "]" << endl;
 	static WSABUF mybuf{}; mybuf.buf = reinterpret_cast<char*>(const_cast<void*>(packet));
 	mybuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
 	DWORD send_bytes;
@@ -66,9 +75,56 @@ void Networker::CbRecv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWOR
 	nw.DoRecv();
 }
 
+void Networker::LoginSignupOnConsole()
+{
+RETRY:
+	{
+		string str; str.resize(MAX_LOGIN_ID_BUFFER_SIZE);
+		cout << " LOGIN or SIGNUP? (L/S)" << endl; cin >> str;
+		if (str.find_first_of('L') < str.find_first_of('S'))
+		{
+			system("cls");
+			cout << "=========== LOGIN ===========" << endl;
+			cs_login login;
+			cout << "[ ID ]  :: "; str.clear(); cin >> str;
+			strcpy_s(login.login_id, str.c_str());
+			cout << "[P / W] :: "; str.clear(); cin >> str;
+			strcpy_s(login.login_password, str.c_str());
+
+			cout << login.login_id << " " << login.login_password << endl;
+			DoSend(&login);
+			return;
+		}
+		else if (str.find_first_of('L') == str.find_first_of('S'))
+		{
+			system("cls");
+			goto RETRY;
+		}
+		else
+		{
+			system("cls");
+			cout << "=========== SIGNUP ===========" << endl;
+			cs_signup signup;
+			cout << "[ ID ]  :: "; str.clear(); cin >> str;
+			strcpy_s(signup.signup_id, str.c_str());
+			cout << "[P / W] :: "; str.clear(); cin >> str;
+			strcpy_s(signup.signup_password, str.c_str());
+			cout << signup.signup_id << " " << signup.signup_password << endl;
+			cout << "Is it alright? (Y/N)" << endl; str.clear(); cin >> str;
+			if (str.find_first_of('N') != string::npos) {
+				system("cls");
+				cout << "(CANCLE)" << endl;
+				goto RETRY;
+			}
+			DoSend(&signup);
+			return;
+		}
+	}
+}
+
 void Networker::Start()
 {
-	cs_hi hi; DoSend(&hi);
 	DoRecv();
+	LoginSignupOnConsole();
 }
 

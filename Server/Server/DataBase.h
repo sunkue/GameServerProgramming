@@ -2,7 +2,7 @@
 
 struct QueryRequest
 {
-	wstring_view Query;
+	wstring Query;
 	function<void(vector<any>)> Func;	// delete params here
 	shared_ptr<vector<any>> Targets;	// SQL types pointer.
 };
@@ -14,6 +14,7 @@ class DataBase
 	~DataBase();
 public:
 	void AddQueryRequest(QueryRequest&& e) { QueryRequestQueue_.push(e); }
+	void AddQueryRequest(QueryRequest& e) { QueryRequestQueue_.push(move(e)); }
 protected:
 	template<class ... Args>
 	void ExecuteQuery(wstring_view query, function<void()> f, Args&... targets);

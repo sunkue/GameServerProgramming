@@ -44,7 +44,12 @@ int main()
 {
 	vector<RaiiThread> workers; workers.reserve(thread::hardware_concurrency());
 
-	for (int i = 0; i < workers.capacity() - 3; i++)
+	Server::Get();
+	DataBase::Get();
+	CharacterManager::Get();
+
+	auto WORKER_THREAD_NUM = workers.capacity() - 3;
+	for (int i = 0; i < WORKER_THREAD_NUM; i++)
 	{
 #ifdef GQCPEX
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoopEx(); });
@@ -52,30 +57,16 @@ int main()
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoop(); });
 #endif // GQCPEX
 	}
-	CharacterManager::Get();
-	workers.emplace_back([&]() { EventManager::Get().ProcessEventQueueLoop(); });
-	cout << "event manager ready" << endl;
-
-	{
-		QueryRequest q;
-		q.Query = L"EXEC SelectCharacterDataGreaterLevel -1"sv;
-		q.Targets = make_shared<vector<any>>(); q.Targets->reserve(3);
-		q.Targets->emplace_back(make_any<SQLINTEGER>());
-		q.Targets->emplace_back(make_any<wstring>());
-		q.Targets->emplace_back(make_any<SQLINTEGER>());
-		q.Func = [](const vector<any>& t)
-		{
-			wcout << "[ ] " << any_cast<SQLINTEGER>(t[0]) << " :: "
-				<< any_cast<wstring>(t[1]) << " :: "
-				<< any_cast<SQLINTEGER>(t[2]) << endl;
-		};
-		DataBase::Get().AddQueryRequest(move(q));
-	}
+	cout << "worker thread ready (" << WORKER_THREAD_NUM << ")" << endl;
 
 	workers.emplace_back([&]() { DataBase::Get().ProcessQueryQueueLoop(); });
-	cout << "DB query ready" << endl;
+	cout << "DB query thread ready(1)" << endl;
+
+	workers.emplace_back([&]() { EventManager::Get().ProcessEventQueueLoop(); });
+	cout << "event manager thread ready (1)" << endl;
 
 	Server::Get().StartAccept();
 	cout << "ready 2 accept" << endl;
+
 	StartCommandLoop();
 }

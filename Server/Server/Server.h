@@ -12,16 +12,16 @@ public:
 	void StartAccept();
 	void RepeatSendLoop(milliseconds repeat_time = 50ms);
 private:
-	void OnRecvComplete(ID Id_, DWORD transfered);
-	void OnSendComplete(ID Id_, ExpOverlapped* exover);
+	void OnRecvComplete(NetID Id_, DWORD transfered);
+	void OnSendComplete(NetID Id_, ExpOverlapped* exover);
 	void OnAcceptComplete(ExpOverlapped* exover);
-	void OnDisconnectComplete(ID Id_, ExpOverlapped* exover);
+	void OnDisconnectComplete(NetID Id_, ExpOverlapped* exover);
 	void OnEventTimerComplete(ExpOverlapped* exover);
 	void OnDataBaseQueryComplete(ExpOverlapped* exover);
 public:
-	void ProcessPacket(ID Id_, const void* const packet);
+	void ProcessPacket(NetID Id_, const void* const packet);
 private:
-	ID GetFreeId();
+	NetID GetFreeId();
 public:
 	GET(Iocp);
 	GET_REF_UNSAFE(Clients);

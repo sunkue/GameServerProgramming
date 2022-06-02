@@ -36,7 +36,7 @@ public:
 
 private:
 	SOCKET Socket_{};
-	ID Id_{ -1 };
+	NetID Id_{ -1 };
 	RecvExpOverlapped RecvOver_{};
 	atomic<SESSION_STATE> State_{ SESSION_STATE::FREE };
 #ifndef RINGBUFFER

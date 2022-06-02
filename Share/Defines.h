@@ -21,6 +21,8 @@ using uint64 = uint64_t;
 
 using ID = int;
 using NetID = ID; // nt<type,1> :: ID
+using DbCharacterID = ID; // nt<type,1> :: ID
+//using CharacterID = _ID; // nt<type,1> :: ID
 using packet_size_t = uint8; //  need to be unsigned
 using Position = glm::ivec2;
 //====================================
@@ -29,7 +31,8 @@ const uint16_t SERVER_PORT = 8282;
 
 //====================================
 constexpr int MAX_PLAYER = 5'0000;
-constexpr int MAX_MONSTER = 20'0000;
+// constexpr int MAX_MONSTER = 20'0000;
+constexpr int MAX_MONSTER = 20'00;
 constexpr int MAX_NPC = 10;
 constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
 
@@ -56,4 +59,10 @@ constexpr int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max();
 constexpr int MAX_BUFFER_SIZE = MAX_PACKET_SIZE * 4;
 constexpr int MAX_CHAT_SIZE = 50;
 constexpr int MAX_CHAT_BUFFER_SIZE = MAX_CHAT_SIZE + 1;
+constexpr int MAX_CHARACTER_NAME_SIZE = 10 * (sizeof(wchar_t) / sizeof(char));
+constexpr int MAX_CHARACTER_NAME_BUFFER_SIZE = MAX_CHARACTER_NAME_SIZE + 1;
+constexpr int MAX_LOGIN_ID_SIZE = 10 * (sizeof(wchar_t) / sizeof(char));
+constexpr int MAX_LOGIN_ID_BUFFER_SIZE = MAX_LOGIN_ID_SIZE + 1;
+constexpr int MAX_LOGIN_PASSWORD_SIZE = 10 * (sizeof(wchar_t) / sizeof(char));
+constexpr int MAX_LOGIN_PASSWORD_BUFFER_SIZE = MAX_LOGIN_PASSWORD_SIZE + 1;
 static_assert(MAX_PACKET_SIZE <= MAX_BUFFER_SIZE, "Net Buffer could overflow");

@@ -1,6 +1,5 @@
 #include "DataBase.h"
 
-
 template<class ... Args>
 inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&... targets)
 {
@@ -66,10 +65,10 @@ template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWC
 	return SQLBindCol(Stmt_, col, SQL_C_WCHAR, &target, lenTemp, &cbTemp);
 }
 
-template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLWCHAR*& target)
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLCHAR& target)
 {
 	SQLLEN cbTemp{}, lenTemp = 50;
-	return SQLBindCol(Stmt_, col, SQL_C_WCHAR, target, lenTemp, &cbTemp);
+	return SQLBindCol(Stmt_, col, SQL_C_CHAR, &target, lenTemp, &cbTemp);
 }
 
 template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, wstring& target)
@@ -104,11 +103,12 @@ template<> inline SQLRETURN DataBase::SQLBindColAutoType(vector<any>& targets)
 
 inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 {
-	SQLLEN cbTemp{}, lenTemp = 50;
 	SQLRETURN ret{};
 	auto targetTypeCode = target.type().hash_code();
 	static const auto INTEGER_TYPECODE = typeid(SQLINTEGER).hash_code();
 	static const auto WSTR_TYPECODE = typeid(wstring).hash_code();
+	static const auto WCHAR_TYPECODE = typeid(SQLWCHAR).hash_code();
+	static const auto CHAR_TYPECODE = typeid(SQLCHAR).hash_code();
 
 	if (WSTR_TYPECODE == targetTypeCode)
 	{
@@ -117,6 +117,14 @@ inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 	else if (INTEGER_TYPECODE == targetTypeCode)
 	{
 		ret = SQLBindColAutoType(col, *target._Cast<SQLINTEGER>());
+	}
+	else if (WCHAR_TYPECODE == targetTypeCode)
+	{
+		ret = SQLBindColAutoType(col, *target._Cast<SQLWCHAR>());
+	}
+	else if (CHAR_TYPECODE == targetTypeCode)
+	{
+		ret = SQLBindColAutoType(col, *target._Cast<SQLCHAR>());
 	}
 	else
 	{

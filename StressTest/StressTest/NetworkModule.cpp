@@ -21,7 +21,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_CLIENTS = MAX_CHARACTER;
+const static int MAX_CLIENTS = MAX_PLAYER;
 const static int MAX_TEST = MAX_PLAYER;
 const static int INVALID_ID = -1;
 
@@ -145,11 +145,11 @@ void ProcessPacket(int ci, unsigned char packet[])
 			}
 		}
 	}
-	break; case PACKET_TYPE::Sc_hi:
+	break; case PACKET_TYPE::Sc_login_result:
 	{
 		g_clients[ci].connected = true;
 		active_clients++;
-		auto login_packet = reinterpret_cast<sc_hi*>(packet);
+		auto login_packet = reinterpret_cast<sc_login_result*>(packet);
 		int my_id = ci;
 		client_map[login_packet->id] = my_id;
 		g_clients[my_id].id = login_packet->id;

@@ -43,6 +43,11 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
+	while (!Networker::Get().GetReady())
+	{
+		SleepEx(0, true);
+	}
+
 	GLFWwindow* window = glfwCreateWindow(System::Get().Screen.width, System::Get().Screen.height, "SUNKUE", NULL, NULL);
 	if (window == nullptr)
 	{
@@ -62,6 +67,8 @@ int main()
 	System::Get().Window = window;
 
 	BindDefaultInputFuncs();
+	
+	Game::Get().init();
 
 	{
 		IMGUI_CHECKVERSION();
@@ -73,18 +80,11 @@ int main()
 		io.Fonts->AddFontFromFileTTF("Resource/Font/³ª´®¼Õ±Û¾¾ ´ÞÀÇ±Ëµµ.ttf", 15.f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 
-
-	while (false == Networker::Get().GetReady() && !glfwWindowShouldClose(window))
-	{
-		SleepEx(0, true);
-	}
-
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
 		DoNextFrame();
 	}
-
 
 	{
 		ImGui_ImplOpenGL3_Shutdown();

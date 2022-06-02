@@ -16,9 +16,9 @@ class EventManager
 {
 	SINGLE_TON(EventManager) = default;
 public:
-	void AddEvent(Event&& e) { EventQueue_.push(e); }
+	void AddEvent(const Event& e) { EventQueue_.push(e); }
 	void ProcessEventQueueLoop();
 private:
-	concurrent_priority_queue<Event, greater<Event>> EventQueue_;
+	concurrent_priority_queue<Event, greater<Event>> EventQueue_{ 5000000 };
 };
 

@@ -11,6 +11,7 @@ private:
 	void DoRecv();
 	void ProcessPacket(const void* const packet);
 	static void CALLBACK CbRecv(DWORD error, DWORD transfered, LPWSAOVERLAPPED over, DWORD flag);
+	void LoginSignupOnConsole();
 private:
 	SOCKET Socket_;
 	bool Ready_{ false };

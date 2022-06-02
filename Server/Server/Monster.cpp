@@ -7,7 +7,7 @@
 
 Monster::Monster(ID id) : Character{ id }
 {
-//	CompileScript();
+	CompileScript();
 }
 
 Monster::~Monster()
@@ -55,18 +55,21 @@ void Monster::CompileScript()
 void Monster::HpDecrease(ID agent, int amount)
 {
 	Hp_ -= amount;
+	Hp_ = max(Hp_.load(), 0);
 	if (Hp_ <= 0)
 		Die(agent);
 }
 
 void Monster::HpIncrease(ID agent, int amount)
 {
-	Hp_ = max(Hp_ + amount, MaxHp(Level_));
+	Hp_ += amount;
+	Hp_	= min(Hp_.load(), MaxHp(Level_));
 }
 
 void Monster::Die(ID agent)
 {
 	Died_ = true;
+	Hp_ = 0;
 	Disable();
 	EventManager::Get().AddEvent({ [this]()
 		{ Regen(); }, 30s });
@@ -88,7 +91,7 @@ void Monster::Regen()
 
 bool Monster::Move(Position diff)
 {
-	constexpr size_t NEARLIST_RESERVE_HINT = 20;
+	constexpr size_t NEARLIST_RESERVE_HINT = 2000;
 	unordered_set<Player*> oldNearList; oldNearList.reserve(NEARLIST_RESERVE_HINT);
 	unordered_set<Player*> newNearList; newNearList.reserve(NEARLIST_RESERVE_HINT);
 

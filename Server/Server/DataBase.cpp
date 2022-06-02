@@ -2,6 +2,42 @@
 #include "DataBase.h"
 #include "Server.h"
 
+
+// example 
+/*
+{
+	QueryRequest q;
+	q.Query = L"EXEC SelectCharacterDataGreaterLevel -1"sv;
+	q.Targets = make_shared<vector<any>>(); q.Targets->reserve(3);
+	q.Targets->emplace_back(make_any<SQLINTEGER>());
+	q.Targets->emplace_back(make_any<wstring>());
+	q.Targets->emplace_back(make_any<SQLINTEGER>());
+	q.Func = [](const vector<any>& t)
+	{
+		wcout << "[ DB TEST ] " << any_cast<SQLINTEGER>(t[0]) << " :: "
+			<< any_cast<wstring>(t[1]) << " :: "
+			<< any_cast<SQLINTEGER>(t[2]) << endl;
+	};
+	DataBase::Get().AddQueryRequest(q);
+}
+*/
+/*
+	{
+	QueryRequest q;
+	q.Query = L"EXEC UserLogin admin,admin"s;
+	q.Targets = make_shared<vector<any>>(); q.Targets->reserve(1);
+	q.Targets->emplace_back(make_any<SQLWCHAR>());
+	//q.Targets->emplace_back(make_any<SQLWCHAR>());
+	q.Func = [](const vector<any>& t)
+	{
+		wcout << "[ DB TEST !! ] " << any_cast<SQLWCHAR>(t[0]) << " :: " << endl;
+	};
+	DataBase::Get().AddQueryRequest(q);
+	}
+*/
+
+
+
 DataBase::DataBase()
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &Env_);
@@ -16,7 +52,7 @@ DataBase::DataBase()
 
 			// Set login timeout to 5 seconds  
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-				SQLSetConnectAttr(Dbc_, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
+				SQLSetConnectAttr(Dbc_, SQL_LOGIN_TIMEOUT, (SQLPOINTER)10, 0);
 
 				// Connect to data source  
 				retcode = SQLConnect(Dbc_, (SQLTCHAR*)ODBC_NAME, SQL_NTS, (SQLTCHAR*)NULL, 0, NULL, 0);
@@ -26,7 +62,7 @@ DataBase::DataBase()
 					retcode = SQLAllocHandle(SQL_HANDLE_STMT, Dbc_, &Stmt_);
 					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 					{
-						cerr << "DataBase Connect Success" << endl;
+						cerr << "DataBase Connection Success" << endl;
 						return;
 					}
 					else
@@ -42,7 +78,8 @@ DataBase::DataBase()
 	}
 	else HandleDiagnosticRecord(Env_, SQL_HANDLE_ENV, retcode);
 
-	cerr << "DataBase Connect Fail" << endl;
+	cerr << "DataBase Connection Fail" << endl;
+	exit(-1);
 }
 
 DataBase::~DataBase()
@@ -71,9 +108,8 @@ void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETC
 	while (SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage,
 		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS)
 	{
-		if (wcsncmp(wszState, L"01004", 5)) {
-			wcout << wszState << " " << wszMessage << " (" << iError << ")" << endl;
-		}
+		//if (!wcsncmp(wszState, L"15155", 5))
+		wcout << wszState << " " << wszMessage << " (" << iError << ")" << endl;
 	}
 }
 
@@ -91,7 +127,7 @@ void DataBase::ProcessQueryQueueLoop()
 				//e.Func(*e.Targets);
 				auto exover = new DataBaseExpOverlapped{ f, *r };
 				PostQueuedCompletionStatus(iocp, 0, 0, &exover->Over);
-			}, *e.Targets);
+			}, * e.Targets);
 		}
 	}
 }

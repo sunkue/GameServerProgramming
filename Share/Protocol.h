@@ -20,16 +20,17 @@ BETTER_ENUM
 	/* Client 2 Server */
 
 	, Cs_none = 10
-	, Cs_hi
+	, Cs_login
+	, Cs_signup
 	, Cs_input
 	, Cs_input_timestamp
 	, Cs_chat
-
+	, Cs_request_name
 
 	/* Server 2 Client */
 
 	, Sc_none = 100
-	, Sc_hi
+	, Sc_login_result
 	, Sc_ready
 	, Sc_set_position
 	, Sc_set_position_timestamp
@@ -37,7 +38,9 @@ BETTER_ENUM
 	, Sc_set_hp
 	, Sc_set_exp
 	, Sc_set_level
+	, Sc_set_name
 	, Sc_chat
+	, Sc_signup_result
 );
 
 // 가용길이 패킷 
@@ -52,7 +55,7 @@ struct packet_base
 	packet_size_t size = sizeof(T);
 	PACKET_TYPE packet_type = +PACKET_TYPE::_from_string_nocase(typeid(T).name() + 7);
 };
-#define PACKET(name) struct name : packet_base<name>											
+#define PACKET(name) struct name : packet_base<name>										
 
 PACKET(none)
 {
@@ -60,18 +63,49 @@ PACKET(none)
 
 //============== packet =================
 
-PACKET(cs_hi)
+// do not trim '\0'
+PACKET(cs_login)
 {
+	char login_id[MAX_LOGIN_ID_BUFFER_SIZE]{};
+	char login_password[MAX_LOGIN_PASSWORD_BUFFER_SIZE]{};
 };
 
-PACKET(sc_hi)
+// do not trim '\0'
+PACKET(cs_signup)
 {
-	NetID id = -1;
+	char signup_id[MAX_LOGIN_ID_BUFFER_SIZE]{};
+	char signup_password[MAX_LOGIN_PASSWORD_BUFFER_SIZE]{};
+};
+
+PACKET(sc_signup_result)
+{
+	char result;
+};
+
+PACKET(sc_login_result)
+{
+	// -1 if no id, -2 if wrong password
+	NetID id = -1; 
 };
 
 PACKET(sc_ready)
 {
+	int level;
+	int hp;
+	int money;
+	int exp;
+	char name[MAX_CHARACTER_NAME_BUFFER_SIZE]{};
+};
 
+PACKET(sc_set_name)
+{
+	NetID id;
+	char name[MAX_CHARACTER_NAME_BUFFER_SIZE]{};
+};
+
+PACKET(cs_request_name)
+{
+	NetID id;
 };
 
 PACKET(sc_set_position)
@@ -133,7 +167,6 @@ PACKET(cs_chat)
 {
 	char chat[MAX_CHAT_BUFFER_SIZE]{};
 };
-
 
 // dynamic size packet
 PACKET(sc_chat)

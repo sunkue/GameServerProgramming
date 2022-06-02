@@ -8,28 +8,72 @@ void Networker::ProcessPacket(const void* const packet)
 {
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	auto& game = Game::Get();
-	// cerr << "[PACKET::" << +packet_type._to_string() << "]" << endl;
+	// cerr << "Recv [PACKET::" << +packet_type._to_string() << "]" << endl;
 	switch (packet_type)
 	{
-	case PACKET_TYPE::Sc_hi:
+	case PACKET_TYPE::Sc_login_result:
 	{
-		auto pck = reinterpret_cast<const sc_hi*>(packet);
-		game.SetId(pck->id);
-		game.GetCharacters()[game.GetId()];
-		game.init();
+		auto pck = reinterpret_cast<const sc_login_result*>(packet);
+		switch (pck->id)
+		{
+		case -1: // NO ID
+		{
+			cout << "======[!!] ID don't exist. try agin. =======" << endl;
+			LoginSignupOnConsole();
+		}
+		CASE - 2 : // WRONG PASSWORD
+		{
+			cout << "======[!!] Wrong Password. try agin. =======" << endl;
+			LoginSignupOnConsole();
+		}
+		break; default:
+		{
+			cout << "======[!!] LOGIN COMPLETE. Plz Enjoy Game  =======" << endl;
+			game.SetId(pck->id);
+			game.GetCharacters()[game.GetId()];
+		} break;
+		}
+	}
+	CASE PACKET_TYPE::Sc_signup_result :
+	{
+		auto pck = reinterpret_cast<const sc_signup_result*>(packet);
+		switch (pck->result)
+		{
+		case 'S':
+		{
+			cout << "======[*] SignUp SUCCESS!!! Login now :) =======" << endl;
+			LoginSignupOnConsole();
+		}
+		CASE 'E' :
+		{
+			cout << "======[!!] SignUp Fail. Id Already Exist.. :( =======" << endl;
+			LoginSignupOnConsole();
+		}
+		break; default: break;
+		}
 	}
 	CASE PACKET_TYPE::Sc_ready :
 	{
+		auto pck = reinterpret_cast<const sc_ready*>(packet);
+		auto& player = game.GetCharacters()[game.GetId()];
+		player.SetLevel(pck->level);
+		player.SetHp(pck->hp);
+		player.SetMoney(pck->money);
+		player.SetExp(pck->exp);
+		player.SetName(string{ pck->name, &pck->name[strnlen_s(pck->name, MAX_CHARACTER_NAME_SIZE)] });
+
 		Ready_ = true;
-		cs_input pck;
-		pck.input = eMoveOper::up;
-		Networker::Get().DoSend(&pck);
-		pck.input = eMoveOper::down;
-		Networker::Get().DoSend(&pck);
-		pck.input = eMoveOper::right;
-		Networker::Get().DoSend(&pck);
-		pck.input = eMoveOper::left;
-		Networker::Get().DoSend(&pck);
+		{
+			cs_input input;
+			input.input = eMoveOper::up;
+			Networker::Get().DoSend(&input);
+			input.input = eMoveOper::down;
+			Networker::Get().DoSend(&input);
+			input.input = eMoveOper::right;
+			Networker::Get().DoSend(&input);
+			input.input = eMoveOper::left;
+			Networker::Get().DoSend(&input);
+		}
 	}
 	CASE PACKET_TYPE::Sc_set_position :
 	{
@@ -58,6 +102,12 @@ void Networker::ProcessPacket(const void* const packet)
 		auto level = pck->level;
 		auto id = pck->id;
 		game.GetCharacters()[id].SetLevel(level);
+	}
+	CASE PACKET_TYPE::Sc_set_name :
+	{
+		auto pck = reinterpret_cast<const sc_set_name*>(packet);
+		auto id = pck->id;
+		game.GetCharacters()[id].SetName(string{ pck->name, &pck->name[strnlen_s(pck->name, MAX_CHARACTER_NAME_SIZE)] });
 	}
 	CASE PACKET_TYPE::Sc_remove_obj :
 	{

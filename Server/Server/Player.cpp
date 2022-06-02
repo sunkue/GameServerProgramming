@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "TimerEvent.h"
 #include "Character.h"
+#include "DataBase.h"
 
 /////////////////////////////////
 // 
@@ -14,7 +15,6 @@
 void Player::HpRegen()
 {
 	HpIncrease(Id_, MaxHp(Level_) / 10);
-
 	if (Hp_ < MaxHp(Level_))
 		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
 }
@@ -29,7 +29,7 @@ bool Player::Move(Position diff)
 bool Player::Enable()
 {
 	if (!DynamicObj::Enable()) return false;
-
+	HpRegen();
 	return true;
 }
 
@@ -40,7 +40,7 @@ void Player::Update()
 
 void Player::Regen()
 {
-	HpIncrease(Id_, 9999);
+	HpIncrease(Id_, MaxHp(Level_));
 	ExpSum(Id_, -Exp_ / 2);
 	Move(StartPosition_ - GetPos());
 }
@@ -57,6 +57,20 @@ bool Player::Disable()
 	{
 		unique_lock lck{ ViewLock };
 		ViewList_.clear();
+	}
+
+	{
+		auto pos = GetPos();
+		QueryRequest q;
+		q.Query = L"EXEC UpdateCharacterDataOnLogout "s + to_wstring(DbId_);
+		q.Query += L","s + to_wstring(Hp_);
+		q.Query += L","s + to_wstring(pos.x);
+		q.Query += L","s + to_wstring(pos.y);
+		q.Query += L","s + to_wstring(Money_);
+		q.Query += L","s + to_wstring(Exp_);
+		q.Targets = make_shared<vector<any>>();
+		q.Func = [](const vector<any>& t) {};
+		DataBase::Get().AddQueryRequest(q);
 	}
 
 	SetPos(Position{ 0 });
@@ -248,15 +262,15 @@ void Player::ExpSum(ID agent, int amount)
 void Player::HpDecrease(ID agent, int dmg)
 {
 	Hp_ -= dmg;
+	Hp_ = max(Hp_.load(), 0);
 	if (Hp_ <= 0)
-	{
 		Regen();
-	}
 }
 
 void Player::HpIncrease(ID agent, int amount)
 {
-	Hp_ = std::max(Hp_ + amount, MaxHp(Level_));
+	Hp_ += amount;
+	Hp_ = min(Hp_.load(), MaxHp(Level_));
 
 	sc_set_hp set_hp;
 	set_hp.id = Id_;

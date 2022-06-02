@@ -3,6 +3,8 @@
 #include "TimerEvent.h"
 #include "Monster.h"
 #include "Player.h"
+#include "Server.h"
+#include "DataBase.h"
 
 /////////////////////////////////
 // 
@@ -60,6 +62,69 @@ bool CharacterManager::InitialMove(ID Id_, Position to)
 {
 	Characters_[Id_]->StartPosition_ = to;
 	return Move(Id_, to);
+}
+
+void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
+{
+	reinterpret_cast<Player*>(Characters_[id].get())->SetDbId(dbId);
+	auto& client = Server::Get().GetClients()[id];
+
+	QueryRequest q;
+	q.Query = L"EXEC SelectCharacterDataById "s + to_wstring(dbId);
+	q.Targets = make_shared<vector<any>>(); q.Targets->reserve(20);
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // LVEL
+	q.Targets->emplace_back(make_any<wstring>()); // NAME
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // HP
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // POSX
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // POSY
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // MONEY
+	q.Targets->emplace_back(make_any<SQLINTEGER>()); // EXP
+
+	q.Func = [this, id](const vector<any>& t)
+	{
+		auto level = any_cast<SQLINTEGER>(t[0]);
+		auto name = any_cast<wstring>(t[1]);
+		auto hp = any_cast<SQLINTEGER>(t[2]);
+		auto posx = any_cast<SQLINTEGER>(t[3]);
+		auto posy = any_cast<SQLINTEGER>(t[4]);
+		auto money = any_cast<SQLINTEGER>(t[5]);
+		auto exp = any_cast<SQLINTEGER>(t[6]);
+
+		auto& player = reinterpret_cast<Player&>(*CharacterManager::Get().GetCharacters()[id].get());
+		
+		player.SetLevel(level);
+		player.SetHp(hp);
+		player.SetName(name);
+		player.SetMoney(money);
+		player.SetExp(exp);
+
+		if (CharacterManager::Get().InitialMove(id, Position{ posx, posy }))
+		{
+			sc_set_position set_pos;
+			auto pos = player.GetPos();
+			set_pos.id = NetID(id);
+			set_pos.pos = pos;
+			Server::Get().GetClients()[id].DoSend(&set_pos);
+		}
+		else
+		{
+			cerr << "[!!!]OverflowedInitPosition" << GetPosition(id).x << " " << GetPosition(id).y << endl;
+		}
+
+		{
+			sc_ready ready;
+			ready.level = level;
+			ready.hp = hp;
+			ready.money = money;
+			ready.exp = exp;
+			size_t temp; wcstombs_s(&temp, ready.name, name.c_str(), name.size());
+			ready.size -= static_cast<decltype(ready.size)>(MAX_CHARACTER_NAME_SIZE - strlen(ready.name));
+			Server::Get().GetClients()[id].DoSend(&ready);
+		}
+
+		CharacterManager::Get().Enable(id);
+	};
+	DataBase::Get().AddQueryRequest(q);
 }
 
 void Character::Regen()
