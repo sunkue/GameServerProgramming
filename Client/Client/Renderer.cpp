@@ -3,7 +3,7 @@
 #include "System.h"
 #include "Game.h"
 #include "Texture.h"
-#include "Chat.h"
+#include "GameGui.h"
 
 ////////////////////////////////////////////////////////////////
 
@@ -54,78 +54,6 @@ void Renderer::ReadyDraw()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-ImVec2 TileSize()
-{
-	auto wOffsetPerUnit = static_cast<float>(System::Get().Screen.width - 20) / WINDOW_SIZE;
-	auto hOffsetPerUnit = static_cast<float>(System::Get().Screen.height - 20) / WINDOW_SIZE;
-	return { wOffsetPerUnit , hOffsetPerUnit };
-}
-
-ImVec2 ImGuiGetCenterPosOfTile(Position tilePos)
-{
-	ImVec2 ret{};
-	ret.x += 10;
-	ret.y += 10;
-	auto tileSize = TileSize();
-	ret.x += tilePos.x * tileSize.x;
-	ret.y += tilePos.y * tileSize.y;
-	return ret;
-}
-
-void DrawGui()
-{
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	gui::NewFrame();
-
-	// PLAYER INFO
-	{
-		gui::Begin("PlayerInfo", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-		auto& player = Game::Get().GetPlayer();
-		auto id = Game::Get().GetId();
-		auto pos = player.GetPos();
-		auto hp = player.GetHp();
-		auto exp = player.GetExp();
-		auto level = player.GetLevel();
-		gui::Text(("ID :: "s + VisualizationId(id)).c_str());
-		gui::Text(("HP :: "s + to_string(hp) + "/"s + to_string(MaxHp(level))).c_str());
-		gui::Text(("LEVEL :: "s + to_string(level) + "  EXP :: "s + to_string(exp) + "/"s + to_string(RequireExp(level))).c_str());
-		gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
-		gui::End();
-	}
-
-	// CHAT
-	{
-		ChatManager::Get().RenderChat();
-	}
-
-	{
-		gui::StyleColorsLight();
-		auto playerPos = Game::Get().GetPlayer().GetPos();
-		for (auto& c : Game::Get().GetCharacters())
-		{
-			auto& speechBubble = c.second.GetSpeechBubble();
-			if (speechBubble.second <= system_clock::now())
-				continue;
-
-			auto str = "SpeechBubble"s + to_string(c.first);
-			gui::Begin(str.c_str(), 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-			gui::Text(speechBubble.first.c_str());
-			gui::End();
-
-			ImVec2 bubblePos;
-			bubblePos = ImGuiGetCenterPosOfTile(Position{ c.second.GetPos() - playerPos } + Position{ 10, 10 });
-			bubblePos.x += (-10 - 3 * static_cast<int>(speechBubble.first.size())) * (TileSize().x / 25);
-			bubblePos.y += -40 * (TileSize().y / 25);
-			gui::SetWindowPos(str.c_str(), bubblePos);
-		}
-		gui::StyleColorsDark();
-	}
-
-	gui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
-}
-
 void Renderer::Draw()
 {
 	ReadyDraw();
@@ -160,7 +88,7 @@ void Renderer::Draw()
 		ScreenQuad::Get().DrawQuad();
 	}
 
-	DrawGui();
+	GameGuiManager::Get().DrawGui();
 }
 
 void Renderer::Init()

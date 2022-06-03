@@ -65,6 +65,15 @@
     <Filter Include="Game\Obj\Monster">
       <UniqueIdentifier>{10879494-028f-4421-bb66-05b31882a422}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\GameGui">
+      <UniqueIdentifier>{9a10b399-c8e4-4c52-85d5-1dabef2fd291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Helper">
+      <UniqueIdentifier>{c228f44a-f59d-4e9c-9ee0-d78ebb39baf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Networker">
+      <UniqueIdentifier>{b5722594-f7bc-47b9-a258-39b6f812b5ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
@@ -92,14 +101,8 @@
     <ClCompile Include="Obj.cpp">
       <Filter>Game\Obj\Obj</Filter>
     </ClCompile>
-    <ClCompile Include="Networker.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Share\SocketUtil.cpp">
       <Filter>Share</Filter>
-    </ClCompile>
-    <ClCompile Include="Networker_processpacket.cpp">
-      <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="Dependencies\imgui\imgui.cpp">
       <Filter>Gui\imgui</Filter>
@@ -131,6 +134,18 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderer\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="MouseEvent.cpp">
+      <Filter>InputEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="GameGui.cpp">
+      <Filter>Renderer\GameGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Networker_processpacket.cpp">
+      <Filter>Network\Networker</Filter>
+    </ClCompile>
+    <ClCompile Include="Networker.cpp">
+      <Filter>Network\Networker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyboardEvent.h">
@@ -159,9 +174,6 @@
     </ClInclude>
     <ClInclude Include="Obj.h">
       <Filter>Game\Obj\Obj</Filter>
-    </ClInclude>
-    <ClInclude Include="Networker.h">
-      <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Share\Protocol.h">
       <Filter>Share</Filter>
@@ -219,6 +231,18 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Renderer\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseEvent.h">
+      <Filter>InputEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="GameGui.h">
+      <Filter>Renderer\GameGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Networker.h">
+      <Filter>Network\Networker</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicateHelper.h">
+      <Filter>Network\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

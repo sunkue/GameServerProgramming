@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ReplicateHelper.h"
+
 enum class OBJ_TYPE : int
 {
 	Wlook = 0,
@@ -20,12 +22,14 @@ enum class OBJ_TYPE : int
 class StaticObj
 {
 public:
-	StaticObj(Position pos) : Pos_{ pos } {}
+	StaticObj(ID id, Position pos) : Id_{id}, Pos_ { pos } {}
 public:
+	GET(Id);
 	GET(Pos);
 	SET(Pos);
 protected:
 	Position Pos_{};
+	ID Id_{ -1 };
 };
 
 
@@ -35,17 +39,17 @@ inline int MaxHp(int Level) { return Level * 100; }
 class DynamicObj : public StaticObj
 {
 public:
-	DynamicObj(Position pos) : StaticObj{ pos } {}
+	DynamicObj(ID id, Position pos) : StaticObj{ id, pos } {}
 private:
 public:
-	GET(Hp);
+	REPLICATE(Hp);
 	SET(Hp);
-	GET(Level);
+	REPLICATE(Level);
 	SET(Level);
 protected:
-	int Hp_{};
-	int Level_{};
-	int Exp_{};
+	int Hp_{ -1 };
+	int Level_{ -1 };
+	int Exp_{ -1 };
 
 private:
 };

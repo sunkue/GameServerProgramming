@@ -108,7 +108,8 @@ void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETC
 	while (SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage,
 		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS)
 	{
-		//if (!wcsncmp(wszState, L"15155", 5))
+		if (!wcsncmp(wszState, L"24000", 5)) continue;
+
 		wcout << wszState << " " << wszMessage << " (" << iError << ")" << endl;
 	}
 }

@@ -2,28 +2,6 @@
 #include "Chat.h"
 #include "Networker.h"
 
-inline string VisualizationId(ID id)
-{
-	if (id < MAX_PLAYER)
-	{
-		auto name = Game::Get().GetCharacters()[id].GetName();
-		if (name.size())
-			return name;
-		else
-		{
-			// RequestManager unoderedmap<pair<ID,requestType>, bool> 로 최적화 가능
-			cs_request_name request_name;
-			request_name.id = id;
-			Networker::Get().DoSend(&request_name);
-			return "P_" + to_string(id);
-		}
-	}
-	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
-	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
-	else return "ERR_ID";
-}
-
-
 void ChatManager::RenderChat() const
 {
 	gui::Begin("Chat", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar);

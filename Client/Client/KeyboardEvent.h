@@ -1,39 +1,39 @@
 #pragma once
 
 
-class KEY_BOARD_EVENT_MANAGER
+class KeyboardEventManager
 {
-	SINGLE_TON(KEY_BOARD_EVENT_MANAGER) = default;
+	SINGLE_TON(KeyboardEventManager) = default;
 
 public:
 
-	struct key_event
+	struct KeyEvent
 	{
-		key_event(int key, int code, int action, int modifiers, clk::time_point time_of_event)
-			:key{ key }, code{ code }, action{ action }, modifiers{ modifiers }, time_of_event{ time_of_event }{};
+		KeyEvent(int key, int code, int action, int modifiers, clk::time_point time_of_event)
+			:key{ key }, code{ code }, action{ action }, modifiers{ modifiers }, eventTime{ time_of_event }{};
 		int key, code, action, modifiers;
-		clk::time_point time_of_event;
+		clk::time_point eventTime;
 	};
 
-	using key = int;
-	using action = int;
+	using Key = int;
+	using Action = int;
 	// main_func return true if wanna don't call other keyfunctions with the key.
-	using main_key_func = std::function<bool(const key_event&)>;
-	using key_func = std::function<void(const key_event&)>;
+	using OverrideKeyFunc = std::function<bool(const KeyEvent&)>;
+	using KeyFunc = std::function<void(const KeyEvent&)>;
 
 private:
-	std::map<key, action> keys_;
-	std::queue<key_event> key_events_;
-	std::map<key, key_func> key_functions_;
+	std::map<Key, Action> KeyActions_;
+	std::queue<KeyEvent> KeyEvents_;
+	std::map<Key, KeyFunc> KeyFunctions_;
 
 private:
-	main_key_func main_func_ = [](auto) { return false; };
+	OverrideKeyFunc OverrideKeyFunc_ = [](auto) { return false; };
 
 public:
-	void KeyBoard(GLFWwindow* window, int key, int code, int action, int modifiers);
+	void Keyboard(GLFWwindow* window, int key, int code, int action, int modifiers);
 
-	void BindKeyFunc(key key, key_func func);
-	void BindMainKeyFunc(main_key_func func);
+	void BindKeyFunc(Key key, KeyFunc func);
+	void BindMainKeyFunc(OverrideKeyFunc func);
 
 	void ProcessInput();
 };

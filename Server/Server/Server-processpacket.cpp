@@ -196,7 +196,7 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	}
 	CASE PACKET_TYPE::Cs_request_name :
 	{
-		auto pck = reinterpret_cast<const cs_request_name*>(packet);
+		auto pck = reinterpret_cast<const cs_request_Name*>(packet);
 		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
 		auto name = player->GetName();
 		sc_set_name set_name;
@@ -204,6 +204,42 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 		size_t temp; wcstombs_s(&temp, set_name.name, name.c_str(), name.size());
 		set_name.size -= static_cast<decltype(set_name.size)>(MAX_CHARACTER_NAME_SIZE - strlen(set_name.name));
 		SND2ME(&set_name);
+	}
+	CASE PACKET_TYPE::Cs_request_hp :
+	{
+		auto pck = reinterpret_cast<const cs_request_Hp*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_hp set_hp;
+		set_hp.id = pck->id;
+		set_hp.hp = player->GetHp();
+		SND2ME(&set_hp);
+	}
+	CASE PACKET_TYPE::Cs_request_exp :
+	{
+		auto pck = reinterpret_cast<const cs_request_Exp*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_exp set;
+		set.id = pck->id;
+		set.exp = player->GetExp();
+		SND2ME(&set);
+	}
+	CASE PACKET_TYPE::Cs_request_money :
+	{
+		auto pck = reinterpret_cast<const cs_request_Money*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_money set;
+		set.id = pck->id;
+		set.money = player->GetMoney();
+		SND2ME(&set);
+	}
+	CASE PACKET_TYPE::Cs_request_level :
+	{
+		auto pck = reinterpret_cast<const cs_request_Level*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_level set;
+		set.id = pck->id;
+		set.level = player->GetLevel();
+		SND2ME(&set);
 	}
 	CASE PACKET_TYPE::Cs_input_timestamp :
 	{

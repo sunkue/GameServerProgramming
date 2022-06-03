@@ -26,6 +26,10 @@ BETTER_ENUM
 	, Cs_input_timestamp
 	, Cs_chat
 	, Cs_request_name
+	, Cs_request_hp
+	, Cs_request_money
+	, Cs_request_exp
+	, Cs_request_level
 
 	/* Server 2 Client */
 
@@ -35,10 +39,11 @@ BETTER_ENUM
 	, Sc_set_position
 	, Sc_set_position_timestamp
 	, Sc_remove_obj
+	, Sc_set_name
 	, Sc_set_hp
+	, Sc_set_money
 	, Sc_set_exp
 	, Sc_set_level
-	, Sc_set_name
 	, Sc_chat
 	, Sc_signup_result
 );
@@ -85,7 +90,7 @@ PACKET(sc_signup_result)
 PACKET(sc_login_result)
 {
 	// -1 if no id, -2 if wrong password
-	NetID id = -1; 
+	NetID id = -1;
 };
 
 PACKET(sc_ready)
@@ -97,28 +102,53 @@ PACKET(sc_ready)
 	char name[MAX_CHARACTER_NAME_BUFFER_SIZE]{};
 };
 
+///////////////////////////////////////
+// 
+//			REQUEST PACKET
+// 
+///////////////////////////////////////
+
+PACKET(cs_request_Name)
+{
+	NetID id;
+};
+
+PACKET(cs_request_Exp)
+{
+	NetID id;
+};
+
+PACKET(cs_request_Money)
+{
+	NetID id;
+};
+
+PACKET(cs_request_Hp)
+{
+	NetID id;
+};
+
+PACKET(cs_request_Level)
+{
+	NetID id;
+};
+
+///////////////////////////////////////
+// 
+//				SET PACKET
+// 
+///////////////////////////////////////
+
 PACKET(sc_set_name)
 {
 	NetID id;
 	char name[MAX_CHARACTER_NAME_BUFFER_SIZE]{};
 };
 
-PACKET(cs_request_name)
-{
-	NetID id;
-};
-
 PACKET(sc_set_position)
 {
 	NetID id;
 	Position pos;
-};
-
-PACKET(sc_set_position_timestamp)
-{
-	NetID id;
-	Position pos;
-	milliseconds timestamp;
 };
 
 PACKET(sc_set_hp)
@@ -133,10 +163,25 @@ PACKET(sc_set_exp)
 	int exp;
 };
 
+PACKET(sc_set_money)
+{
+	NetID id;
+	int money;
+};
+
 PACKET(sc_set_level)
 {
 	NetID id;
 	int level;
+};
+
+///////////////////////////////////////
+
+PACKET(sc_set_position_timestamp)
+{
+	NetID id;
+	Position pos;
+	milliseconds timestamp;
 };
 
 PACKET(sc_remove_obj)

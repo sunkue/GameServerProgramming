@@ -7,10 +7,11 @@
 
 void DoNextFrame()
 {
-	KEY_BOARD_EVENT_MANAGER::Get().ProcessInput();
+	KeyboardEventManager::Get().ProcessInput();
+	MouseEventManager::Get().ProcessInput();
 
 	System::Get().Update();
-	Game::Get().update();
+	Game::Get().Update();
 	Renderer::Get().Draw();
 	
 	SleepEx(0, true);
@@ -19,7 +20,7 @@ void DoNextFrame()
 	glfwSwapBuffers(System::Get().Window);
 }
 
-void BindDefaultInputFuncs()
+void BindEventFuncs()
 {
 	glfwSetFramebufferSizeCallback(System::Get().Window,
 		[](GLFWwindow* window, int w, int h)
@@ -27,9 +28,16 @@ void BindDefaultInputFuncs()
 
 	glfwSetKeyCallback(System::Get().Window,
 		[](GLFWwindow* window, int key, int code, int action, int modifiers)
-		{ KEY_BOARD_EVENT_MANAGER::Get().KeyBoard(window, key, code, action, modifiers);  });
-
-
+		{ KeyboardEventManager::Get().Keyboard(window, key, code, action, modifiers);  });
+	glfwSetScrollCallback(System::Get().Window,
+		[](GLFWwindow* window, double xoffset, double yoffset)
+		{ MouseEventManager::Get().Scroll(window, xoffset, yoffset);  });
+	glfwSetMouseButtonCallback(System::Get().Window,
+		[](GLFWwindow* window, int key, int action, int modifiers)
+		{ MouseEventManager::Get().MouseButton(window, key, action, modifiers);  });
+	glfwSetCursorPosCallback(System::Get().Window,
+		[](GLFWwindow* window, double xpos, double ypos)
+		{ MouseEventManager::Get().CursorPosition(window, xpos, ypos);  });
 }
 
 int main()
@@ -66,9 +74,9 @@ int main()
 
 	System::Get().Window = window;
 
-	BindDefaultInputFuncs();
+	BindEventFuncs();
 	
-	Game::Get().init();
+	Game::Get().Init();
 
 	{
 		IMGUI_CHECKVERSION();

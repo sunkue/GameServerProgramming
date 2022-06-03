@@ -3,13 +3,22 @@
 
 
 
-void Game::update()
+void Game::Update()
 {
 }
 
-void Game::init()
+void Game::Init()
 {
-	KEY_BOARD_EVENT_MANAGER::Get().BindMainKeyFunc(
-		[this](const KEY_BOARD_EVENT_MANAGER::key_event& key)->bool
+	KeyboardEventManager::Get().BindMainKeyFunc(
+		[this](const KeyboardEventManager::KeyEvent& key)->bool
 		{ return Characters_[Id_].ProcessInput(key); });
+	MouseEventManager::Get().BindDefaultScrollFunc(
+		[this](const MouseEventManager::ScrollEvent& scroll)->bool
+		{ return Characters_[Id_].ProcessInput(scroll); });
+	MouseEventManager::Get().BindDefaultButtonFunc(
+		[this](const MouseEventManager::ButtonEvent& button)->bool
+		{ return Characters_[Id_].ProcessInput(button); });
+	MouseEventManager::Get().BindDefaultPosFunc(
+		[this](const MouseEventManager::PosEvent& pos)->bool
+		{ return Characters_[Id_].ProcessInput(pos); });
 }

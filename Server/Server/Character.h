@@ -28,6 +28,7 @@ public:
 	GET_REF(Hp);
 	GET_REF(Level);
 protected:
+	virtual bool MoveForce(Position diff);
 	SET(Hp);
 	SET(Level);
 protected:
@@ -46,6 +47,7 @@ class CharacterManager
 public:
 	bool Move(ID Id_, eMoveOper oper);
 	bool Move(ID Id_, Position to);
+	bool MoveForce(ID Id_, Position to);
 	bool InitialMove(ID Id_, Position to);
 	Position GetPosition(ID Id_) { return Characters_[Id_]->GetPos(); }
 	void SetPosition(ID Id_, Position pos) { Characters_[Id_]->SetPos(pos); }

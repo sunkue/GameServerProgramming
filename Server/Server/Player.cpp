@@ -26,6 +26,13 @@ bool Player::Move(Position diff)
 	return moved;
 }
 
+bool Player::MoveForce(Position diff)
+{
+	bool moved = Character::MoveForce(diff);
+	UpdateViewList();
+	return moved;
+}
+
 bool Player::Enable()
 {
 	if (!DynamicObj::Enable()) return false;

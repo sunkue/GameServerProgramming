@@ -8,7 +8,7 @@ void Networker::ProcessPacket(const void* const packet)
 {
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	auto& game = Game::Get();
-	// cerr << "Recv [PACKET::" << +packet_type._to_string() << "]" << endl;
+	cerr << "Recv [PACKET::" << +packet_type._to_string() << "]" << endl;
 	switch (packet_type)
 	{
 	case PACKET_TYPE::Sc_login_result:
@@ -63,24 +63,21 @@ void Networker::ProcessPacket(const void* const packet)
 		player.SetName(string{ pck->name, &pck->name[strnlen_s(pck->name, MAX_CHARACTER_NAME_SIZE)] });
 
 		Ready_ = true;
-		{
-			cs_input input;
-			input.input = eMoveOper::up;
-			Networker::Get().DoSend(&input);
-			input.input = eMoveOper::down;
-			Networker::Get().DoSend(&input);
-			input.input = eMoveOper::right;
-			Networker::Get().DoSend(&input);
-			input.input = eMoveOper::left;
-			Networker::Get().DoSend(&input);
-		}
 	}
 	CASE PACKET_TYPE::Sc_set_position :
 	{
 		auto pck = reinterpret_cast<const sc_set_position*>(packet);
 		auto pos = pck->pos;
 		auto id = pck->id;
+		cout << id << endl;
 		game.GetCharacters()[id].SetPos(pos);
+	}
+	CASE PACKET_TYPE::Sc_set_money :
+	{
+		auto pck = reinterpret_cast<const sc_set_money*>(packet);
+		auto money = pck->money;
+		auto id = pck->id;
+		game.GetCharacters()[id].SetMoney(money);
 	}
 	CASE PACKET_TYPE::Sc_set_hp :
 	{

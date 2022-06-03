@@ -58,6 +58,12 @@ bool CharacterManager::Move(ID Id_, Position to)
 	return moved;
 }
 
+bool CharacterManager::MoveForce(ID Id_, Position to)
+{
+	auto moved = Characters_[Id_]->MoveForce(to);
+	return moved;
+}
+
 bool CharacterManager::InitialMove(ID Id_, Position to)
 {
 	Characters_[Id_]->StartPosition_ = to;
@@ -123,6 +129,7 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 		}
 
 		CharacterManager::Get().Enable(id);
+		CharacterManager::Get().MoveForce(id, Position{});
 	};
 	DataBase::Get().AddQueryRequest(q);
 }
@@ -153,4 +160,9 @@ bool Character::Move(Position diff)
 			{ Moveable = true; }, MovementCooltime_ });
 	}
 	return ret;
+}
+
+bool Character::MoveForce(Position diff)
+{
+	return DynamicObj::Move(diff);
 }

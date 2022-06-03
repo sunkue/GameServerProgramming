@@ -1,37 +1,37 @@
 #include "stdafx.h"
 #include "KeyboardEvent.h"
 
-void KEY_BOARD_EVENT_MANAGER::KeyBoard(GLFWwindow* window, int key, int code, int action, int modifiers)
+void KeyboardEventManager::Keyboard(GLFWwindow* window, int key, int code, int action, int modifiers)
 {
-	key_events_.emplace(key, code, action, modifiers, clk::now());
+	KeyEvents_.emplace(key, code, action, modifiers, clk::now());
 }
 
-void KEY_BOARD_EVENT_MANAGER::BindKeyFunc(key key, key_func func)
+void KeyboardEventManager::BindKeyFunc(Key key, KeyFunc func)
 {
-	key_functions_[key] = func;
+	KeyFunctions_[key] = func;
 }
 
-void KEY_BOARD_EVENT_MANAGER::BindMainKeyFunc(main_key_func func)
+void KeyboardEventManager::BindMainKeyFunc(OverrideKeyFunc func)
 {
-	main_func_ = func;
+	OverrideKeyFunc_ = func;
 }
 
-void KEY_BOARD_EVENT_MANAGER::ProcessInput()
+void KeyboardEventManager::ProcessInput()
 {
-	while (!key_events_.empty())
+	while (!KeyEvents_.empty())
 	{
-		key_event& event = key_events_.front(); key_events_.pop();
+		KeyEvent& event = KeyEvents_.front(); KeyEvents_.pop();
 
-		keys_[event.key] = event.action;
+		KeyActions_[event.key] = event.action;
 
-		if (main_func_(event))
+		if (OverrideKeyFunc_(event))
 		{
 			continue;
 		}
 		
-		if (key_functions_.count(event.key))
+		if (KeyFunctions_.count(event.key))
 		{
-			key_functions_[event.key](event);
+			KeyFunctions_[event.key](event);
 		}
 	}
 }

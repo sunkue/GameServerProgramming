@@ -32,6 +32,7 @@ public:
 	GET_REF(Money);
 	void MoneySum(ID agent, int amount) { Money_ += amount; }
 protected:
+	virtual bool MoveForce(Position diff) override;
 	SET(DbId);
 	SET(Name);
 	SET(Money);
