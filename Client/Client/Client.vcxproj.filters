@@ -56,14 +56,8 @@
     <Filter Include="Game\Obj">
       <UniqueIdentifier>{59f210bd-0f5a-4346-a529-8eaa7a04fc7f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Obj\Player">
-      <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Obj\Obj">
       <UniqueIdentifier>{453c32b5-d86c-4c1d-bd47-4a300d801421}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Obj\Monster">
-      <UniqueIdentifier>{10879494-028f-4421-bb66-05b31882a422}</UniqueIdentifier>
     </Filter>
     <Filter Include="Renderer\GameGui">
       <UniqueIdentifier>{9a10b399-c8e4-4c52-85d5-1dabef2fd291}</UniqueIdentifier>
@@ -73,6 +67,9 @@
     </Filter>
     <Filter Include="Network\Networker">
       <UniqueIdentifier>{b5722594-f7bc-47b9-a258-39b6f812b5ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Obj\Character">
+      <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,8 +92,8 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Renderer\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Game\Obj\Player</Filter>
+    <ClCompile Include="Character.cpp">
+      <Filter>Game\Obj\Character</Filter>
     </ClCompile>
     <ClCompile Include="Obj.cpp">
       <Filter>Game\Obj\Obj</Filter>
@@ -169,8 +166,8 @@
     <ClInclude Include="stb_image.h">
       <Filter>Renderer\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Game\Obj\Player</Filter>
+    <ClInclude Include="Character.h">
+      <Filter>Game\Obj\Character</Filter>
     </ClInclude>
     <ClInclude Include="Obj.h">
       <Filter>Game\Obj\Obj</Filter>

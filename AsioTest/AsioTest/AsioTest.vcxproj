@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c3a0fae9-5a52-455d-b2ec-43180a71a5c5}</ProjectGuid>
-    <RootNamespace>Client</RootNamespace>
+    <ProjectGuid>{289ed46a-3a59-493d-a1ec-ff58e61c2f1d}</ProjectGuid>
+    <RootNamespace>AsioTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -116,7 +116,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,9 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Client\Dependencies\imgui;$(SolutionDir)Client\Dependencies\GLFW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,90 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Share\SocketUtil.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Chat.cpp" />
-    <ClCompile Include="Dependencies\glad\src\glad.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_demo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_draw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_impl_glfw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_impl_opengl3.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_tables.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Dependencies\imgui\imgui_widgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameGui.cpp" />
-    <ClCompile Include="KeyboardEvent.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MouseEvent.cpp" />
-    <ClCompile Include="Networker.cpp" />
-    <ClCompile Include="Networker_processpacket.cpp" />
-    <ClCompile Include="Obj.cpp" />
-    <ClCompile Include="Character.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="System.cpp" />
-    <ClCompile Include="Texture.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Share\Defines.h" />
-    <ClInclude Include="..\..\Share\Includes.h" />
-    <ClInclude Include="..\..\Share\PacketZip.h" />
-    <ClInclude Include="..\..\Share\Protocol.h" />
-    <ClInclude Include="..\..\Share\Share.h" />
-    <ClInclude Include="..\..\Share\SocketUtil.h" />
-    <ClInclude Include="..\..\Share\SUNKUE.hpp" />
-    <ClInclude Include="Chat.h" />
-    <ClInclude Include="Dependencies\imgui\imconfig.h" />
-    <ClInclude Include="Dependencies\imgui\imgui.h" />
-    <ClInclude Include="Dependencies\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="Dependencies\imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="Dependencies\imgui\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="Dependencies\imgui\imgui_internal.h" />
-    <ClInclude Include="Dependencies\imgui\imstb_rectpack.h" />
-    <ClInclude Include="Dependencies\imgui\imstb_textedit.h" />
-    <ClInclude Include="Dependencies\imgui\imstb_truetype.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameGui.h" />
-    <ClInclude Include="KeyboardEvent.h" />
-    <ClInclude Include="MouseEvent.h" />
-    <ClInclude Include="Networker.h" />
-    <ClInclude Include="Obj.h" />
-    <ClInclude Include="Character.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ReplicateHelper.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Shader.hpp" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="System.h" />
-    <ClInclude Include="Texture.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Shader\background.frag" />
-    <None Include="Resource\Shader\background.vert" />
-    <None Include="Resource\Shader\obj.frag" />
-    <None Include="Resource\Shader\obj.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -75,6 +75,7 @@ bool Player::Disable()
 		q.Query += L","s + to_wstring(pos.y);
 		q.Query += L","s + to_wstring(Money_);
 		q.Query += L","s + to_wstring(Exp_);
+		q.Query += L","s + to_wstring(Level_);
 		q.Targets = make_shared<vector<any>>();
 		q.Func = [](const vector<any>& t) {};
 		DataBase::Get().AddQueryRequest(q);
@@ -170,6 +171,36 @@ void Player::UpdateViewList()
 				}
 				else
 				{
+					if (nearList.unsafe_erase(otherId))
+					{
+						sc_remove_obj remove;
+						remove.id = otherId;
+						Server::Get().GetClients()[Id_].DoSend(&remove);
+					}
+				}
+			}
+		}
+
+		{
+			auto& obstacles = ns->GetObstacles();
+			for (auto& o : obstacles)
+			{
+				auto otherPos = o->GetPos();
+				auto otherId = o->GetId() + MAX_CHARACTER;
+				if (IsInSight(otherPos))
+				{
+					// in the sight
+					if (nearList.insert(otherId).second)
+					{
+						sc_set_position setPositioon;
+						setPositioon.id = otherId;
+						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
+						Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+					}
+				}
+				else
+				{
+					// out of the sight
 					if (nearList.unsafe_erase(otherId))
 					{
 						sc_remove_obj remove;

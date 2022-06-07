@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Obj.h"
-#include "Player.h"
+#include "Character.h"
 
 template <class _Kty, class _Ty>
 class UnorderedMapConstructWithKey : public unordered_map<_Kty, _Ty>

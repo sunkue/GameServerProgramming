@@ -1,10 +1,12 @@
 #pragma once
 
+#define SQL_NORETURN -999
+
 struct QueryRequest
 {
 	wstring Query;
-	function<void(vector<any>)> Func;	// delete params here
-	shared_ptr<vector<any>> Targets;	// SQL types pointer.
+	function<void(vector<any>)> Func;
+	shared_ptr<vector<any>> Targets;
 };
 
 class DataBase
@@ -25,7 +27,7 @@ private:
 	SQLRETURN SQLBindColAutoType(Args&... targets);
 	SQLRETURN SQLBindColAnyType(SQLUSMALLINT col, any& target);
 private:
-	static void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode);
+	static void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE& RetCode);
 public:
 	void ProcessQueryQueueLoop();
 private:

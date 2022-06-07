@@ -14,6 +14,18 @@
 
 CharacterManager::CharacterManager()
 {
+	// NPCs
+	cerr << "initiallize Obstracles..";
+	for (ID _id = 0; _id < MAX_OBSTACLE; _id++)
+	{
+		auto id = _id;
+		Obstacles_[id] = make_unique<DynamicObj>(id);
+		Obstacles_[id]->SetPos(Position{ rand() % MAP_SIZE, rand() % MAP_SIZE });
+		Obstacles_[id]->Enable();
+	}
+	cerr << "..done" << endl;
+
+
 	// Players
 	cerr << "initiallize Players..";
 	for (ID _id = 0; _id < MAX_PLAYER; _id++)
@@ -70,6 +82,7 @@ bool CharacterManager::InitialMove(ID Id_, Position to)
 	return Move(Id_, to);
 }
 
+
 void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 {
 	reinterpret_cast<Player*>(Characters_[id].get())->SetDbId(dbId);
@@ -86,7 +99,7 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 	q.Targets->emplace_back(make_any<SQLINTEGER>()); // MONEY
 	q.Targets->emplace_back(make_any<SQLINTEGER>()); // EXP
 
-	q.Func = [this, id](const vector<any>& t)
+	q.Func = [this, id, dbId](const vector<any>& t)
 	{
 		auto level = any_cast<SQLINTEGER>(t[0]);
 		auto name = any_cast<wstring>(t[1]);
@@ -97,14 +110,16 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 		auto exp = any_cast<SQLINTEGER>(t[6]);
 
 		auto& player = reinterpret_cast<Player&>(*CharacterManager::Get().GetCharacters()[id].get());
-		
+
 		player.SetLevel(level);
 		player.SetHp(hp);
 		player.SetName(name);
 		player.SetMoney(money);
 		player.SetExp(exp);
 
-		if (CharacterManager::Get().InitialMove(id, Position{ posx, posy }))
+		for (int failed = 1; !CharacterManager::Get().InitialMove(id, Position{ posx + rand() % failed, posy + rand() % failed }); failed++)
+			;;;
+
 		{
 			sc_set_position set_pos;
 			auto pos = player.GetPos();
@@ -112,10 +127,7 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 			set_pos.pos = pos;
 			Server::Get().GetClients()[id].DoSend(&set_pos);
 		}
-		else
-		{
-			cerr << "[!!!]OverflowedInitPosition" << GetPosition(id).x << " " << GetPosition(id).y << endl;
-		}
+
 
 		{
 			sc_ready ready;

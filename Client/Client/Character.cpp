@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Player.h"
+#include "Character.h"
 #include "NetWorker.h"
 #include "GameGui.h"
 #include "Game.h"
@@ -9,6 +9,7 @@ string VisualizationId(ID id)
 	if (id < MAX_PLAYER) return Game::Get().GetCharacters()[id].GetName();
 	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
 	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
+	else if (id < MAX_OBJECT) return "OBSTRACLE_" + to_string(id - MAX_PLAYER - MAX_MONSTER - MAX_NPC);
 	else return "ERR_ID";
 }
 

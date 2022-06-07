@@ -19,18 +19,18 @@ class Sector
 	friend class World;
 public:
 	void Update();
-private:
-
 public:
 	void EraseObjFromSector(StaticObj* obj);
 	void InsertObjSector(StaticObj* obj);
 	GET_REF(Players);
 	GET_REF(Monsters);
+	GET_REF(Obstacles);
+	GET_REF(Npcs);
 public:
 	shared_mutex PlayerLock;
 	shared_mutex MonsterLock;
 private:
-	vector<StaticObj> Obstacles_;					// 고정데이터..
+	vector<DynamicObj*> Obstacles_;					// 고정데이터..
 	concurrent_unordered_set<Monster*> Monsters_;	// 고정크기..
 	concurrent_unordered_set<DynamicObj*> Npcs_;		// 고정크기..
 	concurrent_unordered_set<Player*> Players_;

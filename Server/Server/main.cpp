@@ -56,7 +56,7 @@ int main()
 #else
 		workers.emplace_back([&]() { Server::Get().ProcessQueuedCompleteOperationLoop(); });
 #endif // GQCPEX
-	}
+}
 	cout << "worker thread ready (" << WORKER_THREAD_NUM << ")" << endl;
 
 	workers.emplace_back([&]() { DataBase::Get().ProcessQueryQueueLoop(); });

@@ -57,6 +57,10 @@ void Sector::InsertObjSector(StaticObj* obj)
 		shared_lock lck{ PlayerLock };
 		Players_.insert(player);
 	}
+	else if (auto obstracles = dynamic_cast<DynamicObj*>(obj))
+	{
+		Obstacles_.push_back(obstracles);
+	}
 }
 
 /////////////////////////////////////////////
@@ -64,7 +68,6 @@ void Sector::InsertObjSector(StaticObj* obj)
 //					World
 // 
 /////////////////////////////////////////////
-
 void World::ChangeSector(StaticObj* obj, Position newSectorIdx)
 {
 	if (!obj) return;

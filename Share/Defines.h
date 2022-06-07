@@ -1,5 +1,8 @@
 #pragma once
 
+#undef max
+#undef min
+
 #define RINGBUFFER
 //#define GQCPEX
 
@@ -30,19 +33,12 @@ using Position = glm::ivec2;
 const uint16_t SERVER_PORT = 8282;
 
 //====================================
-constexpr int MAX_PLAYER = 5'0000;
-// constexpr int MAX_MONSTER = 20'0000;
-constexpr int MAX_MONSTER = 20'00;
-constexpr int MAX_NPC = 10;
-constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
-
 constexpr int MAX_PARTY = 4;
 constexpr int MAP_SIZE = 2000;
 constexpr int SIGHT_SIZE = 15;
 constexpr int WINDOW_SIZE = 20;
 constexpr int SECTOR_SIZE = 50;
 constexpr int SECTOR_NUM = MAP_SIZE / SECTOR_SIZE;
-
 
 static_assert(SIGHT_SIZE % 2);
 static_assert(SIGHT_SIZE < SECTOR_SIZE);
@@ -51,8 +47,15 @@ static_assert(0 == SECTOR_SIZE % 2);
 static_assert(0 == WINDOW_SIZE % 2);
 static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 
-#undef max
-#undef min
+
+constexpr int MAX_PLAYER = 5'0000;
+ constexpr int MAX_MONSTER = 20'0000;
+//constexpr int MAX_MONSTER = 20'00;
+constexpr int MAX_NPC = 10;
+constexpr int MAX_OBSTACLE_PER_SECTOR = 1800;
+constexpr int MAX_OBSTACLE = MAX_OBSTACLE_PER_SECTOR * SECTOR_NUM;
+constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
+constexpr int MAX_OBJECT = MAX_CHARACTER + MAX_OBSTACLE;
 
 static_assert(MAX_PLAYER < std::numeric_limits<ID>::max(), "Player ID could overflow");
 constexpr int MAX_PACKET_SIZE = std::numeric_limits<packet_size_t>::max();

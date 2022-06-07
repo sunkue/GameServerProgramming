@@ -46,7 +46,7 @@ struct CLIENT {
 	int x;
 	int y;
 	atomic_bool connected;
-
+	atomic_bool ready;
 	SOCKET client_socket;
 	OverlappedEx recv_over;
 	unsigned char packet_buf[MAX_PACKET_SIZE];
@@ -148,7 +148,6 @@ void ProcessPacket(int ci, unsigned char packet[])
 	break; case PACKET_TYPE::Sc_login_result:
 	{
 		g_clients[ci].connected = true;
-		active_clients++;
 		auto login_packet = reinterpret_cast<sc_login_result*>(packet);
 		int my_id = ci;
 		client_map[login_packet->id] = my_id;
@@ -162,9 +161,14 @@ void ProcessPacket(int ci, unsigned char packet[])
 		//t_packet.type = CS_TELEPORT;
 		//SendPacket(my_id, &t_packet);
 	}
+	break; case PACKET_TYPE::Sc_ready:
+	{
+		g_clients[ci].ready = true;
+		active_clients++;
+	}
 	break; default: break;
-		//		MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
-		//		while (true);
+				  //		MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
+				  //		while (true);
 	}
 }
 
@@ -310,12 +314,15 @@ void Adjust_Number_Of_Client()
 	DWORD recv_flag = 0;
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_clients[num_connections].client_socket), g_hiocp, num_connections, 0);
 
-	cs_hi l_packet;
+	cs_login l_packet;
 
 	int temp = num_connections;
 	//sprintf_s(l_packet.name, "%d", temp);
 	l_packet.size = sizeof(l_packet);
-	SendPacket(num_connections, &l_packet);
+	auto str = "Dummy"s + to_string(temp);
+	strcpy_s(l_packet.login_id, str.c_str());
+	strcpy_s(l_packet.login_password, str.c_str());
+	SendPacket(temp, &l_packet);
 
 
 	int ret = WSARecv(g_clients[num_connections].client_socket, &g_clients[num_connections].recv_over.wsabuf, 1,
@@ -341,6 +348,7 @@ void Test_Thread()
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
+			if (false == g_clients[i].ready) continue;
 			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			cs_input_timestamp my_packet;

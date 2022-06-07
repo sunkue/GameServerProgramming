@@ -61,4 +61,5 @@ private:
 	// MONSTER	[ MAX_PLAYER, MAX_PLAYER + MAX_MONSTER )
 	// NPC		[ MAX_PLAYER + MAX_MONSTER, MAX_CHARACTER )
 	array<unique_ptr<Character>, MAX_CHARACTER> Characters_;
+	array<unique_ptr<DynamicObj>, MAX_OBSTACLE> Obstacles_;
 };

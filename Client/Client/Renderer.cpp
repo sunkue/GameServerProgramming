@@ -79,9 +79,12 @@ void Renderer::Draw()
 		auto& obj = other.second;
 
 		OBJ_TYPE Type{};
-		if (id < MAX_PLAYER) Type = OBJ_TYPE::Wlook;
+		if (id < MAX_PLAYER) Type = OBJ_TYPE::Wlook;  // player
+		else if (id < MAX_PLAYER + MAX_MONSTER) Type = OBJ_TYPE::Bpawn; // monster
+		else if (id < MAX_CHARACTER) Type = OBJ_TYPE::Wbishop; //npc
+		else if (id < MAX_OBJECT) Type = OBJ_TYPE::Bking; // obstacle
+	
 		if (id == Game::Get().GetId()) Type = OBJ_TYPE::Wknight;
-		if (MAX_PLAYER <= id && id < MAX_PLAYER + MAX_MONSTER) Type = OBJ_TYPE::Bpawn;
 
 		ObjShader_->Set("u_type", int(Type));
 		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });

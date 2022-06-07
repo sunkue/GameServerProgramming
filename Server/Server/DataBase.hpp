@@ -1,5 +1,6 @@
 #include "DataBase.h"
 
+
 template<class ... Args>
 inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&... targets)
 {
@@ -16,6 +17,10 @@ inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&
 				HandleDiagnosticRecord(Stmt_, SQL_HANDLE_STMT, retcode);
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 				f();
+			else if (retcode == SQL_NORETURN)
+			{
+				f(); break;
+			}
 			else break;
 		}
 

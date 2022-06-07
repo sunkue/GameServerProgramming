@@ -2,7 +2,7 @@
 #include "GameGui.h"
 #include "Game.h"
 #include "Chat.h"
-#include "Player.h"
+#include "Character.h"
 #include "System.h"
 
 ImVec2 TileSize()
@@ -135,6 +135,14 @@ void GameGuiManager::DrawSelectedObjInfo()
 		//	Npc = > 이름 / 상점 / 퀘스트
 		gui::Begin(windowName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
+		gui::End();
+	}
+	else if (SelectedObjId_ < MAX_OBJECT)
+	{
+		//	Npc = > 이름 / 상점 / 퀘스트
+		gui::Begin(windowName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+		string str = "ID : "s + VisualizationId(SelectedObjId_);
+		gui::Text(str.c_str());
 		gui::End();
 	}
 	else cerr << "ERR_ID";

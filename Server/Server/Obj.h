@@ -72,7 +72,6 @@ inline bool IsOverFlowedSectorIdx(Position sectorIdx)
 class StaticObj
 {
 public:
-	StaticObj() {}
 	virtual ~StaticObj() = default;
 	bool IsInSightAndEnable(Position target);
 	bool IsInSight(Position target);
