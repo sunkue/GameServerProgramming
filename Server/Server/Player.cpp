@@ -102,8 +102,6 @@ void Player::UpdateViewList()
 		nearList = ViewList_;
 	}
 
-	unordered_set<ID> newMonsters;
-
 	for (auto& ns : nearSectors)
 	{
 		{
@@ -162,11 +160,30 @@ void Player::UpdateViewList()
 					lck.lock();
 					if (nearList.insert(otherId).second)
 					{
-						newMonsters.insert(otherId);
 						sc_set_position setPositioon;
 						setPositioon.id = otherId;
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
 						Server::Get().GetClients()[Id_].DoSend(&setPositioon);
+
+						EventManager::Get().AddEvent(
+							{ [id = GetId(), L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
+							{
+								lock_guard lck{ mutex };
+								lua_getglobal(L, "EventPlayerEnterSight");
+								lua_pushnumber(L, id);
+								lua_pcall(L, 1, 0, 0);
+							}, 0s });
+					}
+					else
+					{
+						EventManager::Get().AddEvent(
+							{ [id = GetId(), L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
+							{
+								lock_guard lck{ mutex };
+								lua_getglobal(L, "EventPlayerStaySight");
+								lua_pushnumber(L, id);
+								lua_pcall(L, 1, 0, 0);
+							}, 0s });
 					}
 				}
 				else
@@ -176,6 +193,15 @@ void Player::UpdateViewList()
 						sc_remove_obj remove;
 						remove.id = otherId;
 						Server::Get().GetClients()[Id_].DoSend(&remove);
+
+						EventManager::Get().AddEvent(
+							{ [id = GetId(), L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
+							{
+								lock_guard lck{ mutex };
+								lua_getglobal(L, "EventPlayerExitSight");
+								lua_pushnumber(L, id);
+								lua_pcall(L, 1, 0, 0);
+							}, 0s });
 					}
 				}
 			}
@@ -212,23 +238,61 @@ void Player::UpdateViewList()
 		}
 	}
 
-	for (auto& newMonsterId : newMonsters)
-	{
-		Monster* m = reinterpret_cast<Monster*>(CharacterManager::Get().GetCharacters()[newMonsterId].get());
-		EventManager::Get().AddEvent(
-			{ [id = Id_, L = m->GetScripts()[eScriptType::AI], &mutex = m->ScriptLock[eScriptType::AI]] ()
-			{
-				lock_guard lck{ mutex };
-				lua_getglobal(L, "EventPlayerEnterSight");
-				lua_pushnumber(L, id);
-				lua_pcall(L, 1, 0, 0);
-			}, 0s });
-	}
-
 	{
 		unique_lock lck{ ViewLock };
 		ViewList_ = nearList;
 	}
+}
+
+void Player::ActivateSkill(eSkill skill)
+{
+	switch (skill)
+	{
+	case eSkill::attack:
+	{
+		Attack();
+	}
+	CASE eSkill::heal :
+	{
+
+	}
+	CASE eSkill::haste :
+	{
+
+	}
+	CASE eSkill::set_teleport :
+	{
+
+	}
+	CASE eSkill::teleport :
+	{
+
+	}
+	break; default: break;
+	}
+}
+
+void Player::Attack()
+{
+	auto pos = GetPos();
+	auto sectors = World::Get().GetNearSectors4(pos, GetSectorIdx());
+
+	unordered_set<ID> attackableIdSet;
+
+	for (auto s : sectors)
+	{
+		for (auto& m : s->GetMonsters())
+		{
+			if (!m->IsAlive()) continue;
+			auto diff = length(glm::vec2{ m->GetPos() - pos });
+			if (diff <= 1) attackableIdSet.insert(m->GetId());
+		}
+	}
+
+	vector<ID> attackableId{ attackableIdSet.begin(),attackableIdSet.end() };
+
+	// item 무기 공격력 0~10 => DefaultAttack + rand()%(0~10)..
+	Character::Attack(attackableId, DefaultAttack(Level_));
 }
 
 bool Player::EraseFromViewList(ID Id)
@@ -276,20 +340,18 @@ bool Player::InsertToViewList(ID Id)
 
 void Player::ExpSum(ID agent, int amount)
 {
-	auto requireExp = RequireExp(Hp_);
+	auto requireExp = RequireExp(Level_);
 	Exp_ += amount;
 	if (requireExp <= Exp_)
 	{
 		//LevelUp
-		Level_++; Exp_ -= requireExp;
+		Level_++; Exp_ = 0;
+		HpIncrease(Id_, 9999);
 		sc_set_level set_level;
 		set_level.id = Id_;
 		set_level.level = Level_;
 		Server::Get().GetClients()[Id_].DoSend(&set_level);
-		HpIncrease(Id_, 9999);
 	}
-
-	Exp_ -= Exp_ * (Exp_ < 0);
 
 	sc_set_exp set_exp;
 	set_exp.id = Id_;
@@ -301,6 +363,26 @@ void Player::HpDecrease(ID agent, int dmg)
 {
 	Hp_ -= dmg;
 	Hp_ = max(Hp_.load(), 0);
+
+	{
+		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
+		unordered_set<Player*> players;
+		for (auto s : ns)
+		{
+			for (auto p : s->GetPlayers())
+			{
+				players.insert(p);
+			}
+		}
+
+		sc_set_hp pck;
+		pck.hp = Hp_;
+		pck.id = GetId();
+
+		for (auto p : players)
+			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+	}
+
 	if (Hp_ <= 0)
 		Regen();
 }
@@ -310,8 +392,22 @@ void Player::HpIncrease(ID agent, int amount)
 	Hp_ += amount;
 	Hp_ = min(Hp_.load(), MaxHp(Level_));
 
-	sc_set_hp set_hp;
-	set_hp.id = Id_;
-	set_hp.hp = Hp_;
-	Server::Get().GetClients()[Id_].DoSend(&set_hp);
+	{
+		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
+		unordered_set<Player*> players;
+		for (auto s : ns)
+		{
+			for (auto p : s->GetPlayers())
+			{
+				players.insert(p);
+			}
+		}
+
+		sc_set_hp pck;
+		pck.hp = Hp_;
+		pck.id = GetId();
+
+		for (auto p : players)
+			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+	}
 }

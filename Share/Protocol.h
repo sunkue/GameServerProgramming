@@ -30,7 +30,8 @@ BETTER_ENUM
 	, Cs_request_money
 	, Cs_request_exp
 	, Cs_request_level
-
+	, Cs_use_skill
+	
 	/* Server 2 Client */
 
 	, Sc_none = 100
@@ -208,12 +209,31 @@ PACKET(cs_input_timestamp)
 	milliseconds timestamp;
 };
 
+enum class eSkill : uint8
+{
+	attack,
+	heal,
+	haste,
+	set_teleport,
+	teleport,
+};
+
+PACKET(cs_use_skill)
+{
+	eSkill skill;
+};
+
+// attack / heal /
+constexpr ID SYSTEM_ID = -10;
+//constexpr ID SYSTEM_ID = -10;
+//constexpr ID SYSTEM_ID = -10;
+//constexpr ID SYSTEM_ID = -10;
+
 PACKET(cs_chat)
 {
 	char chat[MAX_CHAT_BUFFER_SIZE]{};
 };
 
-// dynamic size packet
 PACKET(sc_chat)
 {
 	NetID id;

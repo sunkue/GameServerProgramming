@@ -27,6 +27,7 @@ bool DynamicObj::Move(const Position diff)
 	{
 		for (auto& o : World::Get().GetSector(newSector).GetObstacles())
 		{
+			if (!o->Enable_)continue;
 			if (o->GetPos() == pos)
 			{
 				pos -= diff;
@@ -36,6 +37,7 @@ bool DynamicObj::Move(const Position diff)
 
 		for (auto& m : World::Get().GetSector(newSector).GetMonsters())
 		{
+			if (!m->Enable_)continue;
 			if (m == this) continue;
 			if (m->GetPos() == pos)
 			{
@@ -46,6 +48,7 @@ bool DynamicObj::Move(const Position diff)
 
 		for (auto& p : World::Get().GetSector(newSector).GetPlayers())
 		{
+			if (!p->Enable_)continue;
 			if (p == this) continue;
 			if (p->GetPos() == pos)
 			{
@@ -56,6 +59,7 @@ bool DynamicObj::Move(const Position diff)
 
 		for (auto& n : World::Get().GetSector(newSector).GetNpcs())
 		{
+			if (!n->Enable_)continue;
 			if (n == this) continue;
 			if (n->GetPos() == pos)
 			{

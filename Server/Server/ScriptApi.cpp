@@ -98,7 +98,7 @@ int API_NavigateAstar(lua_State* L)
 	Position from = { lua_toint(L, -4), lua_toint(L, -3) };
 	Position to = { lua_toint(L, -2), lua_toint(L, -1) };
 	lua_pop(L, 5);
-	Position navigatePos{ -1 };
+	Position navigatePos{ from };
 	lua_pushnumber(L, navigatePos.x);
 	lua_pushnumber(L, navigatePos.y);
 	return 2;
@@ -111,7 +111,16 @@ int API_Attack(lua_State* L)
 	int damage = lua_toint(L, -1);
 	lua_pop(L, 4);
 	vector<ID> targets{ targetId };
-	CharacterManager::Get().GetCharacters()[agentId]->Attack(targets, damage);
+	CharacterManager::Get().GetCharacters()[agentId]->Attack(targets, damage + damage * CharacterManager::Get().GetCharacters()[agentId]->GetLevel());
+	return 0;
+}
+
+int API_DebugMessage(lua_State* L)
+{
+	int speakerId = lua_toint(L, -2);
+	const char* mess = lua_tostring(L, -1);
+	lua_pop(L, 3);
+	cerr << speakerId << " :: " << mess << endl;
 	return 0;
 }
 

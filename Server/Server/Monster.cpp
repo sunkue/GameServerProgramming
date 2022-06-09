@@ -7,6 +7,8 @@
 
 Monster::Monster(ID id) : Character{ id }
 {
+	AggressionType_ = eMonsterAggressionType(id % 2); // Peace, Agro
+	MovementType_ = eMonsterMovementType(2 <= (id % 4)); // Fixed, Roaming
 	CompileScript();
 }
 
@@ -22,13 +24,47 @@ void Monster::CompileScript()
 	aiScript = luaL_newstate();
 	luaL_openlibs(aiScript);
 	{
-		string str; str.reserve(1500);
+		string str; str.reserve(2500);
 		ifstream basicGlobalDeclaration{ "LuaScript/Monster/monsterBasicDeclaration.lua" , ios::binary };
-		ifstream movement{ "LuaScript/Monster/monsterMovementRoaming.lua" , ios::binary };
-		ifstream aggression{ "LuaScript/Monster/monsterAggressionPeace.lua" , ios::binary };
+		ifstream movementRomaing{ "LuaScript/Monster/monsterMovementRoaming.lua" , ios::binary };
+		ifstream movementFixed{ "LuaScript/Monster/monsterMovementFixed.lua" , ios::binary };
+		ifstream aggressionAgro{ "LuaScript/Monster/monsterAggressionAgro.lua" , ios::binary };
+		ifstream aggressionPeace{ "LuaScript/Monster/monsterAggressionPeace.lua" , ios::binary };
+
 		str += string{ (std::istreambuf_iterator<char>(basicGlobalDeclaration)), std::istreambuf_iterator<char>() };
-		str += string{ (std::istreambuf_iterator<char>(movement)), std::istreambuf_iterator<char>() };
-		str += string{ (std::istreambuf_iterator<char>(aggression)), std::istreambuf_iterator<char>() };
+
+		switch (MovementType_)
+		{
+		case eMonsterMovementType::Fixed:
+		{
+			str += string{ (std::istreambuf_iterator<char>(movementFixed)), std::istreambuf_iterator<char>() };
+		}
+		CASE eMonsterMovementType::Roaming :
+		{
+			str += string{ (std::istreambuf_iterator<char>(movementRomaing)), std::istreambuf_iterator<char>() };
+		}break; default:
+		{
+			cerr << "MovementType_ ERR" << endl;
+		}
+		break;
+		}
+
+		switch (AggressionType_)
+		{
+		case eMonsterAggressionType::Peace:
+		{
+			str += string{ (std::istreambuf_iterator<char>(aggressionPeace)), std::istreambuf_iterator<char>() };
+		}
+		CASE eMonsterAggressionType::Agro :
+		{
+			str += string{ (std::istreambuf_iterator<char>(aggressionAgro)), std::istreambuf_iterator<char>() };
+		}break; default:
+		{
+			cerr << "AggressionType_ ERR" << endl;
+		}
+		break;
+		}
+
 		luaL_loadstring(aiScript, str.c_str());
 		lua_pcall(aiScript, 0, 0, 0);
 	}
@@ -46,6 +82,7 @@ void Monster::CompileScript()
 		lua_register(aiScript, "API_ReturnToStartPoint", API_ReturnToStartPoint);
 		lua_register(aiScript, "API_NavigateAstar", API_NavigateAstar);
 		lua_register(aiScript, "API_Attack", API_Attack);
+		lua_register(aiScript, "API_DEBUG", API_DebugMessage);
 	}
 	Scripts_[eScriptType::AI] = aiScript;
 }
@@ -56,21 +93,72 @@ void Monster::HpDecrease(ID agent, int amount)
 {
 	Hp_ -= amount;
 	Hp_ = max(Hp_.load(), 0);
+
+	{
+		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
+		unordered_set<Player*> players;
+		for (auto s : ns)
+		{
+			for (auto p : s->GetPlayers())
+			{
+				players.insert(p);
+			}
+		}
+
+		sc_set_hp pck;
+		pck.hp = Hp_;
+		pck.id = GetId();
+
+		for (auto p : players)
+			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+	}
+
+
 	if (Hp_ <= 0)
 		Die(agent);
+	else
+	{
+		EventManager::Get().AddEvent(
+			{ [agent = agent, L = GetScripts()[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+			{
+				lock_guard lck{ mutex };
+				lua_getglobal(L, "EventBeAttacked");
+				lua_pushnumber(L, agent);
+				lua_pcall(L, 1, 0, 0);
+			}, 0s });
+	}
 }
 
 void Monster::HpIncrease(ID agent, int amount)
 {
 	Hp_ += amount;
-	Hp_	= min(Hp_.load(), MaxHp(Level_));
+	Hp_ = min(Hp_.load(), MaxHp(Level_));
+
+	{
+		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
+		unordered_set<Player*> players;
+		for (auto s : ns)
+		{
+			for (auto p : s->GetPlayers())
+			{
+				players.insert(p);
+			}
+		}
+
+		sc_set_hp pck;
+		pck.hp = Hp_;
+		pck.id = GetId();
+
+		for (auto p : players)
+			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+	}
 }
 
 void Monster::Die(ID agent)
 {
+	Disable();
 	Died_ = true;
 	Hp_ = 0;
-	Disable();
 	EventManager::Get().AddEvent({ [this]()
 		{ Regen(); }, 30s });
 	if (auto killerAsPlayer = dynamic_cast<Player*>(CharacterManager::Get().GetCharacters()[agent].get()))
@@ -156,6 +244,17 @@ bool Monster::Move(Position diff)
 					lua_pcall(L, 1, 0, 0);
 				}, 0s });
 		}
+		else
+		{
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerStaySight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
+		}
 	}
 
 	for (auto& p : oldNearList)
@@ -163,6 +262,15 @@ bool Monster::Move(Position diff)
 		if (!newNearList.contains(p))
 		{
 			p->EraseFromViewList(Id_);
+
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerExitSight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
 		}
 	}
 

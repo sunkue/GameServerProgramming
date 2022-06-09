@@ -22,6 +22,8 @@ public:
 	GET_REF_UNSAFE(Characters);
 	Character& GetPlayer() { return Characters_[Id_]; }
 private:
+	void GarbageCollect();
+private:
 	ID Id_{};
 	UnorderedMapConstructWithKey<ID, Character> Characters_;
 };

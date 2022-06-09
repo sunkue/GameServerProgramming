@@ -2,7 +2,6 @@
 myId = nil
 targetId = nil
 state = nil
-damage = nil
 
 
 function SetObjectId(id)

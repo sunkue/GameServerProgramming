@@ -127,6 +127,8 @@ void GameGuiManager::DrawSelectedObjInfo()
 		gui::Text(str.c_str());
 		str = "LV : "s + to_string(selectedObj.GetLevel());
 		gui::Text(str.c_str());
+		str = "HP : "s + to_string(selectedObj.GetHp());
+		gui::Text(str.c_str());
 		gui::End();
 
 	}
@@ -139,7 +141,7 @@ void GameGuiManager::DrawSelectedObjInfo()
 	}
 	else if (SelectedObjId_ < MAX_OBJECT)
 	{
-		//	Npc = > 이름 / 상점 / 퀘스트
+		//	Obstacles
 		gui::Begin(windowName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 		string str = "ID : "s + VisualizationId(SelectedObjId_);
 		gui::Text(str.c_str());

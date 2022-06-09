@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Character.h"
+#include "Item.h"
 
 /////////////////////////////////
 // 
@@ -20,6 +21,7 @@ public:
 	virtual void Update() override;
 	virtual void Regen() override;
 	void UpdateViewList();
+	void ActivateSkill(eSkill);
 	bool EraseFromViewList(ID);
 	bool InsertToViewList(ID);
 	GET_REF(Exp);
@@ -38,6 +40,7 @@ protected:
 	SET(Money);
 	SET(Exp);
 private:
+	void Attack();
 	void HpRegen();
 public:
 protected:

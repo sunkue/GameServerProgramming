@@ -33,6 +33,7 @@
 #include <memory>
 #include <map>
 #include <thread>
+#include <list>
 #include <mutex>
 #include <shared_mutex>
 #include <set>

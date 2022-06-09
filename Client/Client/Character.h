@@ -9,6 +9,7 @@ string VisualizationId(ID id);
 class Character : public DynamicObj
 {
 	friend class Networker;
+	friend class Game;
 public:
 	Character(ID id, Position pos = {}) :DynamicObj{ id, pos } {};
 	bool ProcessInput(const KeyboardEventManager::KeyEvent& key);
@@ -25,11 +26,14 @@ protected:
 	SET(Exp);
 	SET(Name);
 	SET(Money);
-private:
+	GET(Disabled);
+	SET(Disabled);
+protected:
 private:
 	int Exp_{ -1 };
 	int Money_{ -1 };
 	string Name_;
 	array<ID, MAX_PARTY - 1> PartyCrews_{ -1 };
 	pair<string, system_clock::time_point> SpeechBubble_;
+	bool Disabled_ = false;
 };

@@ -1,11 +1,26 @@
+damage = 3
 
 function EventPlayerEnterSight(playerId)
 	API_Chat(myId, playerId, "Hi~", 0);
 end
 
+function EventPlayerExitSight(playerId)
+	if targetId == playerId then
+		state = Return
+		targetId = nil
+	end
+end
+
+function EventPlayerStaySight(playerId)
+end
+
+
+
+
+
 function EventBeAttacked(playerId)
 	if targetId == nil then
-		API_Chat(myId, playerId, speechOnBattleBegin, 0);
+		API_Chat(myId, playerId, "!!", 0);
 		targetId = playerId
 		state = Battle
 	end
@@ -20,16 +35,17 @@ function Attack()
 	if navigateX < 0 then
 		targetId = nil
 		state = Idle
-		API_Chat(myId, playerId, speechOnChaseFail, 0)
 		return
 	end
 
 	-- attackable range
-	if abs(playerPosX - myX) < 1 and abs(playerPosY - myY) < 1 then
-		API_Attack(myId, playerId, damage)
+	if math.abs(targetX - myX) <= 1 and math.abs(targetY - myY) <= 1 then
+		API_Chat(myId, targetId, "smash!", 0)
+		API_Attack(myId, targetId, damage)
 		return
 	-- non attackable range
 	else
+		API_Chat(myId, targetId, "grr..", 0)
 		API_Move(myId, navigateX, navigateY);
 		return
 	end

@@ -41,6 +41,8 @@ CharacterManager::CharacterManager()
 	{
 		auto id = _id + MAX_PLAYER;
 		Characters_[id] = make_unique<Monster>(id);
+		Characters_[id]->SetLevel(rand() % 5 + 1);
+		Characters_[id]->SetHp(MaxHp(Characters_[id]->GetLevel()));
 		InitialMove(id, { rand() % MAP_SIZE, rand() % MAP_SIZE });
 	}
 	cerr << "..done" << endl;
@@ -146,6 +148,14 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 	DataBase::Get().AddQueryRequest(q);
 }
 
+void CharacterManager::ActivateSkill(ID id, eSkill skill)
+{
+	if (auto p = dynamic_cast<Player*>(Characters_[id].get()))
+	{
+		p->ActivateSkill(skill);
+	}
+}
+
 void Character::Regen()
 {
 	Hp_ = 1;
@@ -154,11 +164,20 @@ void Character::Regen()
 
 void Character::Attack(const vector<ID>& target, int damage)
 {
-	if (!Attackable_ || damage < 0) return;
+	if (!Attackable_) return;
 	Attackable_ = false;
-	AttackImpl(target);
+	AttackImpl(target, damage);
 	EventManager::Get().AddEvent({ [&Attackable = Attackable_]()
 		{ Attackable = true; }, AttackCooltime_ });
+}
+
+void Character::AttackImpl(const vector<ID>& target, int damage)
+{
+	auto& characters = CharacterManager::Get().GetCharacters();
+	for (auto t : target)
+	{
+		characters[t]->HpDecrease(Id_, damage);
+	}
 }
 
 bool Character::Move(Position diff)

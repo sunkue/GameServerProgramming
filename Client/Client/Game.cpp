@@ -3,10 +3,6 @@
 
 
 
-void Game::Update()
-{
-}
-
 void Game::Init()
 {
 	KeyboardEventManager::Get().BindMainKeyFunc(
@@ -21,4 +17,25 @@ void Game::Init()
 	MouseEventManager::Get().BindDefaultPosFunc(
 		[this](const MouseEventManager::PosEvent& pos)->bool
 		{ return Characters_[Id_].ProcessInput(pos); });
+}
+
+void Game::Update()
+{
+	GarbageCollect();
+}
+
+void Game::GarbageCollect()
+{
+	static auto GarbageCollectingTimeInterval = clk::now();
+	if (clk::now() < GarbageCollectingTimeInterval) return;
+	GarbageCollectingTimeInterval = clk::now() + 1s;
+DanglingIterator:
+	for (auto& c : Characters_)
+	{
+		if (c.second.GetDisabled())
+		{
+			Characters_.erase(c.first);
+			goto DanglingIterator;
+		}
+	}
 }

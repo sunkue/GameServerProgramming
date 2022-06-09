@@ -48,6 +48,7 @@ class World
 public:
 	void ChangeSector(StaticObj* obj, Position newSector);
 	Sector& GetSector(Position sector) { return Sectors_[sector.y][sector.x]; }
+	array<Sector*, 4> GetNearSectors4(Position pos);
 	array<Sector*, 4> GetNearSectors4(Position pos, Position sector);
 	array<Sector*, 9> GetNearSectors9(Position pos, Position sector);
 public:

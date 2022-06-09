@@ -10,6 +10,7 @@ string VisualizationId(ID id)
 	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
 	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
 	else if (id < MAX_OBJECT) return "OBSTRACLE_" + to_string(id - MAX_PLAYER - MAX_MONSTER - MAX_NPC);
+	else if (id == SYSTEM_ID) return "SYSTEM";
 	else return "ERR_ID";
 }
 
@@ -43,6 +44,12 @@ bool Character::ProcessInput(const KeyboardEventManager::KeyEvent& key)
 		{
 			cs_input pck;
 			pck.input = eMoveOper::left;
+			Networker::Get().DoSend(&pck);
+		}
+		CASE GLFW_KEY_A :
+		{
+			cs_use_skill pck;
+			pck.skill = eSkill::attack;
 			Networker::Get().DoSend(&pck);
 		}
 		break; default: return false;

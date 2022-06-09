@@ -35,7 +35,9 @@ public:
 	virtual void Regen() override;
 	virtual void HpDecrease(ID agent, int amount) override;
 	virtual void HpIncrease(ID agent, int amount) override;
-	void Die(ID agent); 
+//	virtual void AttackImpl(const vector<ID>& target, int damage) override;
+	void Die(ID agent);
+	bool IsAlive() { return !Died_ && Enable_; };
 private:
 public:
 protected:

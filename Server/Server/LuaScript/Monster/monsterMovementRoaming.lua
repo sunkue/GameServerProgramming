@@ -1,7 +1,7 @@
 
 
 function Move()
-	API_MoveRandomly(myId, 1);
+	API_MoveRandomly(myId, 1)
 end
 
 

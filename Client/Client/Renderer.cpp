@@ -80,10 +80,31 @@ void Renderer::Draw()
 
 		OBJ_TYPE Type{};
 		if (id < MAX_PLAYER) Type = OBJ_TYPE::Wlook;  // player
-		else if (id < MAX_PLAYER + MAX_MONSTER) Type = OBJ_TYPE::Bpawn; // monster
+		else if (id < MAX_PLAYER + MAX_MONSTER)
+		{
+			switch (id % 4)
+			{
+			case 0:
+			{
+				Type = OBJ_TYPE::Bpawn; // monster
+			}
+			CASE 1 :
+			{
+				Type = OBJ_TYPE::Bbishop; // monster
+			}
+			CASE 2 :
+			{
+				Type = OBJ_TYPE::Bqueen; // monster
+			}
+			CASE 3 :
+			{
+				Type = OBJ_TYPE::Bknight; // monster
+			}
+			}
+		}
 		else if (id < MAX_CHARACTER) Type = OBJ_TYPE::Wbishop; //npc
 		else if (id < MAX_OBJECT) Type = OBJ_TYPE::Bking; // obstacle
-	
+
 		if (id == Game::Get().GetId()) Type = OBJ_TYPE::Wknight;
 
 		ObjShader_->Set("u_type", int(Type));

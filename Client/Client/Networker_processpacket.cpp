@@ -83,21 +83,57 @@ void Networker::ProcessPacket(const void* const packet)
 		auto pck = reinterpret_cast<const sc_set_hp*>(packet);
 		auto hp = pck->hp;
 		auto id = pck->id;
+		auto prevHp = game.GetCharacters()[id].GetHp();
 		game.GetCharacters()[id].SetHp(hp);
+
+		if (prevHp != WaitForRequestAnswer<decltype(prevHp)>() && prevHp != NeedRequest<decltype(prevHp)>())
+		{
+			if (0 < hp - prevHp)
+				Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("Hp +" + to_string(hp - prevHp), system_clock::now() + 800ms));
+			else if (hp - prevHp < 0)
+				Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("Hp " + to_string(hp - prevHp), system_clock::now() + 800ms));
+		}
+
+		if (hp == 0)
+		{
+			if (id == Game::Get().GetId())
+			{
+				Chat chat;
+				chat.speaker = SYSTEM_ID;
+				chat.timestamp = system_clock::now();
+				strcpy_s(chat.mess, "You died.. and resurrected!!");
+				ChatManager::Get().AddChat(chat);
+				Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(" #(X _ X)# ", system_clock::now() + 1200ms));
+			}
+			else Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(" (X _ X) ", system_clock::now() + 800ms));
+		}
 	}
 	CASE PACKET_TYPE::Sc_set_exp :
 	{
 		auto pck = reinterpret_cast<const sc_set_exp*>(packet);
 		auto exp = pck->exp;
 		auto id = pck->id;
+		auto prevExp = game.GetCharacters()[id].GetExp();
 		game.GetCharacters()[id].SetExp(exp);
+
+		if (prevExp != WaitForRequestAnswer<decltype(prevExp)>() && prevExp != NeedRequest<decltype(prevExp)>())
+		{
+			if (0 < exp - prevExp)
+				Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("Exp +" + to_string(exp - prevExp), system_clock::now() + 1000ms));
+		}
 	}
 	CASE PACKET_TYPE::Sc_set_level :
 	{
 		auto pck = reinterpret_cast<const sc_set_level*>(packet);
 		auto level = pck->level;
 		auto id = pck->id;
+		auto prevLevel = game.GetCharacters()[id].GetLevel();
 		game.GetCharacters()[id].SetLevel(level);
+
+		if (prevLevel != WaitForRequestAnswer<decltype(prevLevel)>() && prevLevel != NeedRequest<decltype(prevLevel)>())
+		{
+			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("Level Up! (" + to_string(level) + ")", system_clock::now() + 1500ms));
+		}
 	}
 	CASE PACKET_TYPE::Sc_set_name :
 	{
@@ -109,7 +145,7 @@ void Networker::ProcessPacket(const void* const packet)
 	CASE PACKET_TYPE::Sc_remove_obj :
 	{
 		auto pck = reinterpret_cast<const sc_remove_obj*>(packet);
-		game.GetCharacters().erase(pck->id);
+		game.GetCharacters()[pck->id].SetDisabled(true);
 	}
 	CASE PACKET_TYPE::Sc_chat :
 	{

@@ -68,6 +68,9 @@
     <Filter Include="DataBase">
       <UniqueIdentifier>{c3d0c0e7-3a95-426b-83c6-10d835f62048}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Item">
+      <UniqueIdentifier>{f65d926a-d6ea-4e74-bade-95c2caf02a17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -119,6 +122,10 @@
     <ClCompile Include="DataBase.cpp">
       <Filter>DataBase</Filter>
     </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Game\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Astar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -190,6 +197,10 @@
     <ClInclude Include="DataBase.hpp">
       <Filter>DataBase</Filter>
     </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Game\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Astar.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LuaScript\Monster\monsterAiTest.lua">

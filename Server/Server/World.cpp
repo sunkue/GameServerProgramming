@@ -81,6 +81,11 @@ void World::ChangeSector(StaticObj* obj, Position newSectorIdx)
 	obj->SetSectorIdx(newSectorIdx);
 }
 
+array<Sector*, 4> World::GetNearSectors4(Position pos)
+{
+	return GetNearSectors4(pos, pos / SECTOR_SIZE);
+}
+
 array<Sector*, 4> World::GetNearSectors4(Position pos, Position sectorIdx)
 {
 	auto range = GetSectorRange(sectorIdx);
