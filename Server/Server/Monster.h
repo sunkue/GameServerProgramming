@@ -23,11 +23,12 @@ enum class eMonsterMovementType
 // 다형성을 스크립트로 구현해보자.
 class Monster : public Character
 {
-	static constexpr Position::value_type MOVEMENT_BOUNDRAY = 20;
+	static constexpr Position::value_type MOVEMENT_BOUNDRAY = 10;
 public:
 	Monster(ID id);
 	virtual ~Monster();
 	virtual bool Move(Position diff) override;
+	virtual bool MoveForce(Position diff) override;
 	virtual void Update() override;
 	virtual bool Enable() override;
 	virtual bool Disable() override;

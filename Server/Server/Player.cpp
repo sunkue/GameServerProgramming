@@ -26,6 +26,22 @@ bool Player::Move(Position diff)
 	return moved;
 }
 
+bool Player::MoneySum(ID agent, int amount)
+{
+	Money_ += amount;
+	if (Money_ < 0)
+	{
+		Money_ -= amount;
+		return false;
+	}
+
+	sc_set_money set_money;
+	set_money.id = Id_;
+	set_money.money = Money_;
+	Server::Get().GetClients()[Id_].DoSend(&set_money);
+	return true;
+}
+
 bool Player::MoveForce(Position diff)
 {
 	bool moved = Character::MoveForce(diff);
@@ -275,11 +291,11 @@ void Player::ActivateSkill(eSkill skill)
 void Player::Attack()
 {
 	auto pos = GetPos();
-	auto sectors = World::Get().GetNearSectors4(pos, GetSectorIdx());
+	auto ns = World::Get().GetNearSectors4(pos, GetSectorIdx());
 
 	unordered_set<ID> attackableIdSet;
 
-	for (auto s : sectors)
+	for (auto s : ns)
 	{
 		for (auto& m : s->GetMonsters())
 		{
@@ -292,7 +308,21 @@ void Player::Attack()
 	vector<ID> attackableId{ attackableIdSet.begin(),attackableIdSet.end() };
 
 	// item 무기 공격력 0~10 => DefaultAttack + rand()%(0~10)..
-	Character::Attack(attackableId, DefaultAttack(Level_));
+	if (Character::Attack(attackableId, DefaultAttack(Level_)))
+	{
+		sc_use_skill use_skill;
+		use_skill.id = GetId();
+		use_skill.skill = eSkill::attack;
+
+		for (auto s : ns)
+		{
+			for (auto& p : s->GetPlayers())
+			{
+				if (!p->GetEnable()) continue;
+				Server::Get().GetClients()[p->GetId()].DoSend(&use_skill);
+			}
+		}
+	}
 }
 
 bool Player::EraseFromViewList(ID Id)

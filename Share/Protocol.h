@@ -47,6 +47,7 @@ BETTER_ENUM
 	, Sc_set_level
 	, Sc_chat
 	, Sc_signup_result
+	, Sc_use_skill
 );
 
 // 가용길이 패킷 
@@ -220,6 +221,12 @@ enum class eSkill : uint8
 
 PACKET(cs_use_skill)
 {
+	eSkill skill;
+};
+
+PACKET(sc_use_skill)
+{
+	ID id;
 	eSkill skill;
 };
 

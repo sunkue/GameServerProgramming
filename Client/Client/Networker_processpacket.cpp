@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "System.h"
 #include "Chat.h"
+#include "Renderer.h"
 
 void Networker::ProcessPacket(const void* const packet)
 {
@@ -101,7 +102,9 @@ void Networker::ProcessPacket(const void* const packet)
 				Chat chat;
 				chat.speaker = SYSTEM_ID;
 				chat.timestamp = system_clock::now();
-				strcpy_s(chat.mess, "You died.. and resurrected!!");
+				strcpy_s(chat.mess, "You died..");
+				ChatManager::Get().AddChat(chat);
+				strcpy_s(chat.mess, "..resurrected!!");
 				ChatManager::Get().AddChat(chat);
 				Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(" #(X _ X)# ", system_clock::now() + 1200ms));
 			}
@@ -147,6 +150,43 @@ void Networker::ProcessPacket(const void* const packet)
 		auto pck = reinterpret_cast<const sc_remove_obj*>(packet);
 		game.GetCharacters()[pck->id].SetDisabled(true);
 	}
+	CASE PACKET_TYPE::Sc_use_skill :
+	{
+		auto pck = reinterpret_cast<const sc_use_skill*>(packet);
+		const Position NEAR_POS_TABLE[4]
+		{ { 0, -1 }, { 0, 1 } ,{ 1, 0 } ,{ -1, 0 } };
+		switch (pck->skill)
+		{
+		case eSkill::attack:
+		{
+			auto now = clk::now();
+			constexpr auto delay = 250ms;
+			for (int i = 0; i < 4; i++)
+			{
+				auto pos = Game::Get().GetCharacters()[pck->id].GetPos();
+				Renderer::Get().GetEffects().emplace_back(make_tuple(now, delay, eEffectType::attack0, pos + NEAR_POS_TABLE[i]));
+				Renderer::Get().GetEffects().emplace_back(make_tuple(now + delay, delay, eEffectType::attack1, pos + NEAR_POS_TABLE[i]));
+				Renderer::Get().GetEffects().emplace_back(make_tuple(now + delay + delay, delay, eEffectType::attack2, pos + NEAR_POS_TABLE[i]));
+			}
+		}
+		CASE eSkill::haste :
+		{
+
+		}
+		CASE eSkill::heal :
+		{
+
+		}
+		CASE eSkill::set_teleport :
+		{
+
+		}
+		CASE eSkill::teleport :
+		{
+
+		}break; default: cerr << "[[[eSkill]]]" << endl; break;
+		}
+	}
 	CASE PACKET_TYPE::Sc_chat :
 	{
 		auto pck = reinterpret_cast<const sc_chat*>(packet);
@@ -155,7 +195,14 @@ void Networker::ProcessPacket(const void* const packet)
 		chat.speaker = pck->id;
 		chat.timestamp = pck->time;
 		memcpy(chat.mess, pck->chat, chatSize);
-		ChatManager::Get().AddChat(chat);
+		if (strncmp(chat.mess, "(@)", 3))
+			ChatManager::Get().AddChat(chat);
+		else
+		{
+			memmove_s(chat.mess, chatSize + 1, chat.mess + 3, chatSize - 2);
+			chatSize -= 3;
+		}
+
 		if (chatSize < 10)
 			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(chat.mess, pck->time + 1500ms));
 		else

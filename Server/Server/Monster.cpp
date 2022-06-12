@@ -79,7 +79,6 @@ void Monster::CompileScript()
 		lua_register(aiScript, "API_GetPos", API_GetPos);
 		lua_register(aiScript, "API_MoveRandomly", API_MoveRandomly);
 		lua_register(aiScript, "API_Move", API_Move);
-		lua_register(aiScript, "API_ReturnToStartPoint", API_ReturnToStartPoint);
 		lua_register(aiScript, "API_NavigateAstar", API_NavigateAstar);
 		lua_register(aiScript, "API_Attack", API_Attack);
 		lua_register(aiScript, "API_DEBUG", API_DebugMessage);
@@ -163,10 +162,13 @@ void Monster::Die(ID agent)
 		{ Regen(); }, 30s });
 	if (auto killerAsPlayer = dynamic_cast<Player*>(CharacterManager::Get().GetCharacters()[agent].get()))
 	{
-		int exp = Level_ * Level_ * 2;
+		auto lvl = Level_.load();
+		int exp = lvl * lvl * 2;
+		int money = lvl * 10;
 		exp += exp * (eMonsterAggressionType::Agro == AggressionType_);
 		exp += exp * (eMonsterMovementType::Roaming == MovementType_);
 		killerAsPlayer->ExpSum(Id_, exp);
+		killerAsPlayer->MoneySum(Id_, money);
 	}
 }
 
@@ -206,6 +208,103 @@ bool Monster::Move(Position diff)
 	}
 
 	auto ret = Character::Move(diff);
+
+	Position newPos;
+	{
+		newPos = GetPos();
+		auto newSector = GetSectorIdx();
+		auto nearSector = World::Get().GetNearSectors4(newPos, newSector);
+		for (auto& ns : nearSector)
+		{
+			shared_lock lck{ ns->PlayerLock };
+			auto& players = ns->GetPlayers();
+			for (auto p : players)
+			{
+				if (p->IsInSightAndEnable(newPos))
+				{
+					newNearList.insert(p);
+				}
+			}
+		}
+	}
+
+	if (newNearList.empty())
+	{
+		Disable();
+	}
+
+	for (auto& p : newNearList)
+	{
+		if (p->InsertToViewList(Id_))
+		{
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerEnterSight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
+		}
+		else
+		{
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerStaySight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
+		}
+	}
+
+	for (auto& p : oldNearList)
+	{
+		if (!newNearList.contains(p))
+		{
+			p->EraseFromViewList(Id_);
+
+			EventManager::Get().AddEvent(
+				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{
+					lock_guard lck{ mutex };
+					lua_getglobal(L, "EventPlayerExitSight");
+					lua_pushnumber(L, id);
+					lua_pcall(L, 1, 0, 0);
+				}, 0s });
+		}
+	}
+
+	return ret;
+}
+
+bool Monster::MoveForce(Position diff)
+{
+	constexpr size_t NEARLIST_RESERVE_HINT = 2000;
+	unordered_set<Player*> oldNearList; oldNearList.reserve(NEARLIST_RESERVE_HINT);
+	unordered_set<Player*> newNearList; newNearList.reserve(NEARLIST_RESERVE_HINT);
+
+	auto oldPos = GetPos();
+
+	{
+		auto oldSector = GetSectorIdx();
+		auto nearSector = World::Get().GetNearSectors4(oldPos, oldSector);
+		for (auto& ns : nearSector)
+		{
+			shared_lock lck{ ns->PlayerLock };
+			auto& players = ns->GetPlayers();
+			for (auto p : players)
+			{
+				if (p->IsInSightAndEnable(oldPos))
+				{
+					oldNearList.insert(p);
+				}
+			}
+		}
+	}
+
+	auto ret = Character::MoveForce(diff);
 
 	Position newPos;
 	{

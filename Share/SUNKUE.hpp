@@ -48,6 +48,17 @@ namespace MY_NAME_SPACE
 		private:										\
 			CLASS()
 
+#define THREAD_LOCAL_SINGLE_TON(CLASS)					\
+		DISABLE_COPY(CLASS)								\
+		public:											\
+			static CLASS& GetThreadLocal()				\
+			{											\
+				thread_local static CLASS _instance;	\
+				return _instance;						\
+			}											\
+		private:										\
+			CLASS()
+
 #define GET(var) auto Get##var()const { return var##_; }
 #define GET_REF(var) const auto& Get##var()const { return var##_; }
 #define GET_REF_UNSAFE(var) auto& Get##var() { return var##_; }

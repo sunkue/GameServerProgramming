@@ -23,11 +23,12 @@ public:
 	virtual ~Character() = default;
 	virtual void HpDecrease(ID agent, int amount) {};
 	virtual void HpIncrease(ID agent, int amount) {};
-	void Attack(const vector<ID>& target, int damage);
+	bool Attack(const vector<ID>& target, int damage);
 	virtual void AttackImpl(const vector<ID>& target, int damage);
 	virtual bool Move(Position diff) override;
 	GET_REF(Hp);
 	GET_REF(Level);
+	GET(StartPosition);
 protected:
 	virtual bool MoveForce(Position diff);
 	SET(Hp);
@@ -40,7 +41,7 @@ protected:
 	milliseconds AttackCooltime_{ 1s };
 	atomic_bool Moveable_{ true };
 	atomic_bool Attackable_{ true };
-	unique_ptr<AstarPathFinder> Astar_;
+	// unique_ptr<AstarPathFinder> Astar_ = make_unique<AstarPathFinder>();
 };
 
 class CharacterManager

@@ -57,8 +57,8 @@ void Renderer::ReadyDraw()
 void Renderer::Draw()
 {
 	ReadyDraw();
-	auto pos = Game::Get().GetPlayer().GetPos();
-	bool startWithDark = (pos.x + pos.y) % 2;
+	auto myPos = Game::Get().GetPlayer().GetPos();
+	bool startWithDark = (myPos.x + myPos.y) % 2;
 
 	BgShader_->Use();
 	BgShader_->Set("u_texture", BgTiles_);
@@ -72,43 +72,57 @@ void Renderer::Draw()
 	ObjShader_->Set("u_start_with_dark", startWithDark);
 	ObjShader_->Set("u_focus_center", FocusCenter_);
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
-
 	for (const auto& other : Game::Get().GetCharacters())
 	{
 		auto& id = other.first;
 		auto& obj = other.second;
 
-		OBJ_TYPE Type{};
-		if (id < MAX_PLAYER) Type = OBJ_TYPE::Wlook;  // player
+		eObjType Type{};
+		if (id < MAX_PLAYER) Type = eObjType::Wlook;  // player
 		else if (id < MAX_PLAYER + MAX_MONSTER)
 		{
 			switch (id % 4)
 			{
 			case 0:
 			{
-				Type = OBJ_TYPE::Bpawn; // monster
+				Type = eObjType::Bpawn; // monster
 			}
 			CASE 1 :
 			{
-				Type = OBJ_TYPE::Bbishop; // monster
+				Type = eObjType::Bbishop; // monster
 			}
 			CASE 2 :
 			{
-				Type = OBJ_TYPE::Bqueen; // monster
+				Type = eObjType::Bqueen; // monster
 			}
 			CASE 3 :
 			{
-				Type = OBJ_TYPE::Bknight; // monster
+				Type = eObjType::Bknight; // monster
 			}
 			}
 		}
-		else if (id < MAX_CHARACTER) Type = OBJ_TYPE::Wbishop; //npc
-		else if (id < MAX_OBJECT) Type = OBJ_TYPE::Bking; // obstacle
+		else if (id < MAX_CHARACTER) Type = eObjType::Wbishop; //npc
+		else if (id < MAX_OBJECT) Type = eObjType::Bking; // obstacle
 
-		if (id == Game::Get().GetId()) Type = OBJ_TYPE::Wknight;
+		if (id == Game::Get().GetId()) Type = eObjType::Wknight;
 
-		ObjShader_->Set("u_type", int(Type));
-		ObjShader_->Set("u_position", obj.GetPos() - pos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
+		ObjShader_->Set("u_type", static_cast<int>(Type));
+		ObjShader_->Set("u_position", obj.GetPos() - myPos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
+		ScreenQuad::Get().DrawQuad();
+	}
+
+	ObjShader_->Use();
+	ObjShader_->Set("u_texture", EffectTiles_);
+	ObjShader_->Set("u_start_with_dark", startWithDark);
+	ObjShader_->Set("u_focus_center", FocusCenter_);
+	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
+	for (auto& e : Effects_)
+	{
+		if (clk::now() < e._Myfirst._Val) continue;
+		auto effectType = e._Get_rest()._Get_rest()._Myfirst._Val;
+		auto effectPos = e._Get_rest()._Get_rest()._Get_rest()._Myfirst._Val;
+		ObjShader_->Set("u_type", static_cast<int>(effectType));
+		ObjShader_->Set("u_position", effectPos - myPos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
 		ScreenQuad::Get().DrawQuad();
 	}
 
@@ -139,6 +153,7 @@ void Renderer::LoadShader()
 
 void Renderer::LoadTexture()
 {
-	BgTiles_ = Texture::Create("background.png");
-	ObjTiles_ = Texture::Create("chess.png");
+	BgTiles_ = Texture::Create("background_CND1.png");
+	ObjTiles_ = Texture::Create("character_CND.png");
+	EffectTiles_ = Texture::Create("effect_CND.png");
 }

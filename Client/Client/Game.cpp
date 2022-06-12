@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
-
+#include "Renderer.h"
 
 
 void Game::Init()
@@ -26,9 +26,19 @@ void Game::Update()
 
 void Game::GarbageCollect()
 {
-	static auto GarbageCollectingTimeInterval = clk::now();
-	if (clk::now() < GarbageCollectingTimeInterval) return;
-	GarbageCollectingTimeInterval = clk::now() + 1s;
+	auto now = clk::now();
+
+	auto& effects = Renderer::Get().GetEffects();
+	for (auto it = effects.cbegin(); it != effects.cend();)
+	{
+		if (it->_Myfirst._Val + it->_Get_rest()._Myfirst._Val < now)
+			it = effects.erase(it);
+		else it++;
+	}
+	
+	static auto GarbageCollectingTimeInterval = now;
+	if (now < GarbageCollectingTimeInterval) return;
+	GarbageCollectingTimeInterval = now + 1s;
 DanglingIterator:
 	for (auto& c : Characters_)
 	{

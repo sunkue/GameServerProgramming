@@ -48,10 +48,10 @@ static_assert(0 == WINDOW_SIZE % 2);
 static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 
 constexpr int MAX_PLAYER = 5'0000;
-//constexpr int MAX_MONSTER = 20'0000;
-constexpr int MAX_MONSTER = 20'00;
+constexpr int MAX_MONSTER = 20'0000;
+//constexpr int MAX_MONSTER = 20'000;
 constexpr int MAX_NPC = 10;
-constexpr int MAX_OBSTACLE_PER_SECTOR = 1800;
+constexpr int MAX_OBSTACLE_PER_SECTOR = 10000;
 constexpr int MAX_OBSTACLE = MAX_OBSTACLE_PER_SECTOR * SECTOR_NUM;
 constexpr int MAX_CHARACTER = MAX_PLAYER + MAX_MONSTER + MAX_NPC;
 constexpr int MAX_OBJECT = MAX_CHARACTER + MAX_OBSTACLE;

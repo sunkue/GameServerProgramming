@@ -2,6 +2,7 @@
 
 class AstarPathFinder
 {
+	THREAD_LOCAL_SINGLE_TON(AstarPathFinder) = default;
 public:
 	class Node // 노드 클래스
 	{
@@ -20,6 +21,7 @@ public:
 	public:
 		static constexpr int Nx = 13; //odd
 		static constexpr int Ny = 13; //odd
+		static_assert(Nx % 2 == 1 && Ny % 2 == 1);
 		void SetMap(Position Center);
 	public:
 		array<array<bool, Ny>, Nx> map{ false };
@@ -36,7 +38,7 @@ public:
 	void FindPath();
 	Position GetWorldPos(int order); // order번째 경로의 좌표를 받아옴
 	Position GetMapPos(int order); // order번째 경로의 좌표를 받아옴
-	const list<Position*>& GetPath() { return path; } // 경로를 Coordinate* 리스트로 통째로 받아옴
+	list<Position*> GetPath() { return path; } // 경로를 Coordinate* 리스트로 통째로 받아옴
 	void SetFree(int _x, int _y); // 해당 좌표의 장애물을 없앰
 	void SetObstacle(int _x, int _y); // 해당 좌표에 장애물을 설치
 
@@ -61,7 +63,7 @@ public:
 	void clear();
 
 	~AstarPathFinder()
-	{ 
+	{
 		clear();
 	}
 };

@@ -101,9 +101,11 @@ void AstarPathFinder::Map::SetMap(Position _Center)
 }
 
 
-// Astar 내부의 함수
-list<Position*> AstarPathFinder::FindPath(Map* Navi, Position StartPoint, Position EndPoint) // Map 은 동적할당했기 때문에 얕은 복사 시 에러
+list<Position*> AstarPathFinder::FindPath(Map* Navi, Position StartPoint, Position EndPoint)
 {
+	if (0 <= EndPoint.x && EndPoint.x < Map::Nx && 0 <= EndPoint.y && EndPoint.y < Map::Ny)
+		Navi->map[EndPoint.x][EndPoint.y] = false;
+
 	// (상,우,하,좌) 4방향 시계방향 탐색 후 결과에 따라 (우상,우하,좌하,좌상) 탐색.	
 	list<Node*> OpenNode; // 열린노드
 	list<Node*> CloseNode; // 닫힌노드
@@ -445,7 +447,7 @@ void AstarPathFinder::FindPath()
 
 Position AstarPathFinder::GetWorldPos(int order)
 {
-	if (path.size() - 1 < order) return Position{ -1 };
+	if (path.size() < order + 1) return Position{ -1 };
 	Position pos = GetMapPos(order);
 	pos.x -= Navi.Nx / 2;
 	pos.y -= Navi.Ny / 2;
@@ -455,7 +457,7 @@ Position AstarPathFinder::GetWorldPos(int order)
 
 Position AstarPathFinder::GetMapPos(int order)
 {
-	if (path.size() - 1 < order) return Position{ -1 };
+	if (path.size() < order + 1) return Position{ -1 };
 	Position pos;
 	auto p = path.begin();
 	for (int i = 0; i < order; i++)

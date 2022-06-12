@@ -61,9 +61,11 @@ void GameGuiManager::DrawPlayerInfo()
 	auto hp = player.GetHp();
 	auto exp = player.GetExp();
 	auto level = player.GetLevel();
+	auto money = player.GetMoney();
 	gui::Text(("ID :: "s + player.GetName()).c_str());
 	gui::Text(("HP :: "s + to_string(hp) + "/"s + to_string(MaxHp(level))).c_str());
 	gui::Text(("LEVEL :: "s + to_string(level) + "  EXP :: "s + to_string(exp) + "/"s + to_string(RequireExp(level))).c_str());
+	gui::Text(("Money :: "s + to_string(money)).c_str());
 	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
 	gui::End();
 }

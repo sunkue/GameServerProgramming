@@ -2,22 +2,6 @@
 
 #include "ReplicateHelper.h"
 
-enum class OBJ_TYPE : int
-{
-	Wlook = 0,
-	Wknight = 1,
-	Wbishop = 2,
-	Wking = 3,
-	Wqueen = 4,
-	Wpawn = 5,
-
-	Blook = 15,
-	Bknight = 16,
-	Bbishop = 17,
-	Bking = 18,
-	Bqueen = 19,
-	Bpawn = 10,
-};
 
 class StaticObj
 {

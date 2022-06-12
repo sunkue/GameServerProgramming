@@ -83,25 +83,58 @@ int API_Move(lua_State* L)
 	return 1;
 }
 
-int API_ReturnToStartPoint(lua_State* L)
-{
-	ID agentId = lua_toint(L, -1);
-	lua_pop(L, 2);
-	bool finish{ true };
-	// return to StartPoint_.
-	lua_pushboolean(L, finish);
-	return 1;
-}
-
 int API_NavigateAstar(lua_State* L)
 {
-	Position from = { lua_toint(L, -4), lua_toint(L, -3) };
-	Position to = { lua_toint(L, -2), lua_toint(L, -1) };
+	auto& pathFinder = AstarPathFinder::GetThreadLocal();
+	ID agentId = lua_toint(L, -4);
+	Position from = CharacterManager::Get().GetCharacters()[agentId]->GetPos();
+	Position to = { lua_toint(L, -3), lua_toint(L, -2) };
+	int step = lua_toint(L, -1);
 	lua_pop(L, 5);
-	Position navigatePos{ from };
-	lua_pushnumber(L, navigatePos.x);
-	lua_pushnumber(L, navigatePos.y);
-	return 2;
+	pathFinder.InitAstar(from, to);
+
+	for (int i = 1; i <= step; i++)
+	{
+		Position nextStepPos = pathFinder.GetWorldPos(i);
+		if (nextStepPos.x < 0)
+		{
+			EventManager::Get().AddEvent({ [agentId]()
+					{
+						auto& m = CharacterManager::Get().GetCharacters()[agentId];
+						auto L = m->GetScripts()[eScriptType::AI];
+						lock_guard lck{ m->ScriptLock[eScriptType::AI] };
+						lua_getglobal(L, "EventTargetMissing");
+						lua_pcall(L, 0, 0, 0);
+					}, seconds{ i } });
+			return 0;
+		}
+
+		EventManager::Get().AddEvent({ [&manager = CharacterManager::Get(), agentId, nextStepPos] ()
+			{
+				auto pos = manager.GetCharacters()[agentId]->GetPos();
+				if (abs(pos.x - nextStepPos.x) <= 1 && abs(pos.y - nextStepPos.y) <= 1)
+				{
+					manager.MoveForce(agentId, nextStepPos - pos);
+				}
+			}, seconds{ i } });
+
+		if (nextStepPos == to)
+		{
+			step = i;
+			break;
+		}
+	}
+
+	EventManager::Get().AddEvent({ [agentId]()
+		{
+			auto& m = CharacterManager::Get().GetCharacters()[agentId];
+			auto L = m->GetScripts()[eScriptType::AI];
+			lock_guard lck{ m->ScriptLock[eScriptType::AI] };
+			lua_getglobal(L, "EventNaviagateDone");
+			lua_pcall(L, 0, 0, 0);
+		}, seconds{ step } });
+
+	return 0;
 }
 
 int API_Attack(lua_State* L)

@@ -193,22 +193,6 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	{
 		auto pck = reinterpret_cast<const cs_input*>(packet);
 		CharacterManager::Get().Move(Id_, pck->input);
-
-		static AstarPathFinder t;
-		auto s = clk::now();
-		t.InitAstar(CharacterManager::Get().GetCharacters()[Id_]->GetPos()
-			, CharacterManager::Get().GetCharacters()[Id_]->GetPos() + Position(0, 1));
-		auto& path = t.GetPath();
-		cout << path.size() << "size " << duration_cast<milliseconds>(clk::now() - s) << endl;
-		for (auto p : path)
-		{
-			cout << p->x << "::" << p->y << endl;
-		}
-		auto p = t.GetWorldPos(0);
-		cout << p.x << "//" << p.y << endl;
-		 p = t.GetWorldPos(1);
-		cout << p.x << "//" << p.y << endl;
-		cout << endl;
 	}
 	CASE PACKET_TYPE::Cs_use_skill :
 	{
@@ -288,6 +272,8 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}
+
+	// cerr << "done" << endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

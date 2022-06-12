@@ -162,13 +162,14 @@ void Character::Regen()
 	Move(StartPosition_ - GetPos());
 }
 
-void Character::Attack(const vector<ID>& target, int damage)
+bool Character::Attack(const vector<ID>& target, int damage)
 {
-	if (!Attackable_) return;
+	if (!Attackable_) return false;
 	Attackable_ = false;
 	AttackImpl(target, damage);
 	EventManager::Get().AddEvent({ [&Attackable = Attackable_]()
 		{ Attackable = true; }, AttackCooltime_ });
+	return true;
 }
 
 void Character::AttackImpl(const vector<ID>& target, int damage)
