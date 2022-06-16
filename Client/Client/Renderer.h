@@ -56,6 +56,7 @@ private:
 	ShaderPtr BgShader_;
 
 	TexturePtr ObjTiles_;
+	TexturePtr ItemTiles_;
 	TexturePtr EffectTiles_;
 	ShaderPtr ObjShader_;
 public:

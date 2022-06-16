@@ -10,7 +10,7 @@ template<class T> constexpr T WaitForRequestAnswer();
 template<> constexpr int WaitForRequestAnswer() { return 0; }
 template<> constexpr string WaitForRequestAnswer() { return { " " }; }
 
-#define REPLICATE(var) auto Get##var()								\
+#define REPLICATE(var) const auto& Get##var()						\
 {																	\
 	if (var##_ == NeedRequest<decltype(var##_)>())					\
 	{																\

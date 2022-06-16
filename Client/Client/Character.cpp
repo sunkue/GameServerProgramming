@@ -17,6 +17,7 @@ string VisualizationId(ID id)
 bool Character::ProcessInput(const KeyboardEventManager::KeyEvent& key)
 {
 	bool pressed = (key.action != GLFW_RELEASE);
+	bool press = (key.action == GLFW_PRESS);
 
 	if (pressed)
 	{
@@ -46,13 +47,43 @@ bool Character::ProcessInput(const KeyboardEventManager::KeyEvent& key)
 			pck.input = eMoveOper::left;
 			Networker::Get().DoSend(&pck);
 		}
+		break; default: break;
+		}
+	}
+
+	if (press)
+	{
+		switch (key.key)
+		{
 		CASE GLFW_KEY_A :
 		{
 			cs_use_skill pck;
 			pck.skill = eSkill::attack;
 			Networker::Get().DoSend(&pck);
 		}
-		break; default: return false;
+		CASE GLFW_KEY_Z :
+		{
+			cs_use_skill pck;
+			pck.skill = eSkill::accquireItem;
+			Networker::Get().DoSend(&pck);
+		}
+		CASE GLFW_KEY_I :
+		{
+			GameGuiManager::Get().ToggleShowMyInventory();
+		}
+		CASE GLFW_KEY_E :
+		{
+			GameGuiManager::Get().ToggleShowMyEquipment();
+		}
+		CASE GLFW_KEY_S :
+		{
+			GameGuiManager::Get().ToggleShowMyStatus();
+		}
+		CASE GLFW_KEY_K :
+		{
+			GameGuiManager::Get().ToggleShowMySkill();
+		}
+		break; default: break;
 		}
 	}
 

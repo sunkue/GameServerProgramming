@@ -19,7 +19,7 @@ Monster::~Monster()
 
 void Monster::CompileScript()
 {
-	lock_guard lck{ ScriptLock[eScriptType::AI] };
+	lock_guard lck{ ScriptLock[eScriptType::UpdateAI] };
 	lua_State* aiScript;
 	aiScript = luaL_newstate();
 	luaL_openlibs(aiScript);
@@ -83,7 +83,7 @@ void Monster::CompileScript()
 		lua_register(aiScript, "API_Attack", API_Attack);
 		lua_register(aiScript, "API_DEBUG", API_DebugMessage);
 	}
-	Scripts_[eScriptType::AI] = aiScript;
+	Scripts_[eScriptType::UpdateAI] = aiScript;
 }
 
 
@@ -96,6 +96,7 @@ void Monster::HpDecrease(ID agent, int amount)
 	{
 		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
 		unordered_set<Player*> players;
+
 		for (auto s : ns)
 		{
 			for (auto p : s->GetPlayers())
@@ -109,16 +110,16 @@ void Monster::HpDecrease(ID agent, int amount)
 		pck.id = GetId();
 
 		for (auto p : players)
-			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+			if (p->IsInSight(GetPos()))
+				Server::Get().GetClients()[p->GetId()].DoSend(&pck);
 	}
-
 
 	if (Hp_ <= 0)
 		Die(agent);
 	else
 	{
 		EventManager::Get().AddEvent(
-			{ [agent = agent, L = GetScripts()[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+			{ [agent = agent, L = GetScripts()[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 			{
 				lock_guard lck{ mutex };
 				lua_getglobal(L, "EventBeAttacked");
@@ -149,7 +150,8 @@ void Monster::HpIncrease(ID agent, int amount)
 		pck.id = GetId();
 
 		for (auto p : players)
-			Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+			if (p->IsInSight(GetPos()))
+				Server::Get().GetClients()[p->GetId()].DoSend(&pck);
 	}
 }
 
@@ -158,6 +160,42 @@ void Monster::Die(ID agent)
 	Disable();
 	Died_ = true;
 	Hp_ = 0;
+
+	{
+		auto pos = GetPos();
+		auto secterIdx = GetSectorIdx();
+
+		{
+			auto& s = World::Get().GetSector(secterIdx);
+			shared_lock lck{ Inventory_.ItemLock };
+			if (!Inventory_.GetItems().empty())
+			{
+				auto base = Inventory_.GetItems().begin()->second.get();
+				shared_lock lck{ s.ItemInstanceLock };
+				auto newItemInst = ItemInstance{ *base, pos };
+				auto& instances = s.GetItemInstances();
+				if (auto it = instances.find(newItemInst); it != instances.end())
+					it->GetOriginalItem().SumNum(base->GetNum());
+				else
+					instances.insert(newItemInst);
+
+				auto ns = World::Get().GetNearSectors4(pos, secterIdx);
+				for (auto s : ns)
+				{
+					shared_lock lck{ s->PlayerLock };
+					for (auto& p : s->GetPlayers())
+					{
+						sc_set_iteminstance_position setIteminstance;
+						setIteminstance.itemType = base->GetType();
+						setIteminstance.pos = pos;
+						Server::Get().GetClients()[p->GetId()].DoSend(&setIteminstance);
+					}
+				}
+			}
+		}
+	}
+
+
 	EventManager::Get().AddEvent({ [this]()
 		{ Regen(); }, 30s });
 	if (auto killerAsPlayer = dynamic_cast<Player*>(CharacterManager::Get().GetCharacters()[agent].get()))
@@ -177,6 +215,7 @@ void Monster::Regen()
 	HpIncrease(Id_, MaxHp(Level_));
 	Move(StartPosition_ - GetPos());
 	Died_ = false;
+	Enable();
 }
 
 bool Monster::Move(Position diff)
@@ -238,7 +277,7 @@ bool Monster::Move(Position diff)
 		if (p->InsertToViewList(Id_))
 		{
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerEnterSight");
@@ -249,7 +288,7 @@ bool Monster::Move(Position diff)
 		else
 		{
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerStaySight");
@@ -266,7 +305,7 @@ bool Monster::Move(Position diff)
 			p->EraseFromViewList(Id_);
 
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerExitSight");
@@ -335,7 +374,7 @@ bool Monster::MoveForce(Position diff)
 		if (p->InsertToViewList(Id_))
 		{
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerEnterSight");
@@ -346,7 +385,7 @@ bool Monster::MoveForce(Position diff)
 		else
 		{
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerStaySight");
@@ -363,7 +402,7 @@ bool Monster::MoveForce(Position diff)
 			p->EraseFromViewList(Id_);
 
 			EventManager::Get().AddEvent(
-				{ [id = p->GetId(), L = Scripts_[eScriptType::AI], &mutex = ScriptLock[eScriptType::AI]] ()
+				{ [id = p->GetId(), L = Scripts_[eScriptType::UpdateAI], &mutex = ScriptLock[eScriptType::UpdateAI]] ()
 				{
 					lock_guard lck{ mutex };
 					lua_getglobal(L, "EventPlayerExitSight");
@@ -380,9 +419,9 @@ void Monster::Update()
 {
 	if (!GetEnable()) return;
 	{
-		lock_guard lck{ ScriptLock[eScriptType::AI] };
-		lua_getglobal(Scripts_[eScriptType::AI], "Update");
-		lua_pcall(Scripts_[eScriptType::AI], 0, 0, 0);
+		lock_guard lck{ ScriptLock[eScriptType::UpdateAI] };
+		lua_getglobal(Scripts_[eScriptType::UpdateAI], "Update");
+		lua_pcall(Scripts_[eScriptType::UpdateAI], 0, 0, 0);
 	}
 	EventManager::Get().AddEvent({ [this]() {Update(); }, 500ms });
 }

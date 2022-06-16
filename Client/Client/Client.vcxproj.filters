@@ -71,6 +71,9 @@
     <Filter Include="Game\Obj\Character">
       <UniqueIdentifier>{a3584185-a6e1-429f-82a7-f67b9b55c228}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Obj\Item">
+      <UniqueIdentifier>{a849373b-f629-47a6-9590-851a64a143da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardEvent.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="Networker.cpp">
       <Filter>Network\Networker</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Game\Obj\Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +246,9 @@
     </ClInclude>
     <ClInclude Include="ReplicateHelper.h">
       <Filter>Network\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Game\Obj\Item</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

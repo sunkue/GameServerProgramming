@@ -20,10 +20,18 @@ public:
 	void Init();
 	GET(Id); SET(Id);
 	GET_REF_UNSAFE(Characters);
+	GET_REF_UNSAFE(ItemInstances);
 	Character& GetPlayer() { return Characters_[Id_]; }
+	bool IsInSight(Position target)
+	{
+		auto diff = target - GetPlayer().GetPos();
+		auto maxCompDiff = glm::compMax(glm::abs(diff));
+		return maxCompDiff <= SIGHT_SIZE / 2;
+	}
 private:
 	void GarbageCollect();
 private:
 	ID Id_{};
 	UnorderedMapConstructWithKey<ID, Character> Characters_;
+	unordered_set<ItemInstance> ItemInstances_;
 };

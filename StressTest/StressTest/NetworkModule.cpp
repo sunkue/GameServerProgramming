@@ -360,6 +360,20 @@ void Test_Thread()
 			}
 			my_packet.timestamp = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch());
 			SendPacket(i, &my_packet);
+
+			if (0 == rand() % 4)
+			{
+				cs_use_skill skill;
+				skill.skill = eSkill::attack;
+				SendPacket(i, &skill);
+			}
+
+			if (0 == rand() % 4)
+			{
+				cs_use_skill skill;
+				skill.skill = eSkill::accquireItem;
+				SendPacket(i, &skill);
+			}
 		}
 	}
 }

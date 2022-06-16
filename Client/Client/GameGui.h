@@ -15,9 +15,23 @@ private:
 	void DrawChat();
 	void DrawSpeechBubble();
 	void DrawSelectedObjInfo();
+	void DrawMyInventory();
+	void DrawMyEquiment();
+	void DrawMyStatus();
+	void DrawMySkill();
+	void DrawSelectedInventory();
 public:
 	SET(SelectedObjId);
-protected:
+	TOGGLE(ShowMyInventory);
+	TOGGLE(ShowMyEquipment);
+	TOGGLE(ShowMyStatus);
+	TOGGLE(ShowSelectedInventory);
+	TOGGLE(ShowMySkill);
 private:
 	ID SelectedObjId_{ -1 };
+	bool ShowMyInventory_{};
+	bool ShowMyEquipment_{};
+	bool ShowMyStatus_{};
+	bool ShowMySkill_{};
+	bool ShowSelectedInventory_{};
 };

@@ -179,6 +179,7 @@
     <ClCompile Include="DataBase.cpp" />
     <ClCompile Include="ExpOverlapped.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemDetail.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptApi.cpp" />

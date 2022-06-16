@@ -99,8 +99,8 @@ bool DynamicObj::Enable()
 
 bool DynamicObj::Disable()
 {
-	if (!Enable_)return false;
-	Enable_ = false;
+	bool t = true;
+	if (!Enable_.compare_exchange_strong(t, false))return false;
 
 	{
 		auto pos = GetPos();

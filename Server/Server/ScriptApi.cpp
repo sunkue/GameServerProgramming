@@ -101,8 +101,8 @@ int API_NavigateAstar(lua_State* L)
 			EventManager::Get().AddEvent({ [agentId]()
 					{
 						auto& m = CharacterManager::Get().GetCharacters()[agentId];
-						auto L = m->GetScripts()[eScriptType::AI];
-						lock_guard lck{ m->ScriptLock[eScriptType::AI] };
+						auto L = m->GetScripts()[eScriptType::UpdateAI];
+						lock_guard lck{ m->ScriptLock[eScriptType::UpdateAI] };
 						lua_getglobal(L, "EventTargetMissing");
 						lua_pcall(L, 0, 0, 0);
 					}, seconds{ i } });
@@ -128,8 +128,8 @@ int API_NavigateAstar(lua_State* L)
 	EventManager::Get().AddEvent({ [agentId]()
 		{
 			auto& m = CharacterManager::Get().GetCharacters()[agentId];
-			auto L = m->GetScripts()[eScriptType::AI];
-			lock_guard lck{ m->ScriptLock[eScriptType::AI] };
+			auto L = m->GetScripts()[eScriptType::UpdateAI];
+			lock_guard lck{ m->ScriptLock[eScriptType::UpdateAI] };
 			lua_getglobal(L, "EventNaviagateDone");
 			lua_pcall(L, 0, 0, 0);
 		}, seconds{ step } });

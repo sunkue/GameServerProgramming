@@ -35,14 +35,25 @@ void Game::GarbageCollect()
 			it = effects.erase(it);
 		else it++;
 	}
-	
+
+	for (auto it = ItemInstances_.cbegin(); it != ItemInstances_.cend();)
+	{
+		if (!IsInSight(it->Pos))
+			it = ItemInstances_.erase(it);
+		else it++;
+	}
+
 	static auto GarbageCollectingTimeInterval = now;
 	if (now < GarbageCollectingTimeInterval) return;
-	GarbageCollectingTimeInterval = now + 1s;
+	GarbageCollectingTimeInterval = now + 750ms;
 DanglingIterator:
 	for (auto& c : Characters_)
 	{
-		if (c.second.GetDisabled())
+		if (c.second.GetState() == eCharacterState::disable)
+		{
+			c.second.SetState(eCharacterState::garbage);
+		}
+		else if (c.second.GetState() == eCharacterState::garbage)
 		{
 			Characters_.erase(c.first);
 			goto DanglingIterator;

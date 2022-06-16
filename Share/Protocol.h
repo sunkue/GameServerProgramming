@@ -4,8 +4,6 @@
 #include "Defines.h"
 #include "enum.h"
 #include "PacketZip.h"
-
-
 //====================================
 
 #pragma warning(push)
@@ -31,7 +29,8 @@ BETTER_ENUM
 	, Cs_request_exp
 	, Cs_request_level
 	, Cs_use_skill
-	
+	, Cs_use_item
+
 	/* Server 2 Client */
 
 	, Sc_none = 100
@@ -48,6 +47,10 @@ BETTER_ENUM
 	, Sc_chat
 	, Sc_signup_result
 	, Sc_use_skill
+	, Sc_set_iteminstance_position
+	, Sc_remove_iteminstance
+	, Sc_sum_item
+	, Sc_equip_item
 );
 
 // 가용길이 패킷 
@@ -191,12 +194,16 @@ PACKET(sc_remove_obj)
 	NetID id = -1;
 };
 
-enum class eMoveOper : uint8
+PACKET(sc_set_iteminstance_position)
 {
-	up,
-	down,
-	right,
-	left
+	eItemType itemType{ eItemType::hpPotion };
+	Position pos;
+};
+
+PACKET(sc_remove_iteminstance)
+{
+	eItemType itemType{ eItemType::hpPotion };
+	Position pos;
 };
 
 PACKET(cs_input)
@@ -210,15 +217,6 @@ PACKET(cs_input_timestamp)
 	milliseconds timestamp;
 };
 
-enum class eSkill : uint8
-{
-	attack,
-	heal,
-	haste,
-	set_teleport,
-	teleport,
-};
-
 PACKET(cs_use_skill)
 {
 	eSkill skill;
@@ -230,12 +228,6 @@ PACKET(sc_use_skill)
 	eSkill skill;
 };
 
-// attack / heal /
-constexpr ID SYSTEM_ID = -10;
-//constexpr ID SYSTEM_ID = -10;
-//constexpr ID SYSTEM_ID = -10;
-//constexpr ID SYSTEM_ID = -10;
-
 PACKET(cs_chat)
 {
 	char chat[MAX_CHAT_BUFFER_SIZE]{};
@@ -246,6 +238,22 @@ PACKET(sc_chat)
 	NetID id;
 	system_clock::time_point time;
 	char chat[MAX_CHAT_BUFFER_SIZE]{};
+};
+
+PACKET(sc_sum_item)
+{
+	eItemType type;
+	int changed;
+};
+
+PACKET(cs_use_item)
+{
+	eItemType type;
+};
+
+PACKET(sc_equip_item)
+{
+	eItemType type;
 };
 
 #pragma pack(pop)

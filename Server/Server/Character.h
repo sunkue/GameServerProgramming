@@ -3,6 +3,7 @@
 #include "Obj.h"
 #include "Script.h"
 #include "Astar.h"
+#include "Item.h"
 
 /////////////////////////////////
 // 
@@ -26,22 +27,25 @@ public:
 	bool Attack(const vector<ID>& target, int damage);
 	virtual void AttackImpl(const vector<ID>& target, int damage);
 	virtual bool Move(Position diff) override;
+	virtual int UseItem(eItemType itemType, int num = 1);
 	GET_REF(Hp);
 	GET_REF(Level);
 	GET(StartPosition);
+	GET_REF_UNSAFE(Inventory);
 protected:
 	virtual bool MoveForce(Position diff);
 	SET(Hp);
 	SET(Level);
+public:
+	milliseconds MovementCooltime{ 1s };
+	milliseconds AttackCooltime{ 1s };
 protected:
+	Inventory Inventory_;
 	Position StartPosition_{};
 	atomic_int Hp_{};
 	atomic_int Level_{};
-	milliseconds MovementCooltime_{ 1s };
-	milliseconds AttackCooltime_{ 1s };
 	atomic_bool Moveable_{ true };
 	atomic_bool Attackable_{ true };
-	// unique_ptr<AstarPathFinder> Astar_ = make_unique<AstarPathFinder>();
 };
 
 class CharacterManager

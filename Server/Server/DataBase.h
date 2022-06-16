@@ -12,6 +12,7 @@ struct QueryRequest
 class DataBase
 {
 	static constexpr TCHAR ODBC_NAME[] = L"GameServerProgrammingDB";
+	// THREAD_LOCAL_SINGLE_TON(DataBase);
 	SINGLE_TON(DataBase);
 	~DataBase();
 public:
@@ -27,7 +28,7 @@ private:
 	SQLRETURN SQLBindColAutoType(Args&... targets);
 	SQLRETURN SQLBindColAnyType(SQLUSMALLINT col, any& target);
 private:
-	static void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE& RetCode);
+	static void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE& RetCode, wstring_view mess = L""s);
 public:
 	void ProcessQueryQueueLoop();
 private:

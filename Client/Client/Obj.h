@@ -6,7 +6,7 @@
 class StaticObj
 {
 public:
-	StaticObj(ID id, Position pos) : Id_{id}, Pos_ { pos } {}
+	StaticObj(ID id, Position pos) : Id_{ id }, Pos_{ pos } {}
 public:
 	GET(Id);
 	GET(Pos);
@@ -37,4 +37,8 @@ protected:
 
 private:
 };
+
+
+
+
 

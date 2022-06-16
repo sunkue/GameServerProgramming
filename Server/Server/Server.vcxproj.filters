@@ -71,6 +71,9 @@
     <Filter Include="Game\Item">
       <UniqueIdentifier>{f65d926a-d6ea-4e74-bade-95c2caf02a17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\PathFinder">
+      <UniqueIdentifier>{8de184ec-77fc-4cd0-9e1a-c6000105d709}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -125,7 +128,12 @@
     <ClCompile Include="Item.cpp">
       <Filter>Game\Item</Filter>
     </ClCompile>
-    <ClCompile Include="Astar.cpp" />
+    <ClCompile Include="Astar.cpp">
+      <Filter>Game\PathFinder</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemDetail.cpp">
+      <Filter>Game\Item</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -200,7 +208,9 @@
     <ClInclude Include="Item.h">
       <Filter>Game\Item</Filter>
     </ClInclude>
-    <ClInclude Include="Astar.h" />
+    <ClInclude Include="Astar.h">
+      <Filter>Game\PathFinder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="LuaScript\Monster\monsterAiTest.lua">

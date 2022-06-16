@@ -47,6 +47,9 @@ void GameGuiManager::DrawGui()
 	DrawChat();
 	DrawSpeechBubble();
 	DrawSelectedObjInfo();
+	DrawMyInventory();
+	DrawMyEquiment();
+	DrawMyStatus();
 
 	gui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
@@ -63,7 +66,7 @@ void GameGuiManager::DrawPlayerInfo()
 	auto level = player.GetLevel();
 	auto money = player.GetMoney();
 	gui::Text(("ID :: "s + player.GetName()).c_str());
-	gui::Text(("HP :: "s + to_string(hp) + "/"s + to_string(MaxHp(level))).c_str());
+	gui::Text(("HP :: "s + to_string(hp) + "/"s + to_string(player.MaxHp())).c_str());
 	gui::Text(("LEVEL :: "s + to_string(level) + "  EXP :: "s + to_string(exp) + "/"s + to_string(RequireExp(level))).c_str());
 	gui::Text(("Money :: "s + to_string(money)).c_str());
 	gui::Text(("Positon :: "s + to_string(pos.x) + " "s + to_string(pos.y)).c_str());
@@ -95,8 +98,104 @@ void GameGuiManager::DrawSpeechBubble()
 		bubblePos.x += (-10 - 3 * static_cast<int>(speechBubble.first.size())) * (TileSize().x / 25);
 		bubblePos.y += -40 * (TileSize().y / 25);
 		gui::SetWindowPos(str.c_str(), bubblePos);
+		if (Position{ Position{ c.second.GetPos() - playerPos } + Position{ 10, 10 } }.x <= 0)
+		{
+		//	cout << VisualizationId(c.second.GetId()) << endl;
+		//	cout << speechBubble.first.c_str() << endl;
+		//	cout << endl;
+		}
 	}
 	gui::StyleColorsDark();
+}
+
+void GameGuiManager::DrawMyInventory()
+{
+	if (!ShowMyInventory_) return;
+	auto& inventory = Game::Get().GetPlayer().GetInventory();
+	gui::Begin("Inventory", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	gui::BeginTabBar("InventoryType", ImGuiTabBarFlags_NoTabListScrollingButtons);
+	if (gui::BeginTabItem("Consumable"))
+	{
+		for (auto& item : inventory.GetItems())
+		{
+			if (!(eItemType::_ConsumableItemStartLine < item.first &&
+				item.first < eItemType::_ConsumableItemEndLine)) continue;
+			if (item.second <= 0) continue;
+			string str = ItemTypeDecoder::toString(item.first) + " (" + to_string(item.second) + ")";
+			gui::Text(str.c_str());
+			gui::SameLine();
+			if (gui::SmallButton(string{ "USE##"s + to_string(static_cast<int>(item.first)) }.c_str()))
+			{
+				cs_use_item useItem;
+				useItem.type = item.first;
+				Networker::Get().DoSend(&useItem);
+			}
+		}
+		gui::EndTabItem();
+	}
+	if (gui::BeginTabItem("Equipment"))
+	{
+		for (auto& item : inventory.GetItems())
+		{
+			if (!(eItemType::_EquipmentItemStartLine < item.first &&
+				item.first < eItemType::_EquipmentItemEndLine)) continue;
+			if (item.second <= 0) continue;
+			string str = ItemTypeDecoder::toString(item.first) + " (" + to_string(item.second) + ")";
+			gui::Text(str.c_str());
+			gui::SameLine();
+			if (gui::SmallButton(string{ "EQUIP##"s + to_string(static_cast<int>(item.first)) }.c_str()))
+			{
+				cs_use_item useItem;
+				useItem.type = item.first;
+				Networker::Get().DoSend(&useItem);
+			}
+		}
+	}
+	gui::EndTabBar();
+
+	gui::End();
+}
+
+void GameGuiManager::DrawMyEquiment()
+{
+	if (!ShowMyEquipment_) return;
+	auto& equimentStates = Game::Get().GetPlayer().GetEquipment().GetEquimentStates();
+	gui::Begin("EquipmentState", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	auto weapon = ItemTypeDecoder::toString(equimentStates[static_cast<int>(eEquimentablePart::weapon)]);
+	auto head = ItemTypeDecoder::toString(equimentStates[static_cast<int>(eEquimentablePart::head)]);
+	auto body = ItemTypeDecoder::toString(equimentStates[static_cast<int>(eEquimentablePart::body)]);
+	auto shoes = ItemTypeDecoder::toString(equimentStates[static_cast<int>(eEquimentablePart::shoes)]);
+	gui::Text(string{ "[Weapon] :: "s + weapon }.c_str());
+	gui::Text(string{ "[Head]   :: "s + head }.c_str());
+	gui::Text(string{ "[Body]   :: "s + body }.c_str());
+	gui::Text(string{ "[Shoes]  :: "s + shoes }.c_str());
+	gui::End();
+}
+
+void GameGuiManager::DrawMyStatus()
+{
+	if (!ShowMyStatus_) return;
+	gui::Begin("Status", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	/*
+	Level Exp/RequiredExp
+	Hp/MAX_HP
+	ArmorPoint
+	AttackPoint
+	MovementSpeed 1/cooltime
+	*/
+	gui::End();
+}
+
+void GameGuiManager::DrawMySkill()
+{
+	// z, x 키 사용하기
+	if (!ShowMySkill_) return;
+	gui::Begin("Skills", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	gui::End();
+}
+
+void GameGuiManager::DrawSelectedInventory()
+{
 }
 
 void GameGuiManager::DrawSelectedObjInfo()
@@ -131,6 +230,8 @@ void GameGuiManager::DrawSelectedObjInfo()
 		gui::Text(str.c_str());
 		str = "HP : "s + to_string(selectedObj.GetHp());
 		gui::Text(str.c_str());
+		str = "st : "s + to_string(static_cast<int>(selectedObj.GetState()));
+		gui::Text(str.c_str());
 		gui::End();
 
 	}
@@ -158,3 +259,5 @@ void GameGuiManager::DrawSelectedObjInfo()
 		gui::SetWindowPos(windowName.c_str(), windowPos);
 	}
 }
+
+

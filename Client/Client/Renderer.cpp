@@ -57,7 +57,8 @@ void Renderer::ReadyDraw()
 void Renderer::Draw()
 {
 	ReadyDraw();
-	auto myPos = Game::Get().GetPlayer().GetPos();
+	auto& player = Game::Get().GetPlayer();
+	auto myPos = player.GetPos();
 	bool startWithDark = (myPos.x + myPos.y) % 2;
 
 	BgShader_->Use();
@@ -126,6 +127,18 @@ void Renderer::Draw()
 		ScreenQuad::Get().DrawQuad();
 	}
 
+	ObjShader_->Use();
+	ObjShader_->Set("u_texture", ItemTiles_);
+	ObjShader_->Set("u_start_with_dark", startWithDark);
+	ObjShader_->Set("u_focus_center", FocusCenter_);
+	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
+	for (auto& item : Game::Get().GetItemInstances())
+	{
+		ObjShader_->Set("u_type", static_cast<int>(eObjType::Bpawn)); // eItemType to render index
+		ObjShader_->Set("u_position", item.Pos - myPos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
+		ScreenQuad::Get().DrawQuad();
+	}
+
 	GameGuiManager::Get().DrawGui();
 }
 
@@ -155,5 +168,6 @@ void Renderer::LoadTexture()
 {
 	BgTiles_ = Texture::Create("background_CND1.png");
 	ObjTiles_ = Texture::Create("character_CND.png");
+	ItemTiles_ = Texture::Create("character_chess.png");
 	EffectTiles_ = Texture::Create("effect_CND.png");
 }

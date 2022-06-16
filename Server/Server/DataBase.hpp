@@ -9,12 +9,11 @@ inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		retcode = SQLBindColAutoType(targets...);
-
 		for (;;)
 		{
 			retcode = SQLFetch(Stmt_);
 			if (retcode == SQL_ERROR || retcode == SQL_SUCCESS_WITH_INFO)
-				HandleDiagnosticRecord(Stmt_, SQL_HANDLE_STMT, retcode);
+				HandleDiagnosticRecord(Stmt_, SQL_HANDLE_STMT, retcode, query);
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 				f();
 			else if (retcode == SQL_NORETURN)
@@ -23,9 +22,14 @@ inline void DataBase::ExecuteQuery(wstring_view query, function<void()> f, Args&
 			}
 			else break;
 		}
-
-		SQLCancel(Stmt_);
 	}
+	else
+	{
+		HandleDiagnosticRecord(Stmt_, SQL_HANDLE_STMT, retcode, query);
+		if (retcode == SQL_NORETURN)
+			f();
+	}
+	SQLCancel(Stmt_);
 }
 
 

@@ -43,6 +43,41 @@ CharacterManager::CharacterManager()
 		Characters_[id] = make_unique<Monster>(id);
 		Characters_[id]->SetLevel(rand() % 5 + 1);
 		Characters_[id]->SetHp(MaxHp(Characters_[id]->GetLevel()));
+		switch (auto x = rand() % 20)
+		{
+		case 0: case 1: case 2: case 3: case 4:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::hpPotion , x + 1 });
+		break; case 5: case 6: case 7: case 8:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::expPotion , 3 });
+
+		break; case 9:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::stoneSword , 1 });
+		break; case 10:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::ironSword , 1 });
+		break; case 11:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::goldSword , 1 });
+		break; case 12:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::diamondSword , 1 });
+
+		break; case 13:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::ironHelmet , 1 });
+		break; case 14:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::steelHelmet , 1 });
+
+		break; case 15:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::leatherArmor , 1 });
+		break; case 16:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::steelArmor , 1 });
+		break; case 17:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::goldArmor , 1 });
+
+		break; case 18:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::robberBoots , 1 });
+		break; case 19:
+			Characters_[id]->GetInventory().CreateItem(ItemBase{ eItemType::wingShoes , 1 });
+
+		break; default: break;
+		}
 		InitialMove(id, { rand() % MAP_SIZE, rand() % MAP_SIZE });
 	}
 	cerr << "..done" << endl;
@@ -119,6 +154,33 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 		player.SetMoney(money);
 		player.SetExp(exp);
 
+		{
+			QueryRequest q;
+			q.Query = L"EXEC SelectItemDataById "s + to_wstring(dbId);
+			q.Targets = make_shared<vector<any>>(); q.Targets->reserve(2);
+			q.Targets->emplace_back(make_any<wstring>());	 // name
+			q.Targets->emplace_back(make_any<SQLINTEGER>()); // num
+			q.Func = [id](const vector<any>& t)
+			{
+				auto itemName = any_cast<wstring>(t[0]);
+				auto itemNum = any_cast<SQLINTEGER>(t[1]);
+#pragma warning( disable : 4244 ) 
+				auto stringitemName = string{ itemName.begin(), itemName.end() };
+#pragma warning( default : 4244 )
+				trim(stringitemName);
+				auto itemType = ItemTypeDecoder::toType(stringitemName);
+				auto& player = CharacterManager::Get().GetCharacters()[id];
+				player->GetInventory().CreateItem(ItemBase{ itemType , itemNum });
+				{
+					sc_sum_item sumItem;
+					sumItem.changed = itemNum;
+					sumItem.type = itemType;
+					Server::Get().GetClients()[player->GetId()].DoSend(&sumItem);
+				}
+			};
+			DataBase::Get().AddQueryRequest(q);
+		}
+
 		for (int failed = 1; !CharacterManager::Get().InitialMove(id, Position{ posx + rand() % failed, posy + rand() % failed }); failed++)
 			;;;
 
@@ -129,7 +191,6 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 			set_pos.pos = pos;
 			Server::Get().GetClients()[id].DoSend(&set_pos);
 		}
-
 
 		{
 			sc_ready ready;
@@ -168,7 +229,7 @@ bool Character::Attack(const vector<ID>& target, int damage)
 	Attackable_ = false;
 	AttackImpl(target, damage);
 	EventManager::Get().AddEvent({ [&Attackable = Attackable_]()
-		{ Attackable = true; }, AttackCooltime_ });
+		{ Attackable = true; }, AttackCooltime });
 	return true;
 }
 
@@ -189,9 +250,14 @@ bool Character::Move(Position diff)
 	{
 		Moveable_ = false;
 		EventManager::Get().AddEvent({ [&Moveable = Moveable_]()
-			{ Moveable = true; }, MovementCooltime_ });
+			{ Moveable = true; }, MovementCooltime });
 	}
 	return ret;
+}
+
+int Character::UseItem(eItemType itemType, int num)
+{
+	return Inventory_.UseItem(Id_, itemType, num);
 }
 
 bool Character::MoveForce(Position diff)

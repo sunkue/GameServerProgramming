@@ -93,7 +93,7 @@ DataBase::~DataBase()
 	if (Env_) SQLFreeHandle(SQL_HANDLE_ENV, Env_);
 }
 
-void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE& RetCode)
+void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE& RetCode, wstring_view mess)
 {
 	std::wcout.imbue(std::locale("korean"));
 	SQLSMALLINT iRec = 0;
@@ -108,13 +108,12 @@ void DataBase::HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETC
 	while (SQLGetDiagRec(hType, hHandle, ++iRec, wszState, &iError, wszMessage,
 		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS)
 	{
-		if (!wcsncmp(wszState, L"24000", 5)) { 
+		if (!wcsncmp(wszState, L"24000", 5)) {
 			RetCode = SQL_NORETURN;
 			continue;
 		}
-		
 
-		wcout << wszState << " " << wszMessage << " (" << iError << ")" << endl;
+		wcout << mess << endl << wszState << " " << wszMessage << " (" << iError << ")" << endl;
 	}
 }
 
@@ -124,7 +123,7 @@ void DataBase::ProcessQueryQueueLoop()
 	while (true)
 	{
 		this_thread::sleep_for(1ms);
-		QueryRequest e;
+		thread_local QueryRequest e;
 		while (QueryRequestQueue_.try_pop(e))
 		{
 			ExecuteQuery(e.Query, [&iocp, f = e.Func, r = e.Targets]()

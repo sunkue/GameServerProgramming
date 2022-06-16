@@ -173,6 +173,7 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameGui.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="KeyboardEvent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MouseEvent.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="Dependencies\imgui\imstb_truetype.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameGui.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="MouseEvent.h" />
     <ClInclude Include="Networker.h" />

@@ -270,9 +270,13 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 		chat.size -= static_cast<decltype(chat.size)>(MAX_CHAT_SIZE - strlen(chat.chat));
 		SND2OEVERY_NEARSECTOR4(Id_, &chat);
 	}
+	CASE PACKET_TYPE::Cs_use_item :
+	{
+		auto pck = reinterpret_cast<const cs_use_item*>(packet);
+		CharacterManager::Get().GetCharacters()[Id_]->UseItem(pck->type);
+	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}
-
 	// cerr << "done" << endl;
 }
 

@@ -2,7 +2,8 @@
 
 enum class eScriptType
 {
-	AI,
+	UpdateAI,
+	OnAcivate
 };
 
 class Scriptable

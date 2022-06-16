@@ -3,6 +3,7 @@
 #include "Obj.h"
 #include "Player.h"
 #include "Monster.h"
+#include "Item.h"
 
 // [ min, max )
 pair<Position, Position> GetSectorRange(Position sector);
@@ -26,13 +27,16 @@ public:
 	GET_REF(Monsters);
 	GET_REF(Obstacles);
 	GET_REF(Npcs);
+	GET_REF_UNSAFE(ItemInstances);
 public:
 	shared_mutex PlayerLock;
 	shared_mutex MonsterLock;
+	shared_mutex ItemInstanceLock;
 private:
 	vector<DynamicObj*> Obstacles_;					// 고정데이터..
-	concurrent_unordered_set<Monster*> Monsters_;	// 고정크기..
-	concurrent_unordered_set<DynamicObj*> Npcs_;		// 고정크기..
+	concurrent_unordered_set<ItemInstance> ItemInstances_;
+	concurrent_unordered_set<Monster*> Monsters_;	
+	concurrent_unordered_set<DynamicObj*> Npcs_;		
 	concurrent_unordered_set<Player*> Players_;
 };
 

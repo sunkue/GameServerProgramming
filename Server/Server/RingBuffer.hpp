@@ -113,3 +113,7 @@ public:
 private:
 	size_t BeginIdx_{}, EndIdx_{}, Size_{};
 };
+
+
+
+

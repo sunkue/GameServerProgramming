@@ -145,10 +145,27 @@ void Networker::ProcessPacket(const void* const packet)
 		auto name = string{ pck->name, &pck->name[strnlen_s(pck->name, MAX_CHARACTER_NAME_SIZE)] }; trim(name);
 		game.GetCharacters()[id].SetName(name);
 	}
+	CASE PACKET_TYPE::Sc_set_iteminstance_position :
+	{
+		auto pck = reinterpret_cast<const sc_set_iteminstance_position*>(packet);
+		ItemInstance item;
+		item.Type = pck->itemType;
+		item.Pos = pck->pos;
+		game.GetItemInstances().emplace(item);
+	}
+	CASE PACKET_TYPE::Sc_remove_iteminstance :
+	{
+		auto pck = reinterpret_cast<const sc_remove_iteminstance*>(packet);
+		ItemInstance item;
+		item.Type = pck->itemType;
+		item.Pos = pck->pos;
+		auto& itemInstances = game.GetItemInstances();
+		game.GetItemInstances().erase(item);
+	}
 	CASE PACKET_TYPE::Sc_remove_obj :
 	{
 		auto pck = reinterpret_cast<const sc_remove_obj*>(packet);
-		game.GetCharacters()[pck->id].SetDisabled(true);
+		game.GetCharacters()[pck->id].SetState(eCharacterState::disable);
 	}
 	CASE PACKET_TYPE::Sc_use_skill :
 	{
@@ -164,9 +181,9 @@ void Networker::ProcessPacket(const void* const packet)
 			for (int i = 0; i < 4; i++)
 			{
 				auto pos = Game::Get().GetCharacters()[pck->id].GetPos();
-				Renderer::Get().GetEffects().emplace_back(make_tuple(now, delay, eEffectType::attack0, pos + NEAR_POS_TABLE[i]));
-				Renderer::Get().GetEffects().emplace_back(make_tuple(now + delay, delay, eEffectType::attack1, pos + NEAR_POS_TABLE[i]));
-				Renderer::Get().GetEffects().emplace_back(make_tuple(now + delay + delay, delay, eEffectType::attack2, pos + NEAR_POS_TABLE[i]));
+				Renderer::Get().GetEffects().emplace_front(make_tuple(now, delay, eEffectType::attack0, pos + NEAR_POS_TABLE[i]));
+				Renderer::Get().GetEffects().emplace_front(make_tuple(now + delay, delay, eEffectType::attack1, pos + NEAR_POS_TABLE[i]));
+				Renderer::Get().GetEffects().emplace_front(make_tuple(now + delay + delay, delay, eEffectType::attack2, pos + NEAR_POS_TABLE[i]));
 			}
 		}
 		CASE eSkill::haste :
@@ -207,6 +224,16 @@ void Networker::ProcessPacket(const void* const packet)
 			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair(chat.mess, pck->time + 1500ms));
 		else
 			Game::Get().GetCharacters()[pck->id].SetSpeechBubble(make_pair("...", pck->time + 1500ms));
+	}
+	CASE PACKET_TYPE::Sc_sum_item :
+	{
+		auto pck = reinterpret_cast<const sc_sum_item*>(packet);
+		game.GetPlayer().GetInventory().GetItems()[pck->type] += pck->changed;
+	}
+	CASE PACKET_TYPE::Sc_equip_item :
+	{
+		auto pck = reinterpret_cast<const sc_equip_item*>(packet);
+		game.GetPlayer().Equipment_.Equip(pck->type);
 	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}
