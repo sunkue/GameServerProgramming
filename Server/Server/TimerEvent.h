@@ -11,7 +11,6 @@ struct Event
 constexpr bool operator<(const Event& l, const Event& r) { return l.ActionTime < r.ActionTime; }
 constexpr bool operator>(const Event& l, const Event& r) { return l.ActionTime > r.ActionTime; }
 
-
 class EventManager
 {
 	SINGLE_TON(EventManager) = default;

@@ -423,7 +423,7 @@ void Monster::Update()
 		lua_getglobal(Scripts_[eScriptType::UpdateAI], "Update");
 		lua_pcall(Scripts_[eScriptType::UpdateAI], 0, 0, 0);
 	}
-	EventManager::Get().AddEvent({ [this]() {Update(); }, 500ms });
+	EventManager::Get().AddEvent({ [this]() { Update(); }, 500ms });
 }
 
 bool Monster::Enable()

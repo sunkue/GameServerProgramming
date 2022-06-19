@@ -20,8 +20,12 @@ public:
 private:
 
 public:
-
+	GET(IsChatFocused);
+	TOGGLE(ChatFocus);
+	SET(ChatFocus);
 private:
-	vector<Chat> chats_;
+	vector<Chat> chats_; 
+	mutable bool ChatFocus_;
+	mutable bool IsChatFocused_;
 };
 

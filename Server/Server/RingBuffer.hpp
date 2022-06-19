@@ -97,7 +97,7 @@ public:
 		EndIdx_ = (EndIdx_ + bytes) % Capacity;
 		Size_ += bytes;
 	}
-	// read :: return true when overflowed
+	// read 
 	void MoveFront(size_t bytes)
 	{
 		auto Capacity = this->Capacity();

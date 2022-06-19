@@ -169,8 +169,7 @@ void Server::OnRecvComplete(ID Id_, DWORD transfered)
 		// 링버퍼경계에 걸친 패킷
 		if (recvbuf.CheckOverflowOnRead(need_bytes))
 		{
-			// cerr << "[RingBuffer]::CollideOnEdge" << endl;
-			// 미완성 패킷임
+			// 미완성 패킷
 			if (recvbuf.Size() < need_bytes)
 				continue;
 
@@ -207,7 +206,6 @@ void Server::OnRecvComplete(ID Id_, DWORD transfered)
 		pck_start += need_bytes;
 		remain_bytes -= need_bytes;
 		need_bytes = *reinterpret_cast<packet_size_t*>(pck_start);
-		// 허위 정보가 들어갈 수 있으나, 그땐 remain_bytes 가 0 이기에 괜찮다.
 	}
 
 	client.prerecv_size = static_cast<packet_size_t>(remain_bytes);

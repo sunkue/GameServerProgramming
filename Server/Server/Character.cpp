@@ -166,6 +166,7 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 				auto itemName = any_cast<wstring>(t[0]);
 				auto itemNum = any_cast<SQLINTEGER>(t[1]);
 				auto itemUsed = any_cast<BOOL>(t[2]);
+				{
 #pragma warning( disable : 4244 ) 
 				auto stringitemName = string{ itemName.begin(), itemName.end() };
 #pragma warning( default : 4244 )
@@ -182,6 +183,7 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 
 				if (itemUsed)
 					reinterpret_cast<Player*>(player.get())->Equip(itemType);
+				} 
 			};
 			DataBase::Get().AddQueryRequest(q);
 		}

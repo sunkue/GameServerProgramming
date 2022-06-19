@@ -36,7 +36,6 @@ private:
 	mutable atomic_int Num_{};
 };
 
-// 알아서 단 한 번 초기화 해 줄 것이야.
 inline bool ItemBase::InitOnce = []() { InitItemEffectTable(); InitItemLevelTable(); return true; } ();
 
 /*=======================================

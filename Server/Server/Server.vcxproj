@@ -198,6 +198,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="LuaScript\Monster\monsterAggressionAgro.lua" />
     <None Include="LuaScript\Monster\monsterAggressionPeace.lua" />
     <None Include="LuaScript\Monster\monsterAiTest.lua" />

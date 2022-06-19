@@ -2,6 +2,16 @@
 #include "Chat.h"
 #include "Networker.h"
 
+string VisualizationId(ID id)
+{
+	if (id == SYSTEM_ID) return "[SYS]";
+	else if (id < MAX_PLAYER) return Game::Get().GetCharacters()[id].GetName();
+	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
+	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
+	else if (id < MAX_OBJECT) return "OBSTRACLE_" + to_string(id - MAX_PLAYER - MAX_MONSTER - MAX_NPC);
+	else return "ERR_ID";
+}
+
 void ChatManager::RenderChat() const
 {
 	gui::Begin("Chat", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar);
@@ -28,6 +38,7 @@ void ChatManager::RenderChat() const
 
 	gui::Begin("ChatInput", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
 	static char chatBuffer[MAX_CHAT_BUFFER_SIZE]{};
+	if (ChatFocus_)gui::SetKeyboardFocusHere(0);
 	if (gui::InputText("ENTER", chatBuffer, MAX_CHAT_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
 	{
 		if (auto chatLen = strlen(chatBuffer))
@@ -39,6 +50,7 @@ void ChatManager::RenderChat() const
 		}
 		ZeroMemory(chatBuffer, sizeof(chatBuffer));
 	}
+	IsChatFocused_ = gui::IsItemFocused();
 	gui::End();
 }
 

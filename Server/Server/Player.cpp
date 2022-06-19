@@ -16,7 +16,8 @@
 void Player::HpRegen()
 {
 	HpIncrease(Id_, MaxHp() / 10);
-	EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
+	if (GetEnable())
+		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
 }
 
 bool Player::Move(Position diff)
@@ -79,6 +80,7 @@ bool Player::Equip(eItemType item)
 			}
 		}
 		else Server::Get().GetClients()[Id_].DoSend(&set);
+		HpIncrease(Id_, 0);
 	}
 	CASE eEquimentablePart::shoes :
 	{

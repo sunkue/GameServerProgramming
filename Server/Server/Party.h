@@ -25,3 +25,4 @@ public:
 private:
 	array<Party, MAX_PARTY> Partys_;
 };
+

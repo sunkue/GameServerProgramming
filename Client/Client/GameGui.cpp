@@ -287,8 +287,8 @@ void GameGuiManager::DrawSelectedObjInfo()
 		gui::Text(str.c_str());
 		str = "HP : "s + to_string(selectedObj.GetHp());
 		gui::Text(str.c_str());
-		str = "st : "s + to_string(static_cast<int>(selectedObj.GetState()));
-		gui::Text(str.c_str());
+	//	str = "st : "s + to_string(static_cast<int>(selectedObj.GetState()));
+	//	gui::Text(str.c_str());
 		gui::End();
 
 	}
