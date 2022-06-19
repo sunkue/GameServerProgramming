@@ -33,7 +33,8 @@ using Position = glm::ivec2;
 const uint16_t SERVER_PORT = 4000;
 
 //====================================
-constexpr int MAX_PARTY = 4;
+constexpr int MAX_PARTY_CREW = 4;
+constexpr int MAX_PARTY = 1000;
 constexpr int MAP_SIZE = 2000;
 constexpr int SIGHT_SIZE = 15;
 constexpr int WINDOW_SIZE = 20;
@@ -48,9 +49,9 @@ static_assert(0 == WINDOW_SIZE % 2);
 static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 
 constexpr int MAX_PLAYER = 1'0000;
-//constexpr int MAX_MONSTER = 20'0000;
+constexpr int MAX_MONSTER = 20'0000;
 //constexpr int MAX_MONSTER = 10'0000;
-constexpr int MAX_MONSTER = 10'0;
+//constexpr int MAX_MONSTER = 10'0;
 constexpr int MAX_NPC = 10;
 constexpr int MAX_OBSTACLE_PER_SECTOR = 10000;
 constexpr int MAX_OBSTACLE = MAX_OBSTACLE_PER_SECTOR * SECTOR_NUM;
@@ -208,11 +209,30 @@ enum class eSkill : uint8
 {
 	accquireItem,
 	attack,
-	heal,
-	haste,
-	set_teleport,
-	teleport,
+	explosion,
+	windBooster,
 };
+
+#include <chrono>
+
+class SkillInfo
+{
+private:
+	static bool InitOnce;
+	inline static unordered_map<eSkill, std::chrono::milliseconds> SkillCooltimeTable_;
+public:
+	inline static std::chrono::milliseconds GetCoolTime(eSkill skill)
+	{
+		return SkillCooltimeTable_[skill];
+	}
+};
+
+bool SkillInfo::InitOnce = []()
+{
+	SkillCooltimeTable_[eSkill::explosion] = 5s;
+	SkillCooltimeTable_[eSkill::windBooster] = 15s;
+	return true;
+}();
 
 /*=======================================
 *

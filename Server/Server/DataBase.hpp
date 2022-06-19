@@ -62,6 +62,12 @@ inline SQLRETURN DataBase::SQLBindColAutoType(Args& ...targets)
 /
 /
 ==========================================*/
+template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, BOOL& target)
+{
+	SQLLEN cbTemp{}, lenTemp = 50;
+	return SQLBindCol(Stmt_, col, SQL_BIT, &target, lenTemp, &cbTemp);
+}
+
 template<> inline SQLRETURN DataBase::SQLBindColAutoType(SQLUSMALLINT col, SQLINTEGER& target)
 {
 	SQLLEN cbTemp{}, lenTemp = 50;
@@ -118,6 +124,7 @@ inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 	static const auto WSTR_TYPECODE = typeid(wstring).hash_code();
 	static const auto WCHAR_TYPECODE = typeid(SQLWCHAR).hash_code();
 	static const auto CHAR_TYPECODE = typeid(SQLCHAR).hash_code();
+	static const auto BOOL_TYPECODE = typeid(BOOL).hash_code();
 
 	if (WSTR_TYPECODE == targetTypeCode)
 	{
@@ -134,6 +141,10 @@ inline SQLRETURN DataBase::SQLBindColAnyType(SQLUSMALLINT col, any& target)
 	else if (CHAR_TYPECODE == targetTypeCode)
 	{
 		ret = SQLBindColAutoType(col, *target._Cast<SQLCHAR>());
+	}
+	else if (BOOL_TYPECODE == targetTypeCode)
+	{
+		ret = SQLBindColAutoType(col, *target._Cast<BOOL>());
 	}
 	else
 	{

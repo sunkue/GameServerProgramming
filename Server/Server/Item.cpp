@@ -114,3 +114,9 @@ eItemType EquipmentState::GetTypeOfPart(eEquimentablePart part) const
 {
 	return EquimentStates_[static_cast<int>(part)];
 }
+
+void EquipmentState::Clear()
+{
+	for (auto& e : EquimentStates_)
+		e = eItemType::_None;
+}

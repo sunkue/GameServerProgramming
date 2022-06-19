@@ -4,9 +4,10 @@
 #include "GameGui.h"
 #include "Game.h"
 
+
 string VisualizationId(ID id)
 {
-	if (id == SYSTEM_ID) return "[SYSTEM]";
+	if (id == SYSTEM_ID) return "[SYS]";
 	else if (id < MAX_PLAYER) return Game::Get().GetCharacters()[id].GetName();
 	else if (id < MAX_PLAYER + MAX_MONSTER) return "M_" + to_string(id - MAX_PLAYER);
 	else if (id < MAX_PLAYER + MAX_MONSTER + MAX_NPC) return "NPC_" + to_string(id - MAX_PLAYER - MAX_MONSTER);
@@ -67,6 +68,18 @@ bool Character::ProcessInput(const KeyboardEventManager::KeyEvent& key)
 			pck.skill = eSkill::accquireItem;
 			Networker::Get().DoSend(&pck);
 		}
+		CASE GLFW_KEY_X :
+		{
+			cs_use_skill pck;
+			pck.skill = eSkill::explosion;
+			Networker::Get().DoSend(&pck);
+		}
+		CASE GLFW_KEY_C :
+		{
+			cs_use_skill pck;
+			pck.skill = eSkill::windBooster;
+			Networker::Get().DoSend(&pck);
+		}
 		CASE GLFW_KEY_I :
 		{
 			GameGuiManager::Get().ToggleShowMyInventory();
@@ -82,6 +95,10 @@ bool Character::ProcessInput(const KeyboardEventManager::KeyEvent& key)
 		CASE GLFW_KEY_K :
 		{
 			GameGuiManager::Get().ToggleShowMySkill();
+		}
+		CASE GLFW_KEY_P :
+		{
+			GameGuiManager::Get().ToggleShowMyParty();
 		}
 		break; default: break;
 		}
@@ -104,7 +121,6 @@ bool Character::ProcessInput(const MouseEventManager::ButtonEvent& button)
 	{
 		if (GLFW_PRESS == button.action)
 		{
-			GameGuiManager::Get().SetSelectedObjId(-1);
 		}
 	}
 

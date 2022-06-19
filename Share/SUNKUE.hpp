@@ -253,7 +253,7 @@ namespace MY_NAME_SPACE {
 
 
 	// 컨테이너 [b,e) macro
-#define ALLOF(cont)(std::Begin(cont)),(std::End(cont))
+#define ALLOF(cont)(std::begin(cont)),(std::end(cont))
 #define cALLOF(cont)(std::cbegin(cont)),(std::cend(cont))
 
 

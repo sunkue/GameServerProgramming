@@ -159,6 +159,7 @@
     <ClInclude Include="ExpOverlapped.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Monster.h" />
+    <ClInclude Include="Party.h" />
     <ClInclude Include="Script.h" />
     <ClInclude Include="TimerEvent.h" />
     <ClInclude Include="World.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemDetail.cpp" />
     <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="Party.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptApi.cpp" />
     <ClCompile Include="TimerEvent.cpp" />

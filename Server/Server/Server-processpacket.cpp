@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Character.h"
 #include "DataBase.h"
+#include "Party.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -113,11 +114,23 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	{
 		auto pck = reinterpret_cast<const cs_login*>(packet);
 
+		auto loginId = wstring{ &pck->login_id[0], &pck->login_id[strnlen_s(pck->login_id, MAX_LOGIN_ID_SIZE)] };
+		auto password = wstring{ &pck->login_password[0], &pck->login_password[strnlen_s(pck->login_password, MAX_LOGIN_PASSWORD_SIZE)] };
+
+		const auto CantBeQuery = L"\'\"\\,;: \n\t\b";
+		if (loginId.find_last_not_of(CantBeQuery, loginId.size()) != (loginId.size() - 1) || password.find_last_not_of(CantBeQuery, password.size()) != (password.size() - 1))
+		{
+			sc_login_result result;
+			result.id = -3;
+			Clients_[Id_].DoSend(&result);
+			break;
+		}
+
 		QueryRequest q;
 		q.Query = L"EXEC UserLogin "s;
-		q.Query += wstring{ &pck->login_id[0], &pck->login_id[strnlen_s(pck->login_id, MAX_LOGIN_ID_SIZE)] };
+		q.Query += loginId;
 		q.Query += L", "s;
-		q.Query += wstring{ &pck->login_password[0], &pck->login_password[strnlen_s(pck->login_password, MAX_LOGIN_PASSWORD_SIZE)] };
+		q.Query += password;
 		q.Targets = make_shared<vector<any>>(); q.Targets->reserve(2);
 		q.Targets->emplace_back(make_any<SQLWCHAR>());
 		q.Targets->emplace_back(make_any<SQLINTEGER>());
@@ -159,10 +172,22 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	CASE PACKET_TYPE::Cs_signup :
 	{
 		auto pck = reinterpret_cast<const cs_signup*>(packet);
+		auto signupId = wstring{ pck->signup_id, &pck->signup_id[strnlen_s(pck->signup_id, MAX_LOGIN_ID_SIZE)] };
+		auto password = wstring{ pck->signup_password, &pck->signup_password[strnlen_s(pck->signup_password, MAX_LOGIN_PASSWORD_SIZE)] };
+
+		const auto CantBeQuery = L"\'\"\\,;: \n\t\b";
+		if (signupId.find_last_not_of(CantBeQuery, signupId.size()) != signupId.size() || password.find_last_not_of(CantBeQuery, password.size()) != password.size())
+		{
+			sc_signup_result signup_result;
+			signup_result.result = 'N';
+			Clients_[Id_].DoSend(&signup_result);
+			break;
+		}
+
 		QueryRequest q;
 		q.Query = L"EXEC UserSignup "s;
-		q.Query += wstring{ pck->signup_id, &pck->signup_id[strnlen_s(pck->signup_id, MAX_LOGIN_ID_SIZE)] };
-		q.Query += L", "s + wstring{ pck->signup_password, &pck->signup_password[strnlen_s(pck->signup_password, MAX_LOGIN_PASSWORD_SIZE)] };
+		q.Query += signupId;
+		q.Query += L", "s + password;
 		q.Targets = make_shared<vector<any>>();
 		q.Targets->emplace_back(make_any<SQLWCHAR>()); // 'S' 'E'
 		q.Func = [this, Id_](const vector<any>& t)
@@ -246,6 +271,42 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 		set.level = player->GetLevel();
 		SND2ME(&set);
 	}
+	CASE PACKET_TYPE::Cs_request_AttackPoint :
+	{
+		auto pck = reinterpret_cast<const cs_request_AttackPoint*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_attack_point set;
+		set.id = pck->id;
+		set.attackPoint = player->GetAttackPoint();
+		SND2ME(&set);
+	}
+	CASE PACKET_TYPE::Cs_request_ArmorPoint :
+	{
+		auto pck = reinterpret_cast<const cs_request_ArmorPoint*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_armor_point set;
+		set.id = pck->id;
+		set.armorPoint = player->GetArmorPoint();
+		SND2ME(&set);
+	}
+	CASE PACKET_TYPE::Cs_request_AdditionalHp :
+	{
+		auto pck = reinterpret_cast<const cs_request_AdditionalHp*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_additional_hp set;
+		set.id = pck->id;
+		set.additionalHp = player->GetAdditionalHp();
+		SND2ME(&set);
+	}
+	CASE PACKET_TYPE::Cs_request_MovemetSpeed :
+	{
+		auto pck = reinterpret_cast<const cs_request_MovemetSpeed*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pck->id].get());
+		sc_set_movement_speed set;
+		set.id = pck->id;
+		set.movemetSpeed = static_cast<float>(1000ms / player->MovementCooltime);
+		SND2ME(&set);
+	}
 	CASE PACKET_TYPE::Cs_input_timestamp :
 	{
 		auto pck = reinterpret_cast<const cs_input_timestamp*>(packet);
@@ -274,6 +335,45 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 	{
 		auto pck = reinterpret_cast<const cs_use_item*>(packet);
 		CharacterManager::Get().GetCharacters()[Id_]->UseItem(pck->type);
+	}
+	CASE PACKET_TYPE::Cs_invite_to_party :
+	{
+		auto pck = reinterpret_cast<const cs_invite_to_party*>(packet);
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[Id_].get());
+		auto partyId = player->GetPartyId();
+		if (partyId < 0)
+		{
+			partyId = PartyManager::Get().CreateParty(Id_);
+			if (partyId < 0)
+			{
+				cerr << "[ERR]::NoEmptyParty" << endl;
+				break;
+			}
+			player->SetPartyId(partyId);
+		}
+		sc_join_party_request joinRequest;
+		joinRequest.partyId = partyId;
+		joinRequest.inviterId = Id_;
+		Clients_[pck->targetId].DoSend(&joinRequest);
+	}
+	CASE PACKET_TYPE::Cs_accept_party_invite :
+	{
+		auto pck = reinterpret_cast<const cs_accept_party_invite*>(packet);
+		auto partyId = pck->partyId;
+		if (!PartyManager::Get().JoinParty(partyId, Id_))
+		{
+			sc_chat chat;
+			chat.id = SYSTEM_ID;
+			strcpy_s(chat.chat, "Party Fulled.");
+			chat.time = system_clock::now();
+			SND2ME(&chat);
+			break;
+		}
+	}
+	CASE PACKET_TYPE::Cs_leave_party :
+	{
+		auto player = reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[Id_].get());
+		PartyManager::Get().ExitParty(player->GetPartyId(), Id_);
 	}
 	break; default: cerr << "[[[!!]]]" << endl; break;
 	}

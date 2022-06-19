@@ -157,13 +157,15 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 		{
 			QueryRequest q;
 			q.Query = L"EXEC SelectItemDataById "s + to_wstring(dbId);
-			q.Targets = make_shared<vector<any>>(); q.Targets->reserve(2);
+			q.Targets = make_shared<vector<any>>(); q.Targets->reserve(3);
 			q.Targets->emplace_back(make_any<wstring>());	 // name
 			q.Targets->emplace_back(make_any<SQLINTEGER>()); // num
+			q.Targets->emplace_back(make_any<BOOL>()); // used
 			q.Func = [id](const vector<any>& t)
 			{
 				auto itemName = any_cast<wstring>(t[0]);
 				auto itemNum = any_cast<SQLINTEGER>(t[1]);
+				auto itemUsed = any_cast<BOOL>(t[2]);
 #pragma warning( disable : 4244 ) 
 				auto stringitemName = string{ itemName.begin(), itemName.end() };
 #pragma warning( default : 4244 )
@@ -177,6 +179,9 @@ void CharacterManager::InitFromDataBase(ID id, DbCharacterID dbId)
 					sumItem.type = itemType;
 					Server::Get().GetClients()[player->GetId()].DoSend(&sumItem);
 				}
+
+				if (itemUsed)
+					reinterpret_cast<Player*>(player.get())->Equip(itemType);
 			};
 			DataBase::Get().AddQueryRequest(q);
 		}

@@ -5,6 +5,7 @@
 #include "Character.h"
 #include "System.h"
 
+
 ImVec2 TileSize()
 {
 	auto wOffsetPerUnit = static_cast<float>(System::Get().Screen.width - 20) / WINDOW_SIZE;
@@ -50,6 +51,7 @@ void GameGuiManager::DrawGui()
 	DrawMyInventory();
 	DrawMyEquiment();
 	DrawMyStatus();
+	DrawPartyCrewInfos();
 
 	gui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(gui::GetDrawData());
@@ -100,9 +102,9 @@ void GameGuiManager::DrawSpeechBubble()
 		gui::SetWindowPos(str.c_str(), bubblePos);
 		if (Position{ Position{ c.second.GetPos() - playerPos } + Position{ 10, 10 } }.x <= 0)
 		{
-		//	cout << VisualizationId(c.second.GetId()) << endl;
-		//	cout << speechBubble.first.c_str() << endl;
-		//	cout << endl;
+			//	cout << VisualizationId(c.second.GetId()) << endl;
+			//	cout << speechBubble.first.c_str() << endl;
+			//	cout << endl;
 		}
 	}
 	gui::StyleColorsDark();
@@ -176,13 +178,15 @@ void GameGuiManager::DrawMyStatus()
 {
 	if (!ShowMyStatus_) return;
 	gui::Begin("Status", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	/*
-	Level Exp/RequiredExp
-	Hp/MAX_HP
-	ArmorPoint
-	AttackPoint
-	MovementSpeed 1/cooltime
-	*/
+	auto& player = Game::Get().GetPlayer();
+	auto hp = player.GetHp();
+	auto AttackPoint = player.GetAttackPoint();
+	auto ArmorPoint = player.GetArmorPoint();
+	auto MovementSpeed = player.GetMovemetSpeed();
+	gui::Text(("AttackPoint   :: "s + to_string(AttackPoint)).c_str());
+	gui::Text(("ArmorPoint    :: "s + to_string(ArmorPoint)).c_str());
+	gui::Text(("HP / MAXHP    :: "s + to_string(hp) + "/"s + to_string(player.MaxHp())).c_str());
+	gui::Text(("MovementSpeed :: "s + string{ format("{}", MovementSpeed) }).c_str());
 	gui::End();
 }
 
@@ -190,7 +194,58 @@ void GameGuiManager::DrawMySkill()
 {
 	// z, x 키 사용하기
 	if (!ShowMySkill_) return;
-	gui::Begin("Skills", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//gui::Begin("Skills", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//gui::End();
+}
+
+void GameGuiManager::DrawPartyCrewInfos()
+{
+	if (!ShowMyParty_) return;
+	auto& player = Game::Get().GetPlayer();
+	auto& characters = Game::Get().GetCharacters();
+	gui::Begin("PartyCrew", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	if (ShowPartyJoinRequest_)
+	{
+		auto name = characters[PartyInviter_].GetName();
+		gui::Text((std::format("[{}] invite u to party.", name)).c_str());
+		if (gui::SmallButton("JOIN"))
+		{
+			cs_accept_party_invite accept;
+			accept.partyId = InvitedPartyId_;
+			Networker::Get().DoSend(&accept);
+
+			ShowPartyJoinRequest_ = false;
+			PartyInviter_ = -1;
+			InvitedPartyId_ = -1;
+		}
+		gui::SameLine();
+		if (gui::SmallButton("NOPE"))
+		{
+			ShowPartyJoinRequest_ = false;
+			PartyInviter_ = -1;
+			InvitedPartyId_ = -1;
+		}
+	}
+	else
+	{
+		for (auto crewId : player.GetPartyCrews())
+		{
+			if (crewId < 0) continue;
+			auto& crew = characters[crewId];
+			auto name = crew.GetName();
+			auto lvl = crew.GetLevel();
+			auto hp = crew.GetHp();
+			auto maxHp = crew.MaxHp();
+			gui::Text((name + "  Lvl::"s + to_string(lvl) + "  HP::"s + to_string(hp) + "/"s + to_string(maxHp)).c_str());
+		}
+
+		gui::SetCursorPos({ 149, 98 });
+		if (gui::SmallButton("Leave Party"))
+		{
+			cs_leave_party leave;
+			Networker::Get().DoSend(&leave);
+		}
+	}
 	gui::End();
 }
 
@@ -216,7 +271,9 @@ void GameGuiManager::DrawSelectedObjInfo()
 		gui::Text(str.c_str());
 		if (gui::Button("Invite to Party"))
 		{
-			// 파초
+			cs_invite_to_party inviteRequest;
+			inviteRequest.targetId = SelectedObjId_;
+			Networker::Get().DoSend(&inviteRequest);
 		}
 		gui::End();
 	}

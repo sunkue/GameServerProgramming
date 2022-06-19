@@ -205,7 +205,7 @@ void Monster::Die(ID agent)
 		int money = lvl * 10;
 		exp += exp * (eMonsterAggressionType::Agro == AggressionType_);
 		exp += exp * (eMonsterMovementType::Roaming == MovementType_);
-		killerAsPlayer->ExpSum(Id_, exp);
+		killerAsPlayer->ExpSum(Id_, exp, true);
 		killerAsPlayer->MoneySum(Id_, money);
 	}
 }

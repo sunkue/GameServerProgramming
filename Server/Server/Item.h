@@ -144,8 +144,8 @@ public:
 	eEquimentablePart Equip(eItemType type);
 	int GetLevelOfPart(eEquimentablePart part) const;
 	eItemType GetTypeOfPart(eEquimentablePart part) const;
+	void Clear();
 private:
-	shared_mutex EquimentStatesLock_;
 	array<atomic<eItemType>, static_cast<int>(eEquimentablePart::_Count)> EquimentStates_{ eItemType::_None };
 };
 

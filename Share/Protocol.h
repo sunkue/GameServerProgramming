@@ -30,6 +30,13 @@ BETTER_ENUM
 	, Cs_request_level
 	, Cs_use_skill
 	, Cs_use_item
+	, Cs_invite_to_party
+	, Cs_leave_party
+	, Cs_accept_party_invite
+	, Cs_request_AttackPoint
+	, Cs_request_ArmorPoint
+	, Cs_request_AdditionalHp
+	, Cs_request_MovemetSpeed
 
 	/* Server 2 Client */
 
@@ -51,6 +58,14 @@ BETTER_ENUM
 	, Sc_remove_iteminstance
 	, Sc_sum_item
 	, Sc_equip_item
+	, Sc_insert_partycrew
+	, Sc_erase_partycrew
+	, Sc_join_party_request
+	, Sc_set_attack_point
+	, Sc_set_armor_point
+	, Sc_set_additional_hp
+	, Sc_set_movement_speed
+
 );
 
 // 가용길이 패킷 
@@ -89,13 +104,14 @@ PACKET(cs_signup)
 
 PACKET(sc_signup_result)
 {
+	// 'S' success, 'E' exist, 'N' unable char
 	char result;
 };
 
 PACKET(sc_login_result)
 {
-	// -1 if no id, -2 if wrong password
-	NetID id = -1;
+	// -1 if no id, -2 if wrong password, -3 if unable char
+	NetID id;
 };
 
 PACKET(sc_ready)
@@ -134,6 +150,26 @@ PACKET(cs_request_Hp)
 };
 
 PACKET(cs_request_Level)
+{
+	NetID id;
+};
+
+PACKET(cs_request_AttackPoint)
+{
+	NetID id;
+};
+
+PACKET(cs_request_ArmorPoint)
+{
+	NetID id;
+};
+
+PACKET(cs_request_AdditionalHp)
+{
+	NetID id;
+};
+
+PACKET(cs_request_MovemetSpeed)
 {
 	NetID id;
 };
@@ -180,6 +216,30 @@ PACKET(sc_set_level)
 	int level;
 };
 
+PACKET(sc_set_attack_point)
+{
+	NetID id;
+	int attackPoint;
+};
+
+PACKET(sc_set_armor_point)
+{
+	NetID id;
+	int armorPoint;
+};
+
+PACKET(sc_set_additional_hp)
+{
+	NetID id;
+	int additionalHp;
+};
+
+PACKET(sc_set_movement_speed)
+{
+	NetID id;
+	float movemetSpeed; // 1/cooltime
+};
+
 ///////////////////////////////////////
 
 PACKET(sc_set_position_timestamp)
@@ -224,7 +284,7 @@ PACKET(cs_use_skill)
 
 PACKET(sc_use_skill)
 {
-	ID id;
+	NetID id;
 	eSkill skill;
 };
 
@@ -254,6 +314,36 @@ PACKET(cs_use_item)
 PACKET(sc_equip_item)
 {
 	eItemType type;
+};
+
+PACKET(cs_invite_to_party)
+{
+	NetID targetId;
+};
+
+PACKET(cs_accept_party_invite)
+{
+	NetID partyId;
+};
+
+PACKET(cs_leave_party)
+{
+};
+
+PACKET(sc_join_party_request)
+{
+	NetID inviterId;
+	NetID partyId;
+};
+
+PACKET(sc_insert_partycrew)
+{
+	NetID crewId;
+};
+
+PACKET(sc_erase_partycrew)
+{
+	NetID crewId;
 };
 
 #pragma pack(pop)

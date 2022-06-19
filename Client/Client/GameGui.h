@@ -19,6 +19,8 @@ private:
 	void DrawMyEquiment();
 	void DrawMyStatus();
 	void DrawMySkill();
+	void DrawPartyJoinRequest();
+	void DrawPartyCrewInfos();
 	void DrawSelectedInventory();
 public:
 	SET(SelectedObjId);
@@ -27,11 +29,20 @@ public:
 	TOGGLE(ShowMyStatus);
 	TOGGLE(ShowSelectedInventory);
 	TOGGLE(ShowMySkill);
+	TOGGLE(ShowMyParty);
+	SET(ShowMyParty);
+	SET(ShowPartyJoinRequest);
+	SET(PartyInviter);
+	SET(InvitedPartyId);
 private:
 	ID SelectedObjId_{ -1 };
 	bool ShowMyInventory_{};
 	bool ShowMyEquipment_{};
 	bool ShowMyStatus_{};
 	bool ShowMySkill_{};
+	bool ShowMyParty_{};
 	bool ShowSelectedInventory_{};
+	bool ShowPartyJoinRequest_{};
+	ID PartyInviter_{ -1 };
+	ID InvitedPartyId_{ -1 };
 };

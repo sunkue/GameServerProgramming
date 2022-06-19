@@ -5,7 +5,21 @@
 
 enum class eEffectType : int
 {
-	none = 0,
+	none = -1,
+
+	booster0 = 0,
+	booster1 = 1,
+	booster2 = 2,
+	booster3 = 3,
+	booster4 = 4,
+
+	explosion0 = 10,
+	explosion1 = 11,
+	explosion2 = 12,
+	explosion3 = 13,
+	explosion4 = 14,
+	explosion5 = 5,
+
 	attack0 = 15,
 	attack1 = 16,
 	attack2 = 17
@@ -30,7 +44,8 @@ enum class eObjType : int
 
 class Renderer
 {
-	SINGLE_TON(Renderer) { Init(); };
+	friend class Game;
+	SINGLE_TON(Renderer) = default;
 public:
 	void Draw();
 	void ReadyDraw();
@@ -45,8 +60,9 @@ private:
 		GLuint QuadVao_;
 	};
 
-private:
+protected:
 	void Init();
+private:
 	void LoadShader();
 	void LoadTexture();
 

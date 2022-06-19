@@ -73,10 +73,13 @@ void Renderer::Draw()
 	ObjShader_->Set("u_start_with_dark", startWithDark);
 	ObjShader_->Set("u_focus_center", FocusCenter_);
 	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
+	ObjShader_->Set("u_units", glm::vec2{ 5, 4 });
 	for (const auto& other : Game::Get().GetCharacters())
 	{
 		auto& id = other.first;
 		auto& obj = other.second;
+		
+		if (obj.GetState() != eCharacterState::enable) continue;
 
 		eObjType Type{};
 		if (id < MAX_PLAYER) Type = eObjType::Wlook;  // player
@@ -112,11 +115,7 @@ void Renderer::Draw()
 		ScreenQuad::Get().DrawQuad();
 	}
 
-	ObjShader_->Use();
 	ObjShader_->Set("u_texture", EffectTiles_);
-	ObjShader_->Set("u_start_with_dark", startWithDark);
-	ObjShader_->Set("u_focus_center", FocusCenter_);
-	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
 	for (auto& e : Effects_)
 	{
 		if (clk::now() < e._Myfirst._Val) continue;
@@ -127,14 +126,11 @@ void Renderer::Draw()
 		ScreenQuad::Get().DrawQuad();
 	}
 
-	ObjShader_->Use();
 	ObjShader_->Set("u_texture", ItemTiles_);
-	ObjShader_->Set("u_start_with_dark", startWithDark);
-	ObjShader_->Set("u_focus_center", FocusCenter_);
-	ObjShader_->Set("u_raw_col", WINDOW_SIZE);
+	ObjShader_->Set("u_units", glm::vec2{ 5, 5 });
 	for (auto& item : Game::Get().GetItemInstances())
 	{
-		ObjShader_->Set("u_type", static_cast<int>(eObjType::Bpawn)); // eItemType to render index
+		ObjShader_->Set("u_type", static_cast<int>(item.Type));
 		ObjShader_->Set("u_position", item.Pos - myPos + Position{ WINDOW_SIZE / 2 } + Position{ 0, -1 });
 		ScreenQuad::Get().DrawQuad();
 	}
@@ -168,6 +164,6 @@ void Renderer::LoadTexture()
 {
 	BgTiles_ = Texture::Create("background_CND1.png");
 	ObjTiles_ = Texture::Create("character_CND.png");
-	ItemTiles_ = Texture::Create("character_chess.png");
+	ItemTiles_ = Texture::Create("Items_CND.png");
 	EffectTiles_ = Texture::Create("effect_CND.png");
 }

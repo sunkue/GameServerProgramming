@@ -19,8 +19,9 @@ class Character : public DynamicObj
 	friend class Networker;
 	friend class Game;
 	friend class GameGuiManager;
+	friend class Renderer;
 public:
-	Character(ID id, Position pos = {}) :DynamicObj{ id, pos } {};
+	Character(ID id, Position pos = {}) :DynamicObj{ id, pos } { PartyCrews_.fill(-1); };
 	bool ProcessInput(const KeyboardEventManager::KeyEvent& key);
 	bool ProcessInput(const MouseEventManager::ScrollEvent& scroll);
 	bool ProcessInput(const MouseEventManager::ButtonEvent& button);
@@ -29,28 +30,38 @@ public:
 	REPLICATE(Exp);
 	REPLICATE(Money);
 	REPLICATE(Name);
+	REPLICATE(AttackPoint);
+	REPLICATE(ArmorPoint);
+	REPLICATE(AdditionalHp);
+	REPLICATE(MovemetSpeed);
 	GET_REF(SpeechBubble);
 	GET_REF(Equipment);
 	GET_REF_UNSAFE(Inventory);
+	GET_REF_UNSAFE(PartyCrews);
 protected:
 	SET(SpeechBubble);
 	SET(Exp);
 	SET(Name);
 	SET(Money);
-	GET(State);
+	SET(AttackPoint);
+	SET(ArmorPoint);
+	SET(AdditionalHp);
+	SET(MovemetSpeed);
 	SET(State);
+	eCharacterState GetState()const { return State_.load(); };
 protected:
-	int MaxHp() const { return ::MaxHp(Level_) + AdditionalHp_; }
-	int ArmorPoint_{};
-	int AttackPoint_{};
-	int AdditionalHp_{};
+	int MaxHp() { return ::MaxHp(Level_) + GetAdditionalHp(); }
+	int AttackPoint_{ -1 };
+	int ArmorPoint_{ -1 };
+	int AdditionalHp_{ -1 };
+	float MovemetSpeed_{ -1 };
 private:
 	int Exp_{ -1 };
 	int Money_{ -1 };
 	string Name_;
-	array<ID, MAX_PARTY - 1> PartyCrews_{ -1 };
+	array<ID, MAX_PARTY_CREW> PartyCrews_;
 	pair<string, system_clock::time_point> SpeechBubble_;
 	Inventory Inventory_;
 	EquipmentState Equipment_;
-	eCharacterState State_{ eCharacterState::enable };
+	atomic<eCharacterState> State_{ eCharacterState::enable };
 };

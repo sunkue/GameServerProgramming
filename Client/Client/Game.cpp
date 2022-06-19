@@ -17,6 +17,7 @@ void Game::Init()
 	MouseEventManager::Get().BindDefaultPosFunc(
 		[this](const MouseEventManager::PosEvent& pos)->bool
 		{ return Characters_[Id_].ProcessInput(pos); });
+	Renderer::Get().Init();
 }
 
 void Game::Update()

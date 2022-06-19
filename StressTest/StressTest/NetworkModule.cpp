@@ -22,7 +22,7 @@ using namespace chrono;
 extern HWND		hWnd;
 
 const static int MAX_CLIENTS = MAX_PLAYER;
-const static int MAX_TEST = MAX_PLAYER;
+const static int MAX_TEST = MAX_PLAYER / 2;
 const static int INVALID_ID = -1;
 
 #pragma comment (lib, "ws2_32.lib")
@@ -127,7 +127,8 @@ void ProcessPacket(int ci, unsigned char packet[])
 	auto packet_type = reinterpret_cast<const packet_base<void>*>(packet)->packet_type;
 	switch (packet_type)
 	{
-	case PACKET_TYPE::Sc_set_position_timestamp: {
+	case PACKET_TYPE::Sc_set_position_timestamp: 
+	{
 		auto move_packet = reinterpret_cast<sc_set_position_timestamp*>(packet);
 		if (move_packet->id < MAX_CLIENTS) {
 			int my_id = client_map[move_packet->id];
@@ -144,6 +145,13 @@ void ProcessPacket(int ci, unsigned char packet[])
 				}
 			}
 		}
+	}
+	break; case PACKET_TYPE::Sc_join_party_request:
+	{
+		auto pck = reinterpret_cast<const sc_join_party_request*>(packet);
+		cs_accept_party_invite accept;
+		accept.partyId = pck->partyId;
+		SendPacket(ci, &accept);
 	}
 	break; case PACKET_TYPE::Sc_login_result:
 	{
@@ -368,10 +376,17 @@ void Test_Thread()
 				SendPacket(i, &skill);
 			}
 
-			if (0 == rand() % 4)
+			if (0 == rand() % 10)
 			{
 				cs_use_skill skill;
 				skill.skill = eSkill::accquireItem;
+				SendPacket(i, &skill);
+			}
+
+			if (0 == rand() % 10)
+			{
+				cs_use_skill skill;
+				skill.skill = eSkill::explosion;
 				SendPacket(i, &skill);
 			}
 		}

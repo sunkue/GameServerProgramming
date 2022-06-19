@@ -74,6 +74,9 @@
     <Filter Include="Game\PathFinder">
       <UniqueIdentifier>{8de184ec-77fc-4cd0-9e1a-c6000105d709}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Party">
+      <UniqueIdentifier>{22e5f72b-df5b-41b0-988f-5cef0909f46b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="ItemDetail.cpp">
       <Filter>Game\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Party.cpp">
+      <Filter>Game\Party</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +216,9 @@
     </ClInclude>
     <ClInclude Include="Astar.h">
       <Filter>Game\PathFinder</Filter>
+    </ClInclude>
+    <ClInclude Include="Party.h">
+      <Filter>Game\Party</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,8 @@ uniform bool u_start_with_dark;
 uniform bool u_focus_center;
 uniform int u_raw_col;
 
-uniform int u_type = 18; //[0,19]
+uniform int u_type;
+uniform vec2 u_units;
 uniform vec2 u_position;
 
 in vec2 texcoord;
@@ -15,7 +16,7 @@ out vec4 FragColor;
 
 void main()
 {
-	vec2 unit = vec2(0.2, 0.25);
+	vec2 unit = vec2(1)/u_units;
 
 	vec2 tex = texcoord;
 	vec2 clamp_sp = vec2(mod(u_type, 5), floor(u_type / 5)) * unit;

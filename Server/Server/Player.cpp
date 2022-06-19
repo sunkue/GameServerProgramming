@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "TimerEvent.h"
 #include "Character.h"
+#include "Party.h"
 #include "DataBase.h"
 
 /////////////////////////////////
@@ -15,8 +16,7 @@
 void Player::HpRegen()
 {
 	HpIncrease(Id_, MaxHp() / 10);
-	if (Hp_ < MaxHp())
-		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
+	EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
 }
 
 bool Player::Move(Position diff)
@@ -55,18 +55,48 @@ bool Player::Equip(eItemType item)
 	CASE eEquimentablePart::head :
 	{
 		ArmorPoint_ = itemLevel * 2;
+
+		sc_set_armor_point set;
+		set.id = Id_;
+		set.armorPoint = ArmorPoint_;
+		Server::Get().GetClients()[Id_].DoSend(&set);
 	}
 	CASE eEquimentablePart::body :
 	{
 		AdditionalHp_ = itemLevel * 100;
+
+		sc_set_additional_hp set;
+		set.id = Id_;
+		set.additionalHp = AdditionalHp_;
+
+		auto party = PartyManager::Get().GetParty(PartyId_);
+		if (party)
+		{
+			for (auto& pc : party->GetPartyCrews())
+			{
+				if (pc < 0)continue;
+				Server::Get().GetClients()[pc].DoSend(&set);
+			}
+		}
+		else Server::Get().GetClients()[Id_].DoSend(&set);
 	}
 	CASE eEquimentablePart::shoes :
 	{
 		Character::MovementCooltime = 1000ms / (itemLevel + 1);
+
+		sc_set_movement_speed set;
+		set.id = Id_;
+		set.movemetSpeed = static_cast<float>(1000ms / MovementCooltime);
+		Server::Get().GetClients()[Id_].DoSend(&set);
 	}
 	CASE eEquimentablePart::weapon :
 	{
 		AttackPoint_ = itemLevel * 30;
+
+		sc_set_attack_point set;
+		set.id = Id_;
+		set.attackPoint = AttackPoint_;
+		Server::Get().GetClients()[Id_].DoSend(&set);
 	}
 	break; default: return false;
 	}
@@ -135,6 +165,14 @@ bool Player::Disable()
 		DataBase::Get().AddQueryRequest(q);
 	}
 
+	eItemType equmentState[] =
+	{
+		 EquimentState_.GetTypeOfPart(eEquimentablePart::weapon)
+		,EquimentState_.GetTypeOfPart(eEquimentablePart::head)
+		,EquimentState_.GetTypeOfPart(eEquimentablePart::body)
+		,EquimentState_.GetTypeOfPart(eEquimentablePart::shoes)
+	};
+
 	for (auto& item : Inventory_.GetItems())
 	{
 		auto type = item.second->GetType();
@@ -144,13 +182,27 @@ bool Player::Disable()
 		q.Query = L"EXEC UpdateItemData "s + to_wstring(DbId_);
 		q.Query += L","s + wstring{ itemName.begin(), itemName.end() };
 		q.Query += L","s + to_wstring(num);
+		q.Query += L","s + to_wstring(std::find(ALLOF(equmentState), type) != std::end(equmentState));
 		q.Targets = make_shared<vector<any>>();
 		q.Func = [=](const vector<any>& t) {};
 		DataBase::Get().AddQueryRequest(q);
 	}
 
+	PartyManager::Get().ExitParty(PartyId_, Id_);
+
 	SetPos(Position{ 0 });
+
 	Inventory_.Clear();
+	ArmorPoint_ = 0;
+	AttackPoint_ = 0;
+	AdditionalHp_ = 0;
+	EquimentState_.Clear();
+
+	MovementCooltime = 1s;
+	AttackCooltime = 1s;
+	Moveable_ = true;
+	Attackable_ = true;
+
 	return true;
 }
 
@@ -384,27 +436,50 @@ void Player::ActivateSkill(eSkill skill)
 	{
 		Attack();
 	}
-	CASE eSkill::heal :
+	CASE eSkill::explosion :
 	{
+		bool f{ false };
+		if (IsSkillOnCooling_[eSkill::explosion].compare_exchange_strong(f, true))
+		{
+			EventManager::Get().AddEvent({ [this]() {  IsSkillOnCooling_[eSkill::explosion] = false; },
+				SkillInfo::GetCoolTime(eSkill::explosion) });
 
+			// ÆøÆÈ°ø°Ý
+			Attack(eSkill::explosion, [](Position diff) { return (diff.x + diff.y) <= 2; }, 1.25f);
+		}
 	}
-	CASE eSkill::haste :
+	CASE eSkill::windBooster :
 	{
+		bool f{ false };
+		if (IsSkillOnCooling_[eSkill::windBooster].compare_exchange_strong(f, true))
+		{
+			EventManager::Get().AddEvent({ [this]() {  IsSkillOnCooling_[eSkill::windBooster] = false; },
+				SkillInfo::GetCoolTime(eSkill::windBooster) });
 
-	}
-	CASE eSkill::set_teleport :
-	{
+			Character::AttackCooltime = 500ms;
+			EventManager::Get().AddEvent({ [this]() { Character::AttackCooltime = 1000ms; }, 8s });
 
-	}
-	CASE eSkill::teleport :
-	{
+			auto pos = GetPos();
+			auto ns = World::Get().GetNearSectors4(pos, GetSectorIdx());
+			sc_use_skill use_skill;
+			use_skill.id = GetId();
+			use_skill.skill = skill;
+			for (auto s : ns)
+			{
 
+				for (auto& p : s->GetPlayers())
+				{
+					if (!p->GetEnable()) continue;
+					Server::Get().GetClients()[p->GetId()].DoSend(&use_skill);
+				}
+			}
+		}
 	}
 	break; default: break;
 	}
 }
 
-void Player::Attack()
+void Player::Attack(eSkill animateSkill, function<bool(Position)> isInrange, float power)
 {
 	auto pos = GetPos();
 	auto ns = World::Get().GetNearSectors4(pos, GetSectorIdx());
@@ -416,19 +491,18 @@ void Player::Attack()
 		for (auto& m : s->GetMonsters())
 		{
 			if (!m->IsAlive()) continue;
-			auto diff = length(glm::vec2{ m->GetPos() - pos });
-			if (diff <= 1) attackableIdSet.insert(m->GetId());
+			auto diff = abs(glm::vec2{ m->GetPos() - pos });
+			if (isInrange(diff)) attackableIdSet.insert(m->GetId());
 		}
 	}
 
 	vector<ID> attackableId{ attackableIdSet.begin(),attackableIdSet.end() };
 
-	// item ¹«±â °ø°Ý·Â 0~10 => DefaultAttack + rand()%(0~10)..
-	if (Character::Attack(attackableId, AttackPoint()))
+	if (Character::Attack(attackableId, static_cast<int>(AttackPoint() * power)))
 	{
 		sc_use_skill use_skill;
 		use_skill.id = GetId();
-		use_skill.skill = eSkill::attack;
+		use_skill.skill = animateSkill;
 
 		for (auto s : ns)
 		{
@@ -484,9 +558,24 @@ bool Player::InsertToViewList(ID Id)
 	return inserted;
 }
 
-void Player::ExpSum(ID agent, int amount)
+void Player::ExpSum(ID agent, int amount, bool shareWithParty)
 {
 	auto requireExp = RequireExp(Level_);
+
+	if (shareWithParty)
+	{
+		auto party = PartyManager::Get().GetParty(PartyId_);
+		if (party)
+		{
+			for (auto& pc : party->GetPartyCrews())
+			{
+				if (pc < 0)continue;
+				reinterpret_cast<Player*>(CharacterManager::Get().GetCharacters()[pc].get())
+					->ExpSum(agent, amount / 2, false);
+			}
+		}
+	}
+
 	Exp_ += amount;
 	if (requireExp <= Exp_)
 	{
@@ -496,7 +585,18 @@ void Player::ExpSum(ID agent, int amount)
 		sc_set_level set_level;
 		set_level.id = Id_;
 		set_level.level = Level_;
-		Server::Get().GetClients()[Id_].DoSend(&set_level);
+
+		auto party = PartyManager::Get().GetParty(PartyId_);
+		if (party)
+		{
+			for (auto& pc : party->GetPartyCrews())
+			{
+				if (pc < 0)continue;
+				Server::Get().GetClients()[pc].DoSend(&set_level);
+			}
+		}
+		else
+			Server::Get().GetClients()[Id_].DoSend(&set_level);
 	}
 
 	sc_set_exp set_exp;
@@ -509,20 +609,26 @@ void Player::HpDecrease(ID agent, int _dmg)
 {
 	auto dmg = max(0, _dmg - ArmorPoint_);
 
-	if (Hp_ == MaxHp())
-		EventManager::Get().AddEvent({ [this]() { this->HpRegen(); } ,5s });
-
 	Hp_ -= dmg;
 	Hp_ = max(Hp_.load(), 0);
 
 	{
 		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
-		unordered_set<Player*> players;
+		unordered_set<ID> players;
 		for (auto s : ns)
 		{
 			for (auto p : s->GetPlayers())
+				if (p->IsInSight(GetPos()))
+					players.insert(p->GetId());
+		}
+
+		auto party = PartyManager::Get().GetParty(PartyId_);
+		if (party)
+		{
+			for (auto& pc : party->GetPartyCrews())
 			{
-				players.insert(p);
+				if (pc < 0) continue;
+				players.insert(pc);
 			}
 		}
 
@@ -530,9 +636,7 @@ void Player::HpDecrease(ID agent, int _dmg)
 		pck.hp = Hp_;
 		pck.id = GetId();
 
-		for (auto p : players)
-			if (p->IsInSight(GetPos()))
-				Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+		for (auto p : players) Server::Get().GetClients()[p].DoSend(&pck);
 	}
 
 	if (Hp_ <= 0)
@@ -546,12 +650,23 @@ void Player::HpIncrease(ID agent, int amount)
 
 	{
 		auto ns = World::Get().GetNearSectors4(GetPos(), GetSectorIdx());
-		unordered_set<Player*> players;
+		unordered_set<ID> players;
 		for (auto s : ns)
 		{
 			for (auto p : s->GetPlayers())
 			{
-				players.insert(p);
+				if (p->IsInSight(GetPos()))
+					players.insert(p->GetId());
+			}
+		}
+
+		auto party = PartyManager::Get().GetParty(PartyId_);
+		if (party)
+		{
+			for (auto& pc : party->GetPartyCrews())
+			{
+				if (pc < 0) continue;
+				players.insert(pc);
 			}
 		}
 
@@ -559,9 +674,7 @@ void Player::HpIncrease(ID agent, int amount)
 		pck.hp = Hp_;
 		pck.id = GetId();
 
-		for (auto p : players)
-			if (p->IsInSight(GetPos()))
-				Server::Get().GetClients()[p->GetId()].DoSend(&pck);
+		for (auto p : players) Server::Get().GetClients()[p].DoSend(&pck);
 	}
 }
 
