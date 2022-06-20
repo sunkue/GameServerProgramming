@@ -173,7 +173,7 @@ void Server::OnRecvComplete(ID Id_, DWORD transfered)
 			if (recvbuf.Size() < need_bytes)
 				continue;
 
-			std::byte temp_packet[MAX_PACKET_SIZE];
+			thread_local static std::byte temp_packet[MAX_PACKET_SIZE];
 			auto packetsize1 = recvbuf.FilledEdgespace();
 			memcpy(temp_packet, pck_start, packetsize1);
 			auto packetsize2 = need_bytes - packetsize1;
