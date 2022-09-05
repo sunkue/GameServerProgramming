@@ -174,9 +174,8 @@ void Server::ProcessPacket(ID Id_, const void* const packet)
 		auto pck = reinterpret_cast<const cs_signup*>(packet);
 		auto signupId = wstring{ pck->signup_id, &pck->signup_id[strnlen_s(pck->signup_id, MAX_LOGIN_ID_SIZE)] };
 		auto password = wstring{ pck->signup_password, &pck->signup_password[strnlen_s(pck->signup_password, MAX_LOGIN_PASSWORD_SIZE)] };
-
 		const auto CantBeQuery = L"\'\"\\,;: \n\t\b";
-		if (signupId.find_last_not_of(CantBeQuery, signupId.size()) != signupId.size() || password.find_last_not_of(CantBeQuery, password.size()) != password.size())
+		if (signupId.find_first_of(CantBeQuery) != wstring::npos || password.find_first_of(CantBeQuery) != wstring::npos)
 		{
 			sc_signup_result signup_result;
 			signup_result.result = 'N';

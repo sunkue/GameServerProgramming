@@ -48,7 +48,7 @@ static_assert(0 == SECTOR_SIZE % 2);
 static_assert(0 == WINDOW_SIZE % 2);
 static_assert(0 == MAP_SIZE % SECTOR_SIZE);
 
-constexpr int MAX_PLAYER = 1'0000;
+constexpr int MAX_PLAYER = 2'0000;
 constexpr int MAX_MONSTER = 20'0000;
 //constexpr int MAX_MONSTER = 10'0000;
 //constexpr int MAX_MONSTER = 10'0;

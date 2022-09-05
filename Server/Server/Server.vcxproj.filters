@@ -246,7 +246,5 @@
     <None Include="LuaScript\Monster\monsterSpeech0.lua">
       <Filter>Game\Script\LuaScript</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
