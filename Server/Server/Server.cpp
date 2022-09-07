@@ -25,14 +25,10 @@ void Server::ProcessQueuedCompleteOperationLoop()
 	while (true)
 	{
 		DWORD returned_bytes{}; ID Id_{}; ExpOverlapped* exover{};
-		//	cerr << "GQCSTART::";
 		auto res = GetQueuedCompletionStatus(Iocp_, &returned_bytes, reinterpret_cast<PULONG_PTR>(&Id_), reinterpret_cast<WSAOVERLAPPED**>(&exover), INFINITE);
-		//	cout << this_thread::get_id() << endl;
-		// cerr << "GQCS::" << (SOCKET)Id_ << "::" << returned_bytes << "::" << endl;
 
 		if (FALSE == res) [[unlikely]]
 		{
-			// cerr << "GQCS::ERR::" << WSAGetLastError() << "::" << endl;
 			Clients_[Id_].DoDisconnect();
 			continue;
 		};
@@ -147,14 +143,10 @@ void Server::OnRecvComplete(ID Id_, DWORD transfered)
 	if (0 == transfered)
 	{
 		// cerr << " zero recv " << endl;
-		if (recvbuf.BytesToRecv())
-		{
+		//if (recvbuf.BytesToRecv())
+		//{
 			client.DoDisconnect();
-		}
-		else
-		{
-			// cerr << " recvbuf full " << endl;
-		}
+		//}
 		return;
 	}
 

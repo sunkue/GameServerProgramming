@@ -3,7 +3,7 @@
 
 
 ExpOverlapped::ExpOverlapped(COMP_OP Op, const void* const packet)
-	: ExpOverlappedBasic{ Op }
+	: ExpOverlappedBase{ Op }
 {
 	Wsabuf.buf = reinterpret_cast<CHAR*>(Buf.data());
 	Wsabuf.len = reinterpret_cast<const packet_base<void>*>(packet)->size;
@@ -11,14 +11,14 @@ ExpOverlapped::ExpOverlapped(COMP_OP Op, const void* const packet)
 }
 
 ExpOverlapped::ExpOverlapped(COMP_OP Op)
-	: ExpOverlappedBasic{ Op }
+	: ExpOverlappedBase{ Op }
 {
 	Wsabuf.buf = reinterpret_cast<CHAR*>(Buf.data());
 	Wsabuf.len = static_cast<ULONG>(MAX_BUFFER_SIZE);
 }
 
 RecvExpOverlapped::RecvExpOverlapped()
-	: ExpOverlappedBasic{ COMP_OP::OP_RECV }
+	: ExpOverlappedBase{ COMP_OP::OP_RECV }
 {
 #ifdef RINGBUFFER
 	Wsabuf.buf = reinterpret_cast<CHAR*>(Buf.Begin());

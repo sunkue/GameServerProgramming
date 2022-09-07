@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RingBuffer.hpp"
+
 enum class COMP_OP : int8
 {
 	OP_NONE,
@@ -11,14 +13,14 @@ enum class COMP_OP : int8
 	OP_DB_EVENT
 };
 
-struct ExpOverlappedBasic
+struct ExpOverlappedBase
 {
-	ExpOverlappedBasic(COMP_OP Op) :Op{ Op } { ZeroMemory(&Over, sizeof(Over)); };
+	ExpOverlappedBase(COMP_OP Op) :Op{ Op } { ZeroMemory(&Over, sizeof(Over)); };
 	WSAOVERLAPPED Over{};
 	COMP_OP Op;
 };
 
-struct ExpOverlapped : ExpOverlappedBasic
+struct ExpOverlapped : ExpOverlappedBase
 {
 	ExpOverlapped(COMP_OP Op, const void* const packet);
 	explicit ExpOverlapped(COMP_OP Op);
@@ -26,9 +28,7 @@ struct ExpOverlapped : ExpOverlappedBasic
 	array<std::byte, MAX_PACKET_SIZE> Buf{};
 };
 
-#include "RingBuffer.hpp"
-
-struct RecvExpOverlapped : ExpOverlappedBasic
+struct RecvExpOverlapped : ExpOverlappedBase
 {
 	RecvExpOverlapped();
 	WSABUF Wsabuf{};
@@ -39,16 +39,18 @@ struct RecvExpOverlapped : ExpOverlappedBasic
 #endif // RINGBUFFER
 };
 
-struct EventExpOverlapped : ExpOverlappedBasic
+struct EventExpOverlapped : ExpOverlappedBase
 {
-	EventExpOverlapped(function<void()> e) : ExpOverlappedBasic{ COMP_OP::OP_EVENT }, EventFunc{ e }{}
+	EventExpOverlapped(function<void()> e) : ExpOverlappedBase{ COMP_OP::OP_EVENT }, EventFunc{ e }{}
 	function<void()> EventFunc;
 };
 
-struct DataBaseExpOverlapped : ExpOverlappedBasic
+struct DataBaseExpOverlapped : ExpOverlappedBase
 {
 	DataBaseExpOverlapped(function<void(vector<any>)> f, vector<any> R)
-		: ExpOverlappedBasic{ COMP_OP::OP_DB_EVENT }, Func{ f } { Results = R; }
+		: ExpOverlappedBase{ COMP_OP::OP_DB_EVENT }, Func{ f } { Results = R; }
 	vector<any> Results;
 	function<void(vector<any>)> Func;
 };
+
+
