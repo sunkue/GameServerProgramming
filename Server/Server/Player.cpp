@@ -219,9 +219,7 @@ void Player::UpdateViewList()
 	Server::Get().GetClients()[Id_].DoSend(&setPositioon);
 
 	decltype(ViewList_) viewList;
-	decltype(ViewList_) deletedList;
-	decltype(ViewList_) insertedList;
-
+	
 	{
 		shared_lock lck{ ViewLock };
 		viewList = ViewList_;
@@ -243,9 +241,8 @@ void Player::UpdateViewList()
 				{
 					// in the sight
 					
-					if (0 == viewList.count(otherId))
+					if (viewList.insert(otherId).second)
 					{
-						insertedList.insert(otherId);
 						sc_set_position setPositioon;
 						setPositioon.id = otherId;
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
@@ -257,9 +254,8 @@ void Player::UpdateViewList()
 				else
 				{
 					// out of the sight
-					if (viewList.count(otherId))
+					if (viewList.unsafe_erase(otherId))
 					{
-						deletedList.insert(otherId);
 						sc_remove_obj remove;
 						remove.id = otherId;
 						Server::Get().GetClients()[Id_].DoSend(&remove);
@@ -286,9 +282,8 @@ void Player::UpdateViewList()
 						goto MostersIteratorCouldDangling;
 					}
 					lck.lock();
-					if (0 == viewList.count(otherId))
+					if (viewList.insert(otherId).second)
 					{
-						insertedList.insert(otherId);
 						sc_set_position setPositioon;
 						setPositioon.id = otherId;
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
@@ -317,9 +312,8 @@ void Player::UpdateViewList()
 				}
 				else
 				{
-					if (viewList.count(otherId))
+					if (viewList.unsafe_erase(otherId))
 					{
-						deletedList.insert(otherId);
 						sc_remove_obj remove;
 						remove.id = otherId;
 						Server::Get().GetClients()[Id_].DoSend(&remove);
@@ -346,9 +340,8 @@ void Player::UpdateViewList()
 				if (IsInSight(otherPos))
 				{
 					// in the sight
-					if (0 == viewList.count(otherId))
+					if (viewList.insert(otherId).second)
 					{
-						insertedList.insert(otherId);
 						sc_set_position setPositioon;
 						setPositioon.id = otherId;
 						setPositioon.pos = CharacterManager::Get().GetPosition(otherId);
@@ -358,9 +351,8 @@ void Player::UpdateViewList()
 				else
 				{
 					// out of the sight
-					if (viewList.count(otherId))
+					if (viewList.unsafe_erase(otherId))
 					{
-						deletedList.insert(otherId);
 						sc_remove_obj remove;
 						remove.id = otherId;
 						Server::Get().GetClients()[Id_].DoSend(&remove);
@@ -388,13 +380,8 @@ void Player::UpdateViewList()
 	}
 
 	{
-		shared_lock lck{ ViewLock };
-		ViewList_.insert(insertedList.begin(), insertedList.end());
-	}
-
-	{
 		unique_lock lck{ ViewLock };
-		ViewList_.unsafe_erase(deletedList.begin(), deletedList.end());
+		ViewList_ = viewList;
 	}
 }
 
